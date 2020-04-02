@@ -1,0 +1,15 @@
+{
+    "presets": ["react-app"],
+    "plugins": [
+      [
+        "import", 
+        { 
+          "libraryName": "shineout", 
+         // "libraryDirectory": "css", // import css 
+          "style": false,
+          "camel2DashComponentName": false,
+          "camel2UnderlineComponentName": false
+        }
+      ]
+    ]
+  }
