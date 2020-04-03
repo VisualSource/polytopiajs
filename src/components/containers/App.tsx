@@ -1,7 +1,8 @@
 import React,{PureComponent} from 'react';
 import MainMenu from '../menus/MainMenu';
 import Game from './Game';
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import history from '../../utils/history';
+import { Router, Switch, Route} from "react-router-dom";
 
 
 export default class App extends PureComponent{
@@ -9,13 +10,25 @@ export default class App extends PureComponent{
     super(props);
   }
   render(){
-    return <Router>
+    return <Router history={history}>
               <Switch>
                   <Route exact path="/">
-                     <MainMenu />
+                    <MainMenu />
                   </Route>
                   <Route path="/game">
-                     <Game/>
+                    <Game/>
+                  </Route>
+                  <Route path="/singleplayer">
+                    <h1>Singleplayer</h1>
+                  </Route>
+                  <Route path="/multiplayer">
+                    <h1>Multiplayer</h1>
+                  </Route>
+                  <Route path="/throneroom">
+                    <h1>Throne Room</h1>
+                  </Route>
+                  <Route path="/highscores">
+                    <h1>High Scores</h1>
                   </Route>
               </Switch>
            </Router>

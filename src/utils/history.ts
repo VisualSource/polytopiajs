@@ -4,11 +4,19 @@ const history = createBrowserHistory();
 export default history;
 
 interface RouteOptions{
-    pathname: string;
-    search?: string;
+    search?: {[item: string]: any};
+    state? : { [item: string]: any }
 }
-export function route(to: string | RouteOptions){
-    history.push(to as any);
+export function route(to: string, options?: RouteOptions){
+    const url = new URL(to,"/");
+  /*  if(options && options.search){
+        Object.keys(options.search).forEach(value=>{
+            if(options.search){
+                url.searchParams.append(value,options.search[value])
+            }
+        })
+    }*/
+    history.push(url.toString());
 }
 
 export function useQuery() {

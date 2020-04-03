@@ -9,12 +9,12 @@ export default class Game extends Component{
         super(props);
     }
     componentDidMount(){
-       if(this.gameCavas.current && WEBGL.isWebGL2Available()){
-            const context = this.gameCavas.current.getContext( 'webgl2', { alpha: false } );
-            init(context as WebGL2RenderingContext,this.gameCavas.current)
-       }else{
-           console.error(WEBGL.getWebGL2ErrorMessage())
-       }
+        if(this.gameCavas.current && WEBGL.isWebGL2Available()){
+                const context = this.gameCavas.current.getContext( 'webgl2', { alpha: false } );
+                init(context as WebGL2RenderingContext,this.gameCavas.current)
+        }else{
+            console.error(WEBGL.getWebGL2ErrorMessage())
+        }
 
     }
     componentWillUnmount(){
@@ -22,7 +22,6 @@ export default class Game extends Component{
     }
     render(){
         return (<> 
-                    <h1>GAME</h1>
                     <canvas id="game_canvas" ref={this.gameCavas}></canvas>
                 </>);
     }
