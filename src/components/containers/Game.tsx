@@ -2,6 +2,7 @@ import React,{Component, createRef, RefObject} from 'react';
 import {Switch, Route } from "react-router-dom";
 import { WEBGL } from 'three/examples/jsm/WebGL.js';
 import {init,destory} from '../../game/main';
+import {GameProvider} from '../providor/GameProvidor';
 
 export default class Game extends Component{
     gameCavas: RefObject<HTMLCanvasElement> = createRef();
@@ -21,8 +22,13 @@ export default class Game extends Component{
         destory();
     }
     render(){
-        return (<> 
+        return (<GameProvider> 
+                    <Switch>
+                        <Route path="/game/view"></Route>
+                        <Route path="/game/tech"></Route>
+                        <Route path="/game/settings"></Route>
+                    </Switch>
                     <canvas id="game_canvas" ref={this.gameCavas}></canvas>
-                </>);
+                </GameProvider>);
     }
 }
