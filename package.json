@@ -1,6 +1,6 @@
 {
   "name": "polytopiajs",
-  "version": "0.1.0-alpha",
+  "version": "0.2.2-alpha",
   "private": false,
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.6.5",
