@@ -1,3 +1,4 @@
+declare module 'three.interaction'
 declare namespace Auth0{
     interface Auth0Profile{
         name: string;
