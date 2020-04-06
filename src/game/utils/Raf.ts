@@ -1,0 +1,35 @@
+
+export let RAF: ((callback: FrameRequestCallback) => number) & ((callback: FrameRequestCallback) => number);
+export let CAF: ((handle: number) => void) & ((handle: number) => void);
+function patch() {
+  let lastTime = 0;
+  let vendors = ['ms', 'moz', 'webkit', 'o'];
+  for (let x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    //@ts-ignore
+    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+    //@ts-ignore
+    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+  }
+
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function(callback) {
+      let currTime = new Date().getTime();
+      let timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      let id = window.setTimeout(function() {
+        callback(currTime + timeToCall);
+      }, timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+  }
+
+  if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function(id) {
+      clearTimeout(id);
+    };
+  }
+
+  RAF = window.requestAnimationFrame;
+  CAF = window.cancelAnimationFrame;
+}
+patch();

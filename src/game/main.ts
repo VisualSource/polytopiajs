@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
 import CameraControls from 'camera-controls';
-//import { Interaction } from 'three.interaction';
+//import { Interaction } from '../game/interaction/three.interaction.module';
 import {DynamicBlock} from './objects/dynamicBlocks';
+import Interaction from './interaction/Interaction';
+
 
 class Polytopia extends THREE.Scene{
     constructor(){
@@ -34,7 +36,7 @@ export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
     composer.addPass( new RenderPass( scene, camera ) );
 
     const cameraControls = new CameraControls(camera, canvas);
-    //const interaction = new Interaction(renderer, scene, camera);
+    const interaction = new Interaction(renderer, scene, camera);
 
     
     const mesh = new DynamicBlock({});
