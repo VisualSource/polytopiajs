@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
 import CameraControls from 'camera-controls';
-//import { Interaction } from '../game/interaction/three.interaction.module';
+import './patch/threePatch';
 import {DynamicBlock} from './objects/dynamicBlocks';
-import Interaction from './interaction/Interaction';
+import Interaction from './Interaction';
 
 
 class Polytopia extends THREE.Scene{
@@ -20,14 +20,14 @@ class Polytopia extends THREE.Scene{
     }
 }
 export let scene: Polytopia;
-
+let handleResizeFunc: any;
 export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
     CameraControls.install({THREE: THREE});
     scene = new Polytopia();
     const SCREEN_WIDTH = window.innerWidth;
 	const SCREEN_HEIGHT = window.innerHeight;
     const aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-    const frustumSize = 10;
+    const frustumSize = 30;
     const clock = new THREE.Clock();
     const renderer = new THREE.WebGLRenderer( { canvas, context, antialias: true} );
     const composer = new EffectComposer( renderer );
@@ -39,27 +39,46 @@ export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
     const interaction = new Interaction(renderer, scene, camera);
 
     
-    const mesh = new DynamicBlock({});
+  
        
-    scene.add( mesh );
+    scene.add(new DynamicBlock({position:{x:5,y:2,z:4}}));
+    scene.add(new DynamicBlock({position:{x:4,y:7,z:5}}));
+    scene.add(new DynamicBlock({position:{x:8,y:5,z:5}}));
  
 
-    const gridHelper = new THREE.GridHelper( 10, 10 );
-    scene.add( gridHelper );
+   // const gridHelper = new THREE.GridHelper( 10, 10 );
+   // scene.add( gridHelper );
+
+    const handleResize = ()=>{
+        camera.left = - frustumSize * aspect / 2;
+		camera.right = frustumSize * aspect / 2;
+		camera.top = frustumSize / 2;
+		camera.bottom = - frustumSize / 2;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        composer.setSize(window.innerWidth,window.innerHeight);
+        renderer.setPixelRatio( window.devicePixelRatio );
+        composer.setPixelRatio( window.devicePixelRatio );
+    }
+    handleResizeFunc = handleResize;
 
     const animate = () => {
         const delta = clock.getDelta();
         cameraControls.update( delta );
         requestAnimationFrame( animate );
+        interaction.render();
         composer.render();
 
     }
+    window.addEventListener("resize", handleResizeFunc, false);
     renderer.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
     renderer.setPixelRatio( window.devicePixelRatio );
     composer.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
     composer.setPixelRatio( window.devicePixelRatio );
+    
     animate();
 }
 export function destory(){
+    window.removeEventListener("resize",handleResizeFunc, false);
     scene.delete();
 }
