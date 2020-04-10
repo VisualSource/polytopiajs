@@ -4,12 +4,19 @@ declare namespace Polytopia{
         mp?: boolean;
     }
     type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | null;
-
+    type IMouseEvent = "click" | "mouseover";
+    interface IClickEvent{
+        type: IClickEvent;
+        object: number;
+    }
     namespace Objects{
         interface ICord{
             x: number;
             y: number;
             z: number;
+        }
+        namespace Blocks{
+            interface IWaterParams extends Dynamic.IDynamicBlockParams{} 
         }
         type Block = "Field" | "Ocean" | "Water" | "Forest" | "Mountain" | "City" | "Village";
         type Resource = "game" | "crop" | "fruit" | "fish" | "whale" | "metal" | null;

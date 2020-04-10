@@ -1,2 +1,6 @@
 import globalDispatcher from './EventDispatcher';
-export default class GameStateHandler{}
+export default class GameStateHandler{
+    constructor(){
+
+    }
+}

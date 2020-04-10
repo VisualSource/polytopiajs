@@ -1,5 +1,6 @@
 import {Mesh, BoxGeometry, MeshBasicMaterial} from 'three';
-
+import globalDispatcher from '../EventDispatcher';
+import Files from '../utils/FileLoader';
        
 export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDynamicBlock{
     cursor: Polytopia.Objects.Dynamic.IDynamicBlock["cursor"];
@@ -14,7 +15,7 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
         type
     }: Polytopia.Objects.Dynamic.IDynamicBlockParams){  
         super(geometry,material);
-        this.cursor = "crosshair";
+        this.cursor = "pointer";
         this.userData = {
             type,
             variation,
@@ -23,7 +24,10 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
             resource
         };
         this.position.set(position.x,position.y,position.z);
-        this.on("click",()=>{});
+        globalDispatcher.addListener("click",(data: Polytopia.IClickEvent)=>this.onClick);
+    }
+    onClick(data: Polytopia.IClickEvent){
+
     }
     get blockType(): Polytopia.Objects.Block{
         return this.userData.type;
@@ -35,3 +39,16 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
         return this.userData.faction;
     }
 } 
+
+
+export class Water extends DynamicBlock{
+    constructor({position, variation = 0}:Polytopia.Objects.Blocks.IWaterParams){
+        super({
+            type: "Water",
+            position, 
+            material: Files.resources.water.material[variation],
+            geometry: Files.resources.water.geometry[variation]
+        });
+        this.name = `water${variation}`;
+    }
+}

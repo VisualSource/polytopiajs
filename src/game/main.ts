@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
 import CameraControls from 'camera-controls';
-import './patch/threePatch';
-import {DynamicBlock} from './objects/dynamicBlocks';
+import { Water} from './objects/dynamicBlocks';
 import Interaction from './Interaction';
+import globalDispatcher from './EventDispatcher';
 
 
 class Polytopia extends THREE.Scene{
@@ -24,10 +24,11 @@ let handleResizeFunc: any;
 export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
     CameraControls.install({THREE: THREE});
     scene = new Polytopia();
+    scene.background = new THREE.Color( 0xf0f0f0 );
     const SCREEN_WIDTH = window.innerWidth;
 	const SCREEN_HEIGHT = window.innerHeight;
     const aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-    const frustumSize = 30;
+    const frustumSize = 200;
     const clock = new THREE.Clock();
     const renderer = new THREE.WebGLRenderer( { canvas, context, antialias: true} );
     const composer = new EffectComposer( renderer );
@@ -36,22 +37,14 @@ export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
     composer.addPass( new RenderPass( scene, camera ) );
 
     const cameraControls = new CameraControls(camera, canvas);
-    const interaction = new Interaction(renderer, scene, camera);
-
-    
   
-       
-    scene.add(new DynamicBlock({position:{x:5,y:2,z:4}}));
-    scene.add(new DynamicBlock({position:{x:4,y:7,z:5}}));
-    scene.add(new DynamicBlock({position:{x:8,y:5,z:5}}));
- 
-
-   // const gridHelper = new THREE.GridHelper( 10, 10 );
-   // scene.add( gridHelper );
-
+    scene.add(new Water({}));
+    //scene.add(new DynamicBlock({position:{x:5, y:2,z:3}}));
+    scene.add(createlights());
     const handleResize = ()=>{
-        camera.left = - frustumSize * aspect / 2;
-		camera.right = frustumSize * aspect / 2;
+        const newAspect = window.innerWidth / window.innerHeight;
+        camera.left = - frustumSize * newAspect / 2;
+		camera.right = frustumSize * newAspect / 2;
 		camera.top = frustumSize / 2;
 		camera.bottom = - frustumSize / 2;
         camera.updateProjectionMatrix();
@@ -61,7 +54,7 @@ export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
         composer.setPixelRatio( window.devicePixelRatio );
     }
     handleResizeFunc = handleResize;
-
+    const interaction = new Interaction(scene, camera, canvas);
     const animate = () => {
         const delta = clock.getDelta();
         cameraControls.update( delta );
@@ -75,10 +68,30 @@ export function init(context: WebGL2RenderingContext, canvas:HTMLCanvasElement){
     renderer.setPixelRatio( window.devicePixelRatio );
     composer.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
     composer.setPixelRatio( window.devicePixelRatio );
-    
     animate();
+
 }
 export function destory(){
     window.removeEventListener("resize",handleResizeFunc, false);
+    globalDispatcher.removeAllListeners();
     scene.delete();
+}
+
+function createlights(): THREE.Group{
+    const lights = new THREE.Group();
+    lights.name = "lights";
+
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+	hemiLight.color.setHSL( 0.6, 1, 0.6 );
+    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+	hemiLight.position.set( 0, 50, 0 );
+    lights.add( hemiLight );
+    
+    const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+	dirLight.color.setHSL( 0.1, 1, 0.95 );
+	dirLight.position.set( - 1, 1.75, 1 );
+	dirLight.position.multiplyScalar( 30 );
+    lights.add( dirLight );
+    
+    return lights;
 }

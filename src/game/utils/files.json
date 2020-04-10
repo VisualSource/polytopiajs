@@ -1,0 +1,5 @@
+{
+    "assets":[
+        {"type":"model","name":"water","url":"/assets/models/water/water.obj", "requireUrl":"/assets/models/water/water.mtl", "index":0}
+    ]
+}
