@@ -8,11 +8,7 @@ import * as serviceWorker from './serviceWorker';
 import "./style/index.sass";
 import 'shineout/dist/theme.default.css';
 import {assets} from './game/utils/files.json';
-// Moves this to after HTML CALL
-const files = new Files();
-assets.forEach((data: any)=>{
-    files.load(data);
-});
+
 const onRedirectCallback = (appState: any)=> {history.push(appState && appState.targetUrl ? appState.targetUrl : window.location.pathname);}
 ReactDOM.render(<Auth0Provider 
                     domain={"visualsource.auth0.com"}
@@ -21,6 +17,10 @@ ReactDOM.render(<Auth0Provider
                     onRedirectCallback={onRedirectCallback}>
                     <App />
                 </Auth0Provider>,document.getElementById('root'));
+const files = new Files();
+assets.forEach((data: any)=>{
+    files.load(data);
+});
 serviceWorker.unregister();
 
 

@@ -1,14 +1,16 @@
 {
   "name": "polytopiajs",
-  "version": "0.2.2-alpha",
+  "version": "0.3.4-alpha-rc3",
   "private": false,
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.6.5",
     "camera-controls": "^1.19.1",
+    "random-js": "^2.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "shineout": "1.5.1-rc.18",
+    "simplex-noise": "^2.4.0",
     "three": "^0.115.0",
     "three-instanced-mesh": "^0.96.2"
   },
@@ -26,6 +28,7 @@
     "babel-plugin-import": "^1.13.0",
     "node-sass": "^4.13.1",
     "react-scripts": "3.4.1",
+    "stats.js": "^0.17.0",
     "typescript": "^3.8.3"
   },
   "scripts": {

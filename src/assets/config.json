@@ -1,0 +1,25 @@
+{
+    "probs": {
+        "general": { 
+            "mountain": 0.15, 
+            "forest": 0.4, 
+            "fruit": 0.5, 
+            "crop": 0.5, 
+            "fish": 0.5, 
+            "game": 0.5, 
+            "whale": 0.4, 
+            "metal": 0.5
+        },
+        "faction": {
+            "water": {"Xin-xi": 0, "Imperius": 0, "Bardur": 0, "Oumaji": 0, "Polaris": 0},
+            "forest": {"Xin-xi": 1, "Imperius":1, "Bardur":1, "Oumaji": 0.1, "Polaris": 0},
+            "mountain": {"Xin-xi": 1.5, "Imperius":1, "Bardur":1, "Oumaji":1, "Polaris": 0},
+            "metal": {"Xin-xi":1, "Imperius":1, "Bardur":1, "Oumaji":1, "Polaris": 0 },
+            "fruit": {"Xin-xi":1, "Imperius":1, "Bardur": 1.5, "Oumaji":1, "Polaris": 0},
+            "crop": {"Xin-xi":1, "Imperius":1, "Bardur": 0.1, "Oumaji":1, "Polaris": 0},
+            "game": {"Xin-xi":1, "Imperius":1, "Bardur": 2, "Oumaji":1, "Polaris": 0},
+            "fish": {"Xin-xi":1, "Imperius":1, "Bardur":1, "Oumaji":1, "Polaris": 0},
+            "whale": {"Xin-xi":1, "Imperius":1, "Bardur":1, "Oumaji":1, "Polaris": 0}
+        }
+    }
+}

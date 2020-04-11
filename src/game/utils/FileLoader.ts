@@ -41,13 +41,13 @@ export default class Files{
         },
         background: {}
     };
-    static filesLoaded: number = 0;
+    static filesLoaded: boolean = false;
     private loadingManager = new LoadingManager();
     private mtlLoader = new MTLLoader(this.loadingManager);
     constructor(){
         this.mtlLoader.setResourcePath(`${window.location.origin}/assets/textures/`);
         this.loadingManager.onError = (error: any)=>{console.error(error);}
-        this.loadingManager.onLoad = () =>{ Files.filesLoaded++}
+        this.loadingManager.onLoad = () =>{ Files.filesLoaded = true;}
     }
     public load(load: ILoad): void{
         switch (load.type) {
@@ -84,7 +84,7 @@ export default class Files{
     public loadModel(data: IModel): void{
             this.mtlLoader.load(`${window.location.origin}${data.requireUrl}`,mat=>{
                 mat.preload();
-                const objLoader = new OBJLoader(this.loadingManager);
+                const objLoader = new OBJLoader(this.loadingManager).setMaterials(mat);
                 objLoader.load(`${window.location.origin}${data.url}`,obj=>{
                     if(obj.children[0]){
                         Files.resources[data.name].geometry[data.index] = (obj.children[0] as Mesh).geometry;

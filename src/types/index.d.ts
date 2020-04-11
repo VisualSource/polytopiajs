@@ -3,8 +3,11 @@ declare namespace Polytopia{
         saved?: boolean;
         mp?: boolean;
     }
-    type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | null;
+    type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | 'Polaris' | null;
     type IMouseEvent = "click" | "mouseover";
+    interface IPlayerObject{
+        faction: IFaction;
+    }
     interface IClickEvent{
         type: IClickEvent;
         object: number;
@@ -16,7 +19,31 @@ declare namespace Polytopia{
             z: number;
         }
         namespace Blocks{
-            interface IWaterParams extends Dynamic.IDynamicBlockParams{} 
+            interface IWaterParams extends Dynamic.IDynamicBlockParams{
+                fish?: boolean;
+                ruin?: boolean;
+            } 
+            interface IOceanParams extends Dynamic.IDynamicBlockParams{
+                whale?: boolean;
+                ruin?: boolean;
+            }
+            interface IFieldParams extends Dynamic.IDynamicBlockParams{
+                ruin?: boolean;
+                fruit?: boolean;
+                crop?: boolean;
+            }
+            interface IMountainParams extends Dynamic.IDynamicBlockParams{
+                ruin?: boolean;
+                metal?: boolean;
+            }
+            interface IForestParams extends Dynamic.IDynamicBlockParams{
+                wild_animal?: boolean;
+                ruin?: boolean;
+            }
+            interface IVillageParams extends Dynamic.IDynamicBlockParams{}
+            interface ICityParams extends Dynamic.IDynamicBlockParams{
+                capital?: boolean;
+            }
         }
         type Block = "Field" | "Ocean" | "Water" | "Forest" | "Mountain" | "City" | "Village";
         type Resource = "game" | "crop" | "fruit" | "fish" | "whale" | "metal" | null;

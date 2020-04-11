@@ -23,6 +23,7 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
             faction,
             resource
         };
+        this.receiveShadow = true;
         this.position.set(position.x,position.y,position.z);
         globalDispatcher.addListener("click",(data: Polytopia.IClickEvent)=>this.onClick);
     }
@@ -42,13 +43,115 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
 
 
 export class Water extends DynamicBlock{
-    constructor({position, variation = 0}:Polytopia.Objects.Blocks.IWaterParams){
+    constructor({
+        position, 
+        faction,
+        variation=0,
+        rotation=0,
+        fish=false, 
+        ruin=false
+    }:Polytopia.Objects.Blocks.IWaterParams){
         super({
             type: "Water",
             position, 
+            rotation,
+            faction,
             material: Files.resources.water.material[variation],
             geometry: Files.resources.water.geometry[variation]
         });
         this.name = `water${variation}`;
+    }
+}
+
+export class Ocean extends DynamicBlock{
+    constructor({
+        position, 
+        faction,
+        variation=0, 
+        rotation=0,
+        whale=false, 
+        ruin=false, 
+    }:Polytopia.Objects.Blocks.IOceanParams){
+        super({
+            type: "Ocean",
+            position,
+            rotation,
+            faction,
+            material: Files.resources.ocean.material[variation],
+            geometry: Files.resources.ocean.geometry[variation]
+        });
+        this.name = `ocean${variation}`;
+    }
+}
+
+export class Field extends DynamicBlock{
+    constructor({
+        position, 
+        faction,
+        ruin=false,
+        crop=false,
+        fruit=false
+    }:Polytopia.Objects.Blocks.IFieldParams){
+        super({
+            type:"Field",
+            position,
+            rotation: 0,
+            variation: 0,
+            material: undefined,
+            geometry: undefined,
+            faction
+        });
+        this.name = `field${this.variation}`;
+    }
+}
+export class Mountain extends DynamicBlock{
+    constructor({
+        position,
+        faction=null,
+        ruin=false,
+    }: Polytopia.Objects.Blocks.IMountainParams){
+        super({
+            position,
+            faction,
+            variation: 0,
+        });
+    }
+}
+export class Forest extends DynamicBlock{
+    constructor({
+        position,
+        faction,
+        wild_animal=false,
+        ruin=false
+    }:Polytopia.Objects.Blocks.IForestParams){
+        super({
+            position,
+            faction,
+            variation: 0
+        });
+    }
+}
+export class Village extends DynamicBlock{
+    constructor({
+        position,
+        faction = null
+    }: Polytopia.Objects.Blocks.IVillageParams){
+        super({
+            position,
+            faction,
+            variation:0
+        });
+    }
+}
+export class City extends DynamicBlock{
+    constructor({
+        position,
+        faction=null,
+        capital=false
+    }:Polytopia.Objects.Blocks.ICityParams){
+        super({
+            position,
+            faction
+        });
     }
 }

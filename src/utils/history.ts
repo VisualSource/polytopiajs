@@ -3,14 +3,30 @@ import { useLocation } from "react-router-dom";
 const history = createBrowserHistory();
 export default history;
 export function useQuery(): Polytopia.QueryParams {
-    return new URLSearchParams(useLocation().search) as Polytopia.QueryParams;
+    const params: {[key: string]: string} = {}
+    new URLSearchParams(useLocation().search).forEach((value: string,key: string)=>{
+        params[key] = value;
+    });
+    return params as Polytopia.QueryParams;
+}
+/**
+ * Non hook version of useQuery()
+ *
+ * @export
+ * @returns {Polytopia.QueryParams}
+ */
+export function getQuery(): Polytopia.QueryParams{
+    const params: {[key: string]: string} = {}
+    new URLSearchParams(window.location.search).forEach((value: string,key: string)=>{
+        params[key] = value;
+    });
+    return params as Polytopia.QueryParams;
 }
 
 interface RouteOptions{
     query?: {[item: string]: any};
     state? : { [item: string]: any }
 }
-
 export function route(to: string, options?: RouteOptions){
     history.push({pathname: to, search: serializeQueryParams(options?.query), state:options?.state});
 }

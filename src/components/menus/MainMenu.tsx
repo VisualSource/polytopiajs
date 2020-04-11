@@ -11,7 +11,7 @@ function MainMenu(){
                <main>
                     <Button onClick={()=>route("/singleplayer")} type="primary">{startmenu.new_game}</Button>  
                     <Button onClick={()=>route("/game",{ query: {saved: true}})} type="primary">{startmenu.resume_game}</Button> 
-                    <Button onClick={()=>route("/game",{ query: {saved: true}})} type="primary">DEV START</Button> 
+                    <Button onClick={()=>route("/game",{ query: {saved: false}})} type="primary">DEV START</Button> 
                     <Button onClick={()=>route("/multiplayer")} type="primary">{startmenu.multiplayer}</Button> 
                </main>
                <footer>
