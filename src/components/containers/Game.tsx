@@ -19,7 +19,8 @@ export default class Game extends Component{
             if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
                 const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
                 init(context as WebGL2RenderingContext,this.gameCanvas.current);
-                new WorldGenerationV5({worldSize: 11, players: []}).createDevWorld();
+                const wg = new WorldGenerationV5({worldSize: 11, players: [{faction:"Imperius",id:"ai"},{faction:"Xin-xi",id:"ai"}]});
+                wg.createDefaultWorld();
             }else{
                 console.error(WEBGL.getWebGL2ErrorMessage())
             }

@@ -50,15 +50,20 @@ export default class WorldGenerationV5{
         scene.add(world);
     }
     public createDefaultWorld(){
-        let row = 0, colum = 0, map: Map[] = [], capital_cells: any[] = [], 
-            capital_map: {[name: number]: number} = {}, done_tiles: any[] = [], 
+        let row = 0, 
+            colum = 0, 
+            map: Map[] = [], 
+            capital_cells: any[] = [], 
+            capital_map: {[name: number]: number} = {}, 
+            done_tiles: any[] = [], 
             active_tiles = [];
-        const {worldSize, players} = this.settings, world = new Group(), waterCheck: any[] = [];
+        const {worldSize, players} = this.settings, 
+              world = new Group(), 
+              waterCheck: any[] = [];
         world.name = "overworld";
         const baseMap = this.createBaseMap(worldSize, this.blockPlacement);
         const BORDER_EXPANSION = 1/3;
-        
-
+       
         for(let a = 0; a <= baseMap.length-1; a++){
             waterCheck.push([]);
             for(let b = 0; b <= baseMap[a].length-1; b++){
@@ -121,7 +126,7 @@ export default class WorldGenerationV5{
                                 if(other[0]===true && other[1]===true && other[2]===false && other[3]===false){
                                     rotation = 0;
                                 }else{
-                                    rotation = 90;
+                                    rotation = this.deg[90];
                                 }
                             }
 
@@ -211,7 +216,7 @@ export default class WorldGenerationV5{
                 map.push(type);
             });
         });
-
+        
         console.time('Capital distribution');
         // make a map of potential (ground) tiles associated with numbers (0 by default)
         for (let _ of players) {
@@ -249,6 +254,7 @@ export default class WorldGenerationV5{
             map[(capital_cells[i] / worldSize | 0) * worldSize + (capital_cells[i] % worldSize)]['faction'] = players[i].faction;
         }
         console.timeEnd('Capital distribution');
+        
         console.time('Terrain distribution');
         // done tiles that generate terrain around them
         for (let i = 0; i < capital_cells.length; i++) {
@@ -279,6 +285,7 @@ export default class WorldGenerationV5{
             }
         }
         console.timeEnd('Terrain distribution');
+        
         console.time('Resource generation');
         map.forEach((value,i)=>{
             if(!["WATER","CITY","OCEAN","MOUNTAIN"].includes(value.type)){
@@ -334,9 +341,9 @@ export default class WorldGenerationV5{
             switch (map[cell]['type']) {
                 case 'FIELD':
                     //@ts-ignore
-                    let fruit = probs.general['fruit'] * probs.faction.fruit[map[cell].tribe === null ? "Imperius" : map[cell].tribe];
+                    let fruit = probs.general['fruit'] * probs.faction.fruit[map[cell].faction === null ? "Imperius" : map[cell].faction];
                     //@ts-ignore
-                    let crop = probs.general['crop'] * probs.faction.crop[map[cell].tribe === null ? "Imperius" : map[cell].tribe];
+                    let crop = probs.general['crop'] * probs.faction.crop[map[cell].faction === null ? "Imperius" : map[cell].faction];
                     if (map[cell].type !== 'CITY') {
                         if (village_map[cell] === 3) {
                             map[cell].type = 'VILLAGE';
@@ -352,26 +359,26 @@ export default class WorldGenerationV5{
                         if (village_map[cell] === 3) {
                             map[cell].type = "VILLAGE";
                         //@ts-ignore
-                        } else if (proc(cell, probs.general['game'] * probs.faction.game[map[cell].tribe === null ? "Imperius" : map[cell].tribe])) {
+                        } else if (proc(cell, probs.general['game'] * probs.faction.game[map[cell].faction === null ? "Imperius" : map[cell].faction])) {
                             map[cell].wild_animal = true;
                         }
                     }
                     break;
                 case "WATER":
                     //@ts-ignore
-                    if (proc(cell, probs.general['fish'] * probs.faction.fish[map[cell].tribe === null ? "Imperius" : map[cell].tribe])) {
+                    if (proc(cell, probs.general['fish'] * probs.faction.fish[map[cell].faction === null ? "Imperius" : map[cell].faction])) {
                         map[cell].fish = true;
                     }
                     break;
                 case "OCEAN":
                     //@ts-ignore
-                    if (proc(cell, probs.general['whale'] * probs.faction.whale[map[cell].tribe === null ? "Imperius" : map[cell].tribe])) {
+                    if (proc(cell, probs.general['whale'] * probs.faction.whale[map[cell].faction === null ? "Imperius" : map[cell].faction])) {
                         map[cell].whale = true;
                     }
                     break;
                 case "MOUNTAIN":
                     //@ts-ignore
-                    if (proc(cell, probs.general['metal'] * probs.faction.metal[map[cell].tribe === null ? "Imperius" : map[cell].tribe])) {
+                    if (proc(cell, probs.general['metal'] * probs.faction.metal[map[cell].faction === null ? "Imperius" : map[cell].faction])) {
                         map[cell].metal = true;
                     }
                     break;
@@ -497,6 +504,7 @@ export default class WorldGenerationV5{
             }
     });
     scene.add(world);
+    
     }
 
 

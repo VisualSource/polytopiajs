@@ -7,6 +7,7 @@ declare namespace Polytopia{
     type IMouseEvent = "click" | "mouseover";
     interface IPlayerObject{
         faction: IFaction;
+        id: string;
     }
     interface IClickEvent{
         type: IClickEvent;
@@ -44,15 +45,19 @@ declare namespace Polytopia{
             interface ICityParams extends Dynamic.IDynamicBlockParams{
                 capital?: boolean;
             }
+
+            interface IFruitParams extends Static.IStaticBlockParams{}
+            interface IWildAnimalParams extends Static.IStaticBlockParams{}
         }
         type Block = "Field" | "Ocean" | "Water" | "Forest" | "Mountain" | "City" | "Village";
-        type Resource = "game" | "crop" | "fruit" | "fish" | "whale" | "metal" | null;
+        type Resource = "wild_animal" | "crop" | "fruit" | "fish" | "whale" | "metal" | "ruin" | null;
         namespace Dynamic{
             interface IDynamicBlock extends THREE.Mesh{
                 cursor: "pointer" | "crosshair" | "default";
                 blockType: Block;
                 variation: number;
                 faction: IFaction;
+                resource: Resource;
             }
             interface IDynamicBlockParams {
                 position?: ICord;
@@ -66,10 +71,15 @@ declare namespace Polytopia{
             }
         }
         namespace Static{
-            interface IStaticBlock extends THREE.Mesh{}
+            interface IStaticBlock extends THREE.Mesh{
+                variation: number;
+                getType: Resource;
+            }
             interface IStaticBlockParams{
-                geometry?: THREE.Geometry | THREE.BufferGeometry | undefined
-                material?: THREE.Material | THREE.Material[] | undefined
+                variation?: number;
+                type?: Resource;
+                geometry?: THREE.Geometry | THREE.BufferGeometry | undefined;
+                material?: THREE.Material | THREE.Material[] | undefined;
             }
         }
     }
