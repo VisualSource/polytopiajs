@@ -9,8 +9,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
-    "shineout": "1.5.1-rc.18",
     "simplex-noise": "^2.4.0",
+    "shineout": "1.5.1-rc.20",
     "three": "^0.115.0",
     "three-instanced-mesh": "^0.96.2"
   },
