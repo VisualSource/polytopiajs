@@ -9,11 +9,14 @@ export default class App extends PureComponent{
   constructor(props: any){
     super(props);
   }
+  componentDidMount(){
+    history.push("/");
+  }
   render(){
     return <Router history={history}>
               <Switch>
                   <Route exact path="/">
-                    <MainMenu />
+                    <MainMenu/>
                   </Route>
                   <Route path="/game">
                     <Game/>

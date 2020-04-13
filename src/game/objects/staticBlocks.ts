@@ -29,8 +29,8 @@ class Fruit extends StaticBlock{
         super({
             type: "fruit",
             variation,
-            material: Files.resources.fruit.material[variation],
-            geometry: Files.resources.fruit.geometry[variation]
+            material: Files.resources.fruit.material[0],
+            geometry: Files.resources.fruit.geometry[0]
         });
         this.name = `fruit${variation}`;
     }

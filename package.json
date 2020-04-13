@@ -8,6 +8,7 @@
     "random-js": "^2.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-horizontal-scrolling-menu": "^0.7.7",
     "react-router-dom": "^5.1.2",
     "shineout": "1.5.1-rc.20",
     "simplex-noise": "^2.4.0",

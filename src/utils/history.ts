@@ -3,11 +3,7 @@ import { useLocation } from "react-router-dom";
 const history = createBrowserHistory();
 export default history;
 export function useQuery(): Polytopia.QueryParams {
-    const params: {[key: string]: string} = {}
-    new URLSearchParams(useLocation().search).forEach((value: string,key: string)=>{
-        params[key] = value;
-    });
-    return params as Polytopia.QueryParams;
+    return queryFromURI(useLocation().search) as Polytopia.QueryParams;
 }
 /**
  * Non hook version of useQuery()
@@ -16,19 +12,55 @@ export function useQuery(): Polytopia.QueryParams {
  * @returns {Polytopia.QueryParams}
  */
 export function getQuery(): Polytopia.QueryParams{
-    const params: {[key: string]: string} = {}
-    new URLSearchParams(window.location.search).forEach((value: string,key: string)=>{
-        params[key] = value;
-    });
-    return params as Polytopia.QueryParams;
+    return queryFromURI(window.location.search) as Polytopia.QueryParams;
 }
+/**
+@author swipely
+@see https://github.com/swipely/aviator/blob/master/src/request.js
+**/
+function queryFromURI(input: string): any{
+    const queryParams: {[item: string]: any} = {};
+    const _apply = (key: string, val: any) =>{
+        if(key.indexOf('[]') !== -1){
+            key = key.replace("[]",'');
+            if(Array.isArray(queryParams[key])){
+                queryParams[key].push(val);
+            }else{
+                queryParams[key] = [val];
+            }
+        }else{
+            queryParams[key] = val;
+        }
+    }
+    let parts;
+    if(!input) return;
+    parts = input.replace('?','').split('&');
+
+    parts.forEach(part=>{
+        let key = decodeURIComponent(part.split('=')[0]),
+        val = decodeURIComponent(part.split('=')[1]);
+
+        if(part.indexOf('=') === -1) return;
+        _apply(key,val);
+    });
+
+    
+return queryParams;
+
+}
+
+
+
+
+
+
+
 
 interface RouteOptions{
     query?: {[item: string]: any};
-    state? : { [item: string]: any }
 }
 export function route(to: string, options?: RouteOptions){
-    history.push({pathname: to, search: serializeQueryParams(options?.query), state:options?.state});
+    history.push({pathname: to, search: serializeQueryParams(options?.query)});
 }
   /**
     @author swipely

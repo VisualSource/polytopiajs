@@ -2,12 +2,22 @@ declare namespace Polytopia{
     interface QueryParams{
         saved?: boolean;
         mp?: boolean;
+        id?: number;
+        players?: string[],
+        opp?: number;
     }
     type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | 'Polaris' | null;
+    type ITech = "climbing" | "organization" | "hunting"| "riding" | "fishing" | "roads" | "trade"| "free_spirit" | "chivalry" | "farming" | "construction" | "shields" | "mining" | "smithery" | "meditation" | "philosophy" | "sailing" | "navigation" | "whaling" | "aquatism"| "spirtualism"| "archery" | "forestry" | "mathematics";
     type IMouseEvent = "click" | "mouseover";
     interface IPlayerObject{
         faction: IFaction;
         id: string;
+        tech: ITech[];
+        citys: number;
+        stars: number;
+        starsPerTurn: number;
+        score: number;
+        ai: boolean;
     }
     interface IClickEvent{
         type: IClickEvent;

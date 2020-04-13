@@ -17,7 +17,7 @@
         {"type":"model","name":"whale","url":"/assets/models/ocean/whale.obj","requireUrl":"/assets/models/ocean/whale.mtl","index":0},
         {"type":"model","name":"field","url":"/assets/models/field/field.obj","requireUrl":"/assets/models/field/field.mtl","index":0},
         {"type":"material","name":"field","url":"/assets/models/field/snow.mtl","index":1},
-        {"type":"model","name":"fruit","url":"/assets/models/field/fruit.obj","requireUrl":"/assets/models/field/fruit.mtl","index":0},
+        {"type":"model","name":"fruit","url":"/assets/models/field/fruit_one.obj","requireUrl":"/assets/models/field/fruit_one.mtl","index":0},
         {"type":"model","name":"crop","url":"/assets/models/field/crop.obj","requireUrl":"/assets/models/field/crop.mtl","index":0},
         {"type":"model","name":"mountain","url":"/assets/models/mountain/mountain.obj","requireUrl":"/assets/models/mountain/mountain.mtl","index":0},
         {"type":"model","name":"metal","url":"/assets/models/mountain/gold.obj","requireUrl":"/assets/models/mountain/gold.mtl","index":0},

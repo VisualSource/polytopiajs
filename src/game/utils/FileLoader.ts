@@ -95,7 +95,7 @@ export default class Files{
         this.loadingManager.onLoad = () =>{ 
             Files.filesLoaded = true;
             //@ts-ignore
-            Message.info("All Files Loaded", 3, {
+            Message.success("All Files Loaded", 3, {
                 position: "bottom-right"
             });
         }
