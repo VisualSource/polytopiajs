@@ -25,7 +25,7 @@ export default class Interaction{
         this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
         this.raycaster.setFromCamera(this.mouse,this.camera);
-        const intersects = this.raycaster.intersectObjects(this.scene.children);
+        const intersects = this.raycaster.intersectObjects(this.scene.children,true);
         if(intersects.length > 0){
             if(this.INTERSECTED){
                 globalDispatcher.dispatch({type:"click", object: this.INTERSECTED.id});
@@ -34,19 +34,18 @@ export default class Interaction{
     }
     render(){
         this.raycaster.setFromCamera(this.mouse,this.camera);
-        const intersects = this.raycaster.intersectObjects(this.scene.children);
+        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         if(intersects.length > 0){
             if(this.INTERSECTED != intersects[0].object){
                 // reset object if needed
-                if(this.INTERSECTED){ console.log("TOP",this.INTERSECTED);}
+                if(this.INTERSECTED){}
 
                 // set settings
                 this.INTERSECTED = intersects[0].object;
                 this.domElement.style.cursor = (intersects[0].object as Polytopia.Objects.Dynamic.IDynamicBlock).cursor;
             }
         }else{
-            if(this.INTERSECTED){
-            } 
+            if(this.INTERSECTED){} 
             this.INTERSECTED = null;
             this.domElement.style.cursor = "default";
         }

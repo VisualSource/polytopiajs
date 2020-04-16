@@ -1,6 +1,7 @@
 import {LoadingManager, TextureLoader, Mesh} from 'three';
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
+import {Message} from 'shineout';
 
 interface IModel{
     name: string;
@@ -31,7 +32,15 @@ export default class Files{
             geometry: {},
             material: {}
         },
+        fish:{
+            geometry: {},
+            material: {}
+        },
         ocean: {
+            geometry: {},
+            material: {}
+        },
+        whale:{
             geometry: {},
             material: {}
         },
@@ -39,15 +48,57 @@ export default class Files{
             geometry: {},
             material: {}
         },
+        crop:{
+            geometry: {},
+            material: {}
+        },
+        fruit:{
+            geometry: {},
+            material: {}
+        },
+        mountain:{
+            geometry: {},
+            material: {}
+        },
+        metal:{
+            geometry: {},
+            material: {}
+        },
+        forest:{
+            geometry: {},
+            material: {}
+        },
+        wild_animal:{
+            geometry: {},
+            material: {}
+        },
+        ruin:{
+            geometry: {},
+            material: {}
+        },
+        city:{
+            geometry: {},
+            material: {}
+        },
+        village:{
+            geometry: {},
+            material: {}
+        },
         background: {}
     };
-    static filesLoaded: number = 0;
+    static filesLoaded: boolean = false;
     private loadingManager = new LoadingManager();
     private mtlLoader = new MTLLoader(this.loadingManager);
     constructor(){
         this.mtlLoader.setResourcePath(`${window.location.origin}/assets/textures/`);
         this.loadingManager.onError = (error: any)=>{console.error(error);}
-        this.loadingManager.onLoad = () =>{ Files.filesLoaded++}
+        this.loadingManager.onLoad = () =>{ 
+            Files.filesLoaded = true;
+            //@ts-ignore
+            Message.success("All Files Loaded", 3, {
+                position: "bottom-right"
+            });
+        }
     }
     public load(load: ILoad): void{
         switch (load.type) {
@@ -65,11 +116,17 @@ export default class Files{
         }
     }
     public loadMaterial(params: IMaterial){
-        console.log("IMPLMENT");
-        
-       // this.mtlLoader.load(params.url, material=>{
-        //    material.preload();
-        //})
+        this.mtlLoader.load(params.url,material=>{
+            material.preload();
+            const materials = Object.keys(material.materials).map(e=>{
+                return material.materials[e];
+            });
+            if(materials.length === 1){
+                Files.resources[params.name].material[params.index] = materials[0];
+            }else{
+                Files.resources[params.name].material[params.index] = materials;
+            }
+        });
     }
     public loadTexture(params: ITexture): void{
         const textureLoader = new TextureLoader(this.loadingManager);
@@ -82,9 +139,19 @@ export default class Files{
         });
     }
     public loadModel(data: IModel): void{
+                /*
+                Ocean and Water Load order
+                
+                water         0
+                water_three   1
+                water_two     2
+                water_one     3
+                water_none    4
+                water_two_b   5
+            */
             this.mtlLoader.load(`${window.location.origin}${data.requireUrl}`,mat=>{
                 mat.preload();
-                const objLoader = new OBJLoader(this.loadingManager);
+                const objLoader = new OBJLoader(this.loadingManager).setMaterials(mat);
                 objLoader.load(`${window.location.origin}${data.url}`,obj=>{
                     if(obj.children[0]){
                         Files.resources[data.name].geometry[data.index] = (obj.children[0] as Mesh).geometry;
