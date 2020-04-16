@@ -111,6 +111,9 @@
   "gamemode.might.win": "All capitals were captured",
   "gamemode.death": "Your last city was lost, you have been defeated.",
 
+  "world":{
+     "loading": "CREATING WORLD"
+  },
   "world.intro.title": "Mighty Leader!",
   "world.intro.text": "You have been chosen to rule the {0} tribe. Explore the world and expand your empire, but watch out for the other tribes.",
   "world.intro.objective": "Objective: {0}",
@@ -150,7 +153,6 @@
   "world.building.capture.warning": "Capturing will be completed next turn if you don't stop them.",
   "world.building.capture.warning.title": "{0} is under siege!",
   "world.attract.sanctuary": "Your sanctuary has attracted a wild animal!",
-  "world.loading": "LOADING {0}%",
   "world.suggestion.title": "Here's a Tip!",
   "world.suggestion.message": "You should {0}",
   "world.suggestion.disable": "(These suggestions can be switched off in the menu)",

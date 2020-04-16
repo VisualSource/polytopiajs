@@ -1,51 +1,53 @@
-import {EventDispatcher, WebGLRenderer, Scene, OrthographicCamera, Vector2, Raycaster} from 'three';
-export default class Interaction extends EventDispatcher{
-    private mouse: Vector2;
-    private raycaster: Raycaster;
-    private camera: OrthographicCamera;
-    private scene: Scene;
-    private INTERSECTED: any | null;
-    renderer: WebGLRenderer;
-    constructor(renderer: WebGLRenderer, scene: Scene, camera: OrthographicCamera){
-        super();
-        this.camera = camera;
-        this.mouse = new Vector2(0,0);
-        this.raycaster = new Raycaster();
-        this.renderer = renderer;
+import { Vector2, Raycaster, OrthographicCamera, Scene} from 'three';
+import globalDispatcher from './EventDispatcher';
+export default class Interaction{
+    mouse: Vector2 = new Vector2();
+    INTERSECTED: any;
+    raycaster: Raycaster = new Raycaster;
+    camera: OrthographicCamera;
+    scene: Scene;
+    domElement: HTMLCanvasElement;
+    constructor(scene: any, camera: any, renderer: any){
         this.scene = scene;
-        this.INTERSECTED = null;
-        this.init();
-
+        this.camera = camera;
+        this.domElement = renderer;
+        document.addEventListener('mousemove', event=>this.onDocumentMouseMove(event), false);
+        document.addEventListener("click",event=>this.onDocumentMouseClick(event),false);
     }
-    init(){
-        const test = this.onMouseMove.bind(this);
-        document.addEventListener("mousemove",test,false);
-        
-    }
-    onMouseMove(event: MouseEvent){
+    onDocumentMouseMove(event: any){
         event.preventDefault();
-        this.mouse.x = (event.clientX/window.innerWidth) * 2 - 1;
-        this.mouse.y = (event.clientY/window.innerHeight) * 2 + 1
-
+		this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+		this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     }
+    onDocumentMouseClick(event: any){
+        event.preventDefault();
+		this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    render(){
         this.raycaster.setFromCamera(this.mouse,this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children,true);
-        
         if(intersects.length > 0){
-            console.log(!Object.is(this.INTERSECTED,intersects[0].object));
-            
-            if(!Object.is(this.INTERSECTED,intersects[0].object)){
-                     this.INTERSECTED = intersects[0].object;
-                     this.renderer.domElement.style.cursor = "pointer";
-                     this.INTERSECTED.material.wireframe = false;
-                     console.log(intersects[0].object);
+            if(this.INTERSECTED){
+                globalDispatcher.dispatch({type:"click", object: this.INTERSECTED.id});
+             } 
+        }
+    }
+    render(){
+        this.raycaster.setFromCamera(this.mouse,this.camera);
+        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+        if(intersects.length > 0){
+            if(this.INTERSECTED != intersects[0].object){
+                // reset object if needed
+                if(this.INTERSECTED){}
+
+                // set settings
+                this.INTERSECTED = intersects[0].object;
+                this.domElement.style.cursor = (intersects[0].object as Polytopia.Objects.Dynamic.IDynamicBlock).cursor;
             }
         }else{
+            if(this.INTERSECTED){} 
             this.INTERSECTED = null;
-            this.renderer.domElement.style.cursor = "default";
-           
+            this.domElement.style.cursor = "default";
         }
     }
 
