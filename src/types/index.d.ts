@@ -2,23 +2,72 @@ declare namespace Polytopia{
     interface QueryParams{
         saved?: boolean;
         mp?: boolean;
+        id?: number;
+        players?: string[],
+        opp?: number;
     }
-    type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | null;
-
+    type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | 'Polaris' | null;
+    type ITech = "climbing" | "organization" | "hunting"| "riding" | "fishing" | "roads" | "trade"| "free_spirit" | "chivalry" | "farming" | "construction" | "shields" | "mining" | "smithery" | "meditation" | "philosophy" | "sailing" | "navigation" | "whaling" | "aquatism"| "spirtualism"| "archery" | "forestry" | "mathematics";
+    type IMouseEvent = "click" | "mouseover";
+    interface IPlayerObject{
+        faction: IFaction;
+        id: string;
+        tech: ITech[];
+        citys: number;
+        stars: number;
+        starsPerTurn: number;
+        score: number;
+        ai: boolean;
+    }
+    interface IClickEvent{
+        type: IClickEvent;
+        object: number;
+    }
     namespace Objects{
         interface ICord{
             x: number;
             y: number;
             z: number;
         }
+        namespace Blocks{
+            interface IWaterParams extends Dynamic.IDynamicBlockParams{
+                fish?: boolean;
+                ruin?: boolean;
+            } 
+            interface IOceanParams extends Dynamic.IDynamicBlockParams{
+                whale?: boolean;
+                ruin?: boolean;
+            }
+            interface IFieldParams extends Dynamic.IDynamicBlockParams{
+                ruin?: boolean;
+                fruit?: boolean;
+                crop?: boolean;
+            }
+            interface IMountainParams extends Dynamic.IDynamicBlockParams{
+                ruin?: boolean;
+                metal?: boolean;
+            }
+            interface IForestParams extends Dynamic.IDynamicBlockParams{
+                wild_animal?: boolean;
+                ruin?: boolean;
+            }
+            interface IVillageParams extends Dynamic.IDynamicBlockParams{}
+            interface ICityParams extends Dynamic.IDynamicBlockParams{
+                capital?: boolean;
+            }
+
+            interface IFruitParams extends Static.IStaticBlockParams{}
+            interface IWildAnimalParams extends Static.IStaticBlockParams{}
+        }
         type Block = "Field" | "Ocean" | "Water" | "Forest" | "Mountain" | "City" | "Village";
-        type Resource = "game" | "crop" | "fruit" | "fish" | "whale" | "metal" | null;
+        type Resource = "wild_animal" | "crop" | "fruit" | "fish" | "whale" | "metal" | "ruin" | null;
         namespace Dynamic{
             interface IDynamicBlock extends THREE.Mesh{
                 cursor: "pointer" | "crosshair" | "default";
                 blockType: Block;
                 variation: number;
                 faction: IFaction;
+                resource: Resource;
             }
             interface IDynamicBlockParams {
                 position?: ICord;
@@ -32,10 +81,15 @@ declare namespace Polytopia{
             }
         }
         namespace Static{
-            interface IStaticBlock extends THREE.Mesh{}
+            interface IStaticBlock extends THREE.Mesh{
+                variation: number;
+                getType: Resource;
+            }
             interface IStaticBlockParams{
-                geometry?: THREE.Geometry | THREE.BufferGeometry | undefined
-                material?: THREE.Material | THREE.Material[] | undefined
+                variation?: number;
+                type?: Resource;
+                geometry?: THREE.Geometry | THREE.BufferGeometry | undefined;
+                material?: THREE.Material | THREE.Material[] | undefined;
             }
         }
     }

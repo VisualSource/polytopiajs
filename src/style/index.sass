@@ -1,11 +1,28 @@
-#main-menu 
+body,html 
+    height: 100vh 
+    width: 100vw
+=flexColumn
     display: flex
     flex-direction: column 
     justify-content: center 
     align-content: center
     align-items: center
     justify-items: center
+#main-menu 
+    +flexColumn
 #game_canvas
     overflow: hidden
     display: block 
     height: 100vh
+#loading-screen.game-menu
+    background: black
+    z-index: 10001
+#viewer 
+    z-index: 5
+    bottom: 1rem
+    left: calc(100vw - 50%)
+    > div 
+        display: flex 
+.game-menu 
+    position: absolute
+    overflow: hidden
