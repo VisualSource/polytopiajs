@@ -58,9 +58,11 @@ return queryParams;
 
 interface RouteOptions{
     query?: {[item: string]: any};
+    replace?: boolean
 }
 export function route(to: string, options?: RouteOptions){
-    history.push({pathname: to, search: serializeQueryParams(options?.query)});
+    if(options?.replace) history.replace({pathname: to, search: serializeQueryParams(options?.query)}); 
+    else history.push({pathname: to, search: serializeQueryParams(options?.query)});
 }
   /**
     @author swipely

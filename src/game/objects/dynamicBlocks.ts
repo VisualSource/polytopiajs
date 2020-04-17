@@ -9,7 +9,7 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
     constructor({
         position = {x:0,y:0,z:0},
         geometry = new BoxGeometry( 1, 1, 1 ), 
-        material = new MeshBasicMaterial( { color: 0xff0000, wireframe: true }), 
+        material = new MeshBasicMaterial({ color: 0xff0000, wireframe: true }), 
         variation = 0, 
         rotation = 0, 
         faction = null,
@@ -32,7 +32,7 @@ export class DynamicBlock extends Mesh implements Polytopia.Objects.Dynamic.IDyn
     }
     onClick(data: Polytopia.IClickEvent){
         if(data.object === this.id){
-           route("/game/view",{query: {id: this.id}});
+           route("/game/view",{query: {id: this.id}, replace: true});
         }
     }
     get blockType(): Polytopia.Objects.Block{
@@ -68,6 +68,7 @@ export class Water extends DynamicBlock{
             material: Files.resources.water.material[variation],
             geometry: Files.resources.water.geometry[variation]
         });
+        this.userData.ruin = ruin;
         this.name = `water${variation}`;
         addResouce(this.resource,(object: any)=>this.add(object), ruin);
     }
@@ -91,6 +92,7 @@ export class Ocean extends DynamicBlock{
             material: Files.resources.ocean.material[variation],
             geometry: Files.resources.ocean.geometry[variation]
         });
+        this.userData.ruin = ruin;
         this.name = `ocean${variation}`;
         addResouce(this.resource,(object:any)=>this.add(object),ruin);
     }
@@ -114,6 +116,7 @@ export class Field extends DynamicBlock{
             geometry: Files.resources.field.geometry[0],
             faction
         });
+        this.userData.ruin = ruin;
         this.name = `field${this.variation}`;
         addResouce(this.resource,(object:any)=>this.add(object),ruin, this.variation);
     }
@@ -134,6 +137,7 @@ export class Mountain extends DynamicBlock{
             material: Files.resources.mountian.material[0],
             geometry: Files.resources.mountain.geometry[0]
         });
+        this.userData.ruin = ruin;
         this.name = `mountain${this.variation}`;
         addResouce(this.resource,(object:any)=>this.add(object),ruin);
     }
@@ -154,6 +158,7 @@ export class Forest extends DynamicBlock{
             material: Files.resources.forest.material[0],
             geometry: Files.resources.forest.geometry[0]
         });
+        this.userData.ruin = ruin;
         this.name = `forest${this.variation}`;
         addResouce(this.resource,(object:any)=>this.add(object),ruin,this.variation);
     }

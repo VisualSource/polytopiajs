@@ -1,5 +1,6 @@
 import {Mesh, BoxGeometry, MeshBasicMaterial} from 'three';
 import Files from '../utils/FileLoader';
+import globalDispatcher from '../EventDispatcher';
 export class StaticBlock extends Mesh implements Polytopia.Objects.Static.IStaticBlock{
     constructor({
         geometry = new BoxGeometry( 1, 1, 1 ),
@@ -12,6 +13,12 @@ export class StaticBlock extends Mesh implements Polytopia.Objects.Static.IStati
             variation,
             type
         }
+        globalDispatcher.addListener("click",(data)=>{
+            if(data.object === this.id){
+                //@ts-ignore
+                this.parent?.onClick(this.parent?.id);
+            }
+        });
     }
     get variation(){
         return this.userData.variation;

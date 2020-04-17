@@ -112,11 +112,15 @@
   "gamemode.death": "Your last city was lost, you have been defeated.",
 
   "world":{
-     "loading": "CREATING WORLD"
+     "loading": "CREATING WORLD",
+     "intro":{
+       "title": "Mighty Leader!",
+       "text": "You have been chosen to rule the {0} tribe. Explore the world and expand your empire, but watch out for the other tribes.",
+       "objective": "Objective: {0}"
+     }
   },
-  "world.intro.title": "Mighty Leader!",
-  "world.intro.text": "You have been chosen to rule the {0} tribe. Explore the world and expand your empire, but watch out for the other tribes.",
-  "world.intro.objective": "Objective: {0}",
+
+
   "world.turn.end": "End Turn",
   "world.turn.end.question": "End your turn?",
   "world.turn.end.confirm": "Confirm",
@@ -200,6 +204,16 @@
   "tribes.polaris": "Polaris",
   "tribes.polaris.info": "The {0} have lain trapped in the far reaches of the freezing tundra for eons, but were blessed by the unknowable Gaami with the power to expand their unnatural icy terrain farther than the weather permits. \n\nWith the might of sleds and Mamoos, the mystical {0} are determined to entomb the Square in ice and transform the land into a frigid paradise. \n\n{0} starts the game with the ability to freeze surrounding terrain using Moonies.",
 
+
+
+  "building":{
+    "ability":{
+      "ruin": "A ruin from an ancient civilization, it can contain valuable things! Go there with a unit to examine it."
+    },
+    "names":{
+      "ruin": "Ruin"
+    }
+  },
   "building.capital.owner": "{0} is the {1} capital",
   "building.capital.owner.former": "{0} is the former capital of the {1} empire, currently occupied by {2} forces",
   "building.city.owner": "{0} is a city in the {1} empire",
@@ -222,14 +236,12 @@
   "building.ability.route": "It creates trade routes through {0} to any other {1} within a 5 tiles radius.",
   "building.ability.route.and": " and ",
   "building.ability.road": "Build roads to connect cities with the capital. Connected cities get 1 population as a reward. Roads also give a movement bonus for all units.",
-  "building.ability.ruin": "A ruin from an ancient civilization, it can contain valuable things! Go there with a unit to examine it.",
   "building.ability.patina": "{0} grows over time, so try to build them as early as possible.",
   "building.ability.limited": "You can only build one {0} per city.",
   "building.ability.unique": "{0} can only be built once.",
   "building.restriction.near": "Must be built next to a {0}.",
   "building.restriction.on": "Must be on a tile with {0}.",
   "building.names.city": "City",
-  "building.names.ruin": "Ruin",
   "building.names.monument1": "Altar of Peace",
   "building.names.monument2": "Tower of wisdom",
   "building.names.monument3": "Grand Bazaar",
@@ -263,7 +275,6 @@
   "building.names.ice_bank": "Ice Bank",
   "building.names.iceport": "Outpost",
   "building.names.icetemple": "Ice Temple",
-
   "unit": "unit",
   "unit.info.attack": "Attack",
   "unit.info.defence": "Defence",
@@ -321,124 +332,167 @@
   "unit.abilities.skate": "SKATE",
   "unit.abilities.fortify": "FORTIFY",
 
-  "player.abilities.destroy": "destroy",
-  "player.abilities.disband": "disband",
-  "player.abilities.literacy": "literacy",
-  "player.abilities.glide": "glide",
+  "player_abilities":{
+    "destroy": "destroy",
+    "disband": "disband",
+    "literacy": "literacy",
+    "glide": "glide"
+  },
+  "resource_names":{
+    "fruit": "fruit",
+    "crop": "crop",
+    "fish": "fish",
+    "whale": "whale",
+    "wild_animal": "wild animal",
+    "metal": "metal"
+  },
+  "terrain":{
+    "unknown": "Unknown lands",
+    "water": "Water",
+    "ocean": "Ocean",
+    "field": "Field",
+    "forest": "Forest",
+    "mountain": "Mountain",
+    "ice": "Ice"
+  },
+  "actionbox":{
+    "building_level": "level {0}/{1}",
+    "tile_roads": "roads",
+    "city": "The city of {0}",
+    "city_level": "lvl {0}",
+    "village": "Village",
+    "unit":{
+      "frozen": "Frozen {0}",
+      "kills": "{0}/{1} kills",
+      "veteran": "Veteran",
+      "new": "Train a new {0} {1}",
+      "ability": "Unit Ability",
+      "train": "TRAIN",
+      "upgrade": "UPGRADE",
+      "toomany": "(too many)",
+      "toomany_info": "This city can't support any more units. Upgrade the city to get more space for units."
+    },
+    "building":{
+      "doit": "DO IT",
+      "requiredtech": "You need to research {0} to do this, tap the 'Tech Tree' button.",
+      "techtree": "TECH TREE"
+    },
+    "insufficientfunds": "You don't have enough stars to buy this. Tap 'next turn' to get more stars.",
+    "confirm": "Confirm {0}",
+    "confirm_info": "Are you sure you want to do this?",
+    "confirm_button": "YES"
+  },
+  "tooltip":{
+    "tile":{
+      "capture":{
+        "_": "This city is being captured.",
+        "enemy": "Your city is being captured by the enemy!",
+        "tip":"Move a unit here to capture this city!"
+      },
+      "choose_unit":"Choose a unit to produce.",
+      "limit":"This city cannot support any more units.",
+      "road":"Build a road to connect this city to your capital.",
+      "produces": "Produces {0} each turn.",
+      "level":{
+        "polaris": "Freeze {0} more tiles to reach the next level",
+        "next":"Next level in {0} turns",
+        "max":"Has reached maximum level"
+      },
+      "sailing":"Move a unit here to start sailing!",
+      "monuments": "Monuments gives your empire extra score!",
+      "ruin": "Move a unit here and examine these ancient ruins.",
+      "blocked": "This resource is blocked by an enemy unit",
+      "extract":{
+        "upgrade": "Extract this resource to upgrade your city",
+        "convert": "This resource can be transformed into a unit",
+        "stars": "Extract this resource to earn stars instantly",
+        "research": "You need to research {0} to extract this resource"
+      },
+      "outside": "This resource is outside of your empire",
+      "research": "You need to research {0} to be able to move here",
+      "explore": "Explore this area to see what it holds!"
+    },
+    "unit":{
+      "city":{
+        "capture": "Tap 'Capture' to add this city to your empire",
+        "next": "This city will be ready to capture next turn",
+        "flying": "Flying units cannot capture cities"
+      },
+      "actions":{
+        "none": "No actions left. Press 'Next Turn' to move this unit again.",
+        "move": "Click a blue mark to move.",
+        "attack": "Click a red mark to attack!"
+      },
+      "enemy": {
+        "_":"This is the enemy!",
+        "territory": "This enemy is in your territory!",
+        "city": "This enemy is capturing your city!"
+      },
+      "grow":{
+        "now": "Will grow to {0} at the end of this turn!",
+        "later": "Will grow to {0} in {1} turns."
+      },
+      "decay":{
+        "now": "This unit will dissolve at the end of this turn.",
+        "later": "This unit will dissolve in {0} turns."
+      }
+    },
+    "ability":{
+      "disband": "Remove any of your own units and get half of its cost in return.",
+      "destroy": "Remove any building within your borders, great for reconstructing your empire.",
+      "literacy": "Reduce the price of all technologies by 20%.",
+      "glide": "All non skating units get an extra move when moving on ice.",
+      "dash": "This unit can attack after moving if there is an enemy in range.",
+      "convert": "This unit can convert an enemy to your own tribe by attacking it.",
+      "escape": "This unit can move again after attacking.",
+      "persist": "This unit can keep attacking as long as it completely kills its victims.",
+      "swim": "This unit is amphibious and can move on both land and water.",
+      "carry": "This unit is carrying another unit inside.",
+      "heal": "This unit can heal surrounding units.",
+      "navigate": "This unit can move in any terrain even if you do not have the tech needed to move there.",
+      "fly": "This unit can fly over any terrain with no movement penalties or bonuses.",
+      "splash": "This unit causes splash damage to nearby units when attacking.",
+      "grow": "This unit will eventually grow and become something else.",
+      "sneak": "This unit can move past enemy units without stopping.",
+      "scout": "This unit has double vision range.",
+      "freeze": "This unit freezes its enemies when attacking them so they cannot move.",
+      "freeze_area": "This unit can freeze the surrounding tiles including any enemy units.",
+      "freeze_auto": "This unit freezes any surrounding tiles and units when moving.",
+      "skate": "This unit gets double movement on ice tiles but on land their movement is limited to 1 tile and all other abilities are disabled.",
+      "fortify": "This unit gets a defence bonus when defending in its own cities, double bonus with a city wall."
+    }
+  },
+ "buttons":{
+   "ok": "OK",
+   "exit": "EXIT",
+   "save": "SAVE",
+   "back": "BACK"
+ },
 
-  "resource.names.fruit": "fruit",
-  "resource.names.crop": "crop",
-  "resource.names.fish": "fish",
-  "resource.names.whale": "whale",
-  "resource.names.game": "wild animal",
-  "resource.names.metal": "metal",
+ "gameinfo":{
+   "id": "id: {0}",
+   "lastmove": "Last move: {0} ago",
+   "updated": "updated: {0} ago",
+   "turn": "Turn: {0}",
+   "serverversion": "Server version: {0}",
+   "gameover": "This game is over, open it to view the final result",
+   "yourturn": "It is your turn to {0}",
+   "opponentsturn": "Waiting for {0} to {1}",
+   "start": "start the game",
+   "picktribe": "pick tribe",
+   "play": "play"
+ },
+"gamesaver":{
+  "error":{
+    "save":"I was unable to save the game, make sure you have sufficient storage on your device",
+    "title": "Could not save :("
+  },
+  "loading":{
+    "moves": "Error loading moves"
+  }
+},
 
-  "terrain.unknown": "Unknown lands",
-  "terrain.water": "Water",
-  "terrain.ocean": "Ocean",
-  "terrain.field": "Field",
-  "terrain.forest": "Forest",
-  "terrain.mountain": "Mountain",
-  "terrain.ice": "Ice",
-  "actionbox.building.level": "level {0}/{1}",
-  "actionbox.tile.roads": "roads",
-  "actionbox.city": "The city of {0}",
-  "actionbox.city.level": "lvl {0}",
-  "actionbox.village": "Village",
-  "actionbox.unit.frozen": "Frozen {0}",
-  "actionbox.unit.kills": "{0}/{1} kills",
-  "actionbox.unit.veteran": "Veteran",
-  "actionbox.unit.new": "Train a new {0} {1}",
-  "actionbox.unit.ability": "Unit Ability",
-  "actionbox.unit.train": "TRAIN",
-  "actionbox.unit.upgrade": "UPGRADE",
-  "actionbox.unit.toomany": "(too many)",
-  "actionbox.unit.toomany.info": "This city can't support any more units. Upgrade the city to get more space for units.",
-  "actionbox.building.doit": "DO IT",
-  "actionbox.building.requiredtech": "You need to research {0} to do this, tap the 'Tech Tree' button.",
-  "actionbox.building.techtree": "TECH TREE",
-  "actionbox.insufficientfunds": "You don't have enough stars to buy this. Tap 'next turn' to get more stars.",
-  "actionbox.confirm": "Confirm {0}",
-  "actionbox.confirm.info": "Are you sure you want to do this?",
-  "actionbox.confirm.button": "YES",
 
-  "tooltip.tile.road": "Build a road to connect this city to your capital.",
-  "tooltip.tile.choose_unit": "Choose a unit to produce.",
-  "tooltip.tile.limit": "This city cannot support any more units.",
-  "tooltip.tile.capture.enemy": "Your city is being captured by the enemy!",
-  "tooltip.tile.capture": "This city is being captured.",
-  "tooltip.tile.capture.tip": "Move a unit here to capture this city!",
-  "tooltip.tile.produces": "Produces {0} each turn.",
-  "tooltip.tile.level.polaris": "Freeze {0} more tiles to reach the next level",
-  "tooltip.tile.level.next": "Next level in {0} turns",
-  "tooltip.tile.level.max": "Has reached maximum level",
-  "tooltip.tile.sailing": "Move a unit here to start sailing!",
-  "tooltip.tile.monuments": "Monuments gives your empire extra score!",
-  "tooltip.tile.ruin": "Move a unit here and examine these ancient ruins.",
-  "tooltip.tile.blocked": "This resource is blocked by an enemy unit",
-  "tooltip.tile.extract.upgrade": "Extract this resource to upgrade your city",
-  "tooltip.tile.extract.convert": "This resource can be transformed into a unit",
-  "tooltip.tile.extract.stars": "Extract this resource to earn stars instantly",
-  "tooltip.tile.extract.research": "You need to research {0} to extract this resource",
-  "tooltip.tile.outside": "This resource is outside of your empire",
-  "tooltip.tile.research": "You need to research {0} to be able to move here",
-  "tooltip.tile.explore": "Explore this area to see what it holds!",
-  "tooltip.unit.city.capture": "Tap 'Capture' to add this city to your empire",
-  "tooltip.unit.city.capture.next": "This city will be ready to capture next turn",
-  "tooltip.unit.city.capture.flying": "Flying units cannot capture cities",
-  "tooltip.unit.actions.none": "No actions left. Press 'Next Turn' to move this unit again.",
-  "tooltip.unit.actions.move": "Click a blue mark to move.",
-  "tooltip.unit.actions.attack": "Click a red mark to attack!",
-  "tooltip.unit.enemy": "This is the enemy!",
-  "tooltip.unit.enemy.territory": "This enemy is in your territory!",
-  "tooltip.unit.enemy.city": "This enemy is capturing your city!",
-  "tooltip.unit.grow.now": "Will grow to {0} at the end of this turn!",
-  "tooltip.unit.grow.later": "Will grow to {0} in {1} turns.",
-  "tooltip.unit.decay.now": "This unit will dissolve at the end of this turn.",
-  "tooltip.unit.decay.later": "This unit will dissolve in {0} turns.",
-  "tooltip.ability.disband": "Remove any of your own units and get half of its cost in return.",
-  "tooltip.ability.destroy": "Remove any building within your borders, great for reconstructing your empire.",
-  "tooltip.ability.literacy": "Reduce the price of all technologies by 20%.",
-  "tooltip.ability.glide": "All non skating units get an extra move when moving on ice.",
-  "tooltip.ability.dash": "This unit can attack after moving if there is an enemy in range.",
-  "tooltip.ability.convert": "This unit can convert an enemy to your own tribe by attacking it.",
-  "tooltip.ability.escape": "This unit can move again after attacking.",
-  "tooltip.ability.persist": "This unit can keep attacking as long as it completely kills its victims.",
-  "tooltip.ability.swim": "This unit is amphibious and can move on both land and water.",
-  "tooltip.ability.carry": "This unit is carrying another unit inside.",
-  "tooltip.ability.heal": "This unit can heal surrounding units.",
-  "tooltip.ability.navigate": "This unit can move in any terrain even if you do not have the tech needed to move there.",
-  "tooltip.ability.fly": "This unit can fly over any terrain with no movement penalties or bonuses.",
-  "tooltip.ability.splash": "This unit causes splash damage to nearby units when attacking.",
-  "tooltip.ability.grow": "This unit will eventually grow and become something else.",
-  "tooltip.ability.sneak": "This unit can move past enemy units without stopping.",
-  "tooltip.ability.scout": "This unit has double vision range.",
-  "tooltip.ability.freeze": "This unit freezes its enemies when attacking them so they cannot move.",
-  "tooltip.ability.freeze_area": "This unit can freeze the surrounding tiles including any enemy units.",
-  "tooltip.ability.freeze_auto": "This unit freezes any surrounding tiles and units when moving.",
-  "tooltip.ability.skate": "This unit gets double movement on ice tiles but on land their movement is limited to 1 tile and all other abilities are disabled.",
-  "tooltip.ability.fortify": "This unit gets a defence bonus when defending in its own cities, double bonus with a city wall.",
-
-  "buttons.ok": "OK",
-  "buttons.exit": "EXIT",
-  "buttons.save": "SAVE",
-  "buttons.back": "BACK",
-
-  "gameinfo.id": "id: {0}",
-  "gameinfo.lastmove": "Last move: {0} ago",
-  "gameinfo.updated": "updated: {0} ago",
-  "gameinfo.turn": "Turn: {0}",
-  "gameinfo.serverversion": "Server version: {0}",
-  "gameinfo.gameover": "This game is over, open it to view the final result",
-  "gameinfo.yourturn": "It is your turn to {0}",
-  "gameinfo.opponentsturn": "Waiting for {0} to {1}",
-  "gameinfo.start": "start the game",
-  "gameinfo.picktribe": "pick tribe",
-  "gameinfo.play": "play",
-
-  "gamesaverbinary.unable.to.save": "I was unable to save the game, make sure you have sufficient storage on your device",
-  "gamesaverbinary.unable.to.save.title": "Could not save :(",
-  "gamesaverbinary.error.loading.moves": "Error loading moves",
 
   "polyplayer.task": "task",
   "polyplayer.task.explorer.title": "Explorer",
