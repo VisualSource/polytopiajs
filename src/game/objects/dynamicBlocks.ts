@@ -134,7 +134,7 @@ export class Mountain extends DynamicBlock{
             variation: 0,
             type: "Mountain",
             resource: (metal ? "metal" : null),
-            material: Files.resources.mountian.material[0],
+            material: Files.resources.mountain.material[0],
             geometry: Files.resources.mountain.geometry[0]
         });
         this.userData.ruin = ruin;

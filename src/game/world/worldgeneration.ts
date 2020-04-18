@@ -288,9 +288,11 @@ export default class WorldGenerationV5{
         
         console.time('Resource generation');
         map.forEach((value,i)=>{
-            if(!["WATER","CITY","OCEAN","MOUNTAIN"].includes(value.type)){
+            if(!["WATER","CITY","OCEAN"].includes(value.type)){
                 const forest = bool(probs.general.forest * probs.faction.forest[value.faction === null ? "Imperius" : value.faction])(this.mt);
+                const mountain = bool(probs.general.mountain * probs.faction.mountain[value.faction === null ? "Imperius" : value.faction])(this.mt);
                 if(forest)map[i].type = "FOREST";
+                if(!forest && mountain) map[i].type = "MOUNTAIN";
             }
         });
         console.timeEnd('Resource generation');
@@ -299,7 +301,7 @@ export default class WorldGenerationV5{
         for (let cell = 0; cell < worldSize**2; cell++) {
             let row = cell / worldSize | 0;
             let column = cell % worldSize;
-            if (["MOUNTAIN","OCEAN", "WATER"].includes(map[cell]['type'])) {
+            if (["OCEAN", "WATER"].includes(map[cell]['type'])) { // MOUNTAIN 
                 village_map[cell] = -1;
             } else if (row === 0 || row === worldSize - 1 || column === 0 || column === worldSize - 1) {
                 village_map[cell] = -1; // villages don't spawn next to the map border

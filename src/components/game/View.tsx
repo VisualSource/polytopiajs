@@ -6,16 +6,36 @@ import BackButton from '../parts/BackButton';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
 import GameState from '../../game/GameStateHandler';
 import {Image, Button, Modal} from 'shineout';
-import {tooltip, building} from '../../assets/lang.json';
+import {tooltip, building, resource_names} from '../../assets/lang.json';
+import IconButton from '../parts/IconButton';
+const resource: { [any: string]: Polytopia.ITech} = {
+    "fruit": "organization",
+    "crop": "farming",
+    "metal":"mining",
+    "fish":"fishing",
+    "whale":"whaling",
+    "wild_animal":"hunting"
+};
 export default function View(){
     const {id} = useQuery();
     const player = new GameState().currentPlayer;
     const object = (scene.getObjectById(Number(id)) as Polytopia.Objects.Dynamic.IDynamicBlock);
     
     const genName = (): string =>{
-        return `${object.blockType}${ object.resource !== null ? `,${object.resource}` : ""}`;
+        //@ts-ignore
+        return `${object.blockType}${ object.resource !== null ? `, ${resource_names[object.resource]}` : ""}`;
     }
     const genDesc = (): string =>{
+        if(player.faction !== object.faction && object.resource){
+            return tooltip.tile.outside;
+        }
+        if(player.faction === object.faction && object.resource){
+            if(player.tech.includes(resource[object.resource])){
+                return tooltip.tile.extract.upgrade;
+            }else{
+                return tooltip.tile.extract.research.replace("{0}",resource[object.resource].charAt(0).toUpperCase() + resource[object.resource].slice(1));
+            }
+        }
         return "";
     }
     const genOptions = (): any[]=>{
@@ -54,7 +74,6 @@ export default function View(){
                 <>
                 <div>
                     <div>
-                        <Button type="success" onClick={()=>createModal(false)}>!</Button>
                         <Image height={50} width={50}/>
                     </div>
                     <section>
