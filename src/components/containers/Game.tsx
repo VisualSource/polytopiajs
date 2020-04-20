@@ -64,27 +64,30 @@ export default class Game extends Component{
     componentDidMount(){ 
         const query = getQuery();
         route("/game/loading",{query});
-        this.init();
+        if(Boolean(query.mp) && Boolean(query.saved)){
+            console.log("Multiplayer savedgame");
+            
+        } // multiplayer savedgame 
+        if(Boolean(query.mp) && Boolean(query.saved) === false){
+            console.log("new Multiplayer game");
+            
+        } // new multiplayer game
+        if(!Boolean(query.mp) && Boolean(query.saved)){
+            console.log("singleplayer savedgame");
+            
+        } // singleplayer saved game 
+        if(!Boolean(query.mp) && !Boolean(query.saved)){
+            console.log("new singleplayer game");
+            
+        } //default singleplayer new game 
+        //this.init();
     }
-    init(){
-        if(this.checkFiles()){
-            const {players,opp} = getQuery();
-            const userList = createPlayerList(players as string[],opp as number);
-            const gameState = new GameState();
-            gameState.init({
-               players: userList
-            });
-            if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
-                const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
-                init(context as WebGL2RenderingContext,this.gameCanvas.current);
-                const wg = new WorldGenerationV5({worldSize: 11, players: userList});
-                wg.createDefaultWorld();
-            }else{
-                console.error(WEBGL.getWebGL2ErrorMessage())
-            }
+    init(func_init: Function){
+        if(this.checkFiles(func_init)){
+            func_init();
         }
     }
-    checkFiles(){
+    checkFiles(func_init:Function){
         const query = getQuery();
         if(Files.filesLoaded){
             route("/game",{query});
@@ -92,7 +95,7 @@ export default class Game extends Component{
         }else{
             route("/game/loading",{query});
             setTimeout(()=>{
-                this.init();
+                this.init(func_init);
             },500);
             return false;
         }
@@ -116,3 +119,23 @@ export default class Game extends Component{
                 </GameProvider>);
     }
 }
+/*
+
+
+  const {players,opp} = getQuery();
+            const userList = createPlayerList(players as string[],opp as number);
+            const gameState = new GameState();
+            gameState.init({
+               players: userList
+            });
+            if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
+                const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
+                init(context as WebGL2RenderingContext,this.gameCanvas.current);
+                const wg = new WorldGenerationV5({worldSize: 11, players: userList});
+                wg.createDefaultWorld();
+            }else{
+                console.error(WEBGL.getWebGL2ErrorMessage());
+            }
+
+
+*/

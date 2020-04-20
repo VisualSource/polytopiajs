@@ -87,7 +87,7 @@ export function destory(){
     window.removeEventListener("resize",handleResizeFunc, false);
     globalDispatcher.removeAllListeners();
     stats.dom.remove();
-    scene.delete();
+    scene?.delete();
 }
 
 function createlights(): THREE.Group{

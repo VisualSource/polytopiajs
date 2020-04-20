@@ -5,7 +5,7 @@ interface GameMenuOptions{
     classes?: string;
 }
 export default function GameMenu(props:GameMenuOptions){
-    return <div id={props.id} className={`game-menu ${props.classes}`}>
+    return <div id={props.id} className={`game-menu ${props.classes ?? ""}`}>
             {props.children}
           </div>
 }
