@@ -3,7 +3,7 @@ import globalDispatcher from './EventDispatcher';
 export default class Interaction{
     mouse: Vector2 = new Vector2();
     INTERSECTED: any;
-    raycaster: Raycaster = new Raycaster;
+    raycaster: Raycaster = new Raycaster();
     camera: OrthographicCamera;
     scene: Scene;
     domElement: HTMLCanvasElement;
@@ -36,7 +36,7 @@ export default class Interaction{
         this.raycaster.setFromCamera(this.mouse,this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         if(intersects.length > 0){
-            if(this.INTERSECTED != intersects[0].object){
+            if(!Object.is(this.INTERSECTED, intersects[0].object)){
                 // reset object if needed
                 if(this.INTERSECTED){}
 

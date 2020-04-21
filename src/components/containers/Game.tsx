@@ -56,6 +56,12 @@ function createPlayerList(playerList: any[], opp:number): Polytopia.IPlayerObjec
     return players;
 }
 
+const toBoolean = (value: string): boolean =>{
+    if(value === "true") 
+        return true;
+        else return false;
+ 
+}
 export default class Game extends Component{
     gameCanvas: RefObject<HTMLCanvasElement> = createRef();
     constructor(props:any){
@@ -64,42 +70,44 @@ export default class Game extends Component{
     componentDidMount(){ 
         const query = getQuery();
         route("/game/loading",{query});
-        if(Boolean(query.mp) && Boolean(query.saved)){
-            console.log("Multiplayer savedgame");
-            
-        } // multiplayer savedgame 
-        if(Boolean(query.mp) && Boolean(query.saved) === false){
-            console.log("new Multiplayer game");
-            
-        } // new multiplayer game
-        if(!Boolean(query.mp) && Boolean(query.saved)){
-            console.log("singleplayer savedgame");
-            
-        } // singleplayer saved game 
-        if(!Boolean(query.mp) && !Boolean(query.saved)){
-            console.log("new singleplayer game");
-            
-        } //default singleplayer new game 
+        const mp = toBoolean(query.mp as any);
+        const saved = toBoolean(query.saved as any);
+        if(mp && saved) this.init(()=>this.mutliplayerInit(saved));
+        if(mp && !saved) this.init(()=>this.mutliplayerInit(saved));
+        if(!mp && saved) this.init(()=>this.singleplayerInit(saved));
+        if(!mp && !saved) this.init(()=>this.singleplayerInit(saved));
+        
         //this.init();
     }
     init(func_init: Function){
-        if(this.checkFiles(func_init)){
-            func_init();
-        }
-    }
-    checkFiles(func_init:Function){
-        const query = getQuery();
         if(Files.filesLoaded){
-            route("/game",{query});
-            return true;
+            func_init();
         }else{
-            route("/game/loading",{query});
             setTimeout(()=>{
                 this.init(func_init);
             },500);
-            return false;
         }
     }
+    singleplayerInit(saved: boolean){
+        if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
+            const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
+            if(saved){
+
+            }else{
+                const {players,opp} = getQuery();
+                const userList = createPlayerList(players as string[],opp as number);
+                const gameState = new GameState();
+                gameState.init({ players: userList });
+                init(context as WebGL2RenderingContext,this.gameCanvas.current);
+                const wg = new WorldGenerationV5({worldSize: 11, players: userList});
+                wg.createDefaultWorld();
+                route("/game");
+            }
+        }else{
+            console.error(WEBGL.getWebGL2ErrorMessage());
+        }
+    }
+    mutliplayerInit(saved: boolean){}
     componentWillUnmount(){
         destory();
     }
