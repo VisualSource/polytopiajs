@@ -3,7 +3,9 @@ import {MersenneTwister19937, pick, bool} from 'random-js';
 import {Group} from 'three';
 import {scene} from '../main';
 import {Water, Ocean, Field, Village, Mountain, City, Forest} from '../objects/dynamicBlocks';
-import {probs} from '../../assets/config.json'
+import {probs} from '../../assets/config.json';
+import {LocalStorageLoader} from '../../utils/Loaders';
+//import {route} from '../../utils/history';
 interface WorldGenerationOptions{
     worldSize: number
     players: Polytopia.IPlayerObject[]
@@ -26,7 +28,7 @@ export default class WorldGenerationV5{
     private noise: SimplexNoise = new SimplexNoise();
     private mt: MersenneTwister19937 = MersenneTwister19937.autoSeed();
     protected settings: WorldGenerationOptions;
-    private deg: {90: number,180: number,270: number,} = {90: (Math.PI/2),180: (Math.PI),270: ((3*Math.PI)/2)}
+    private deg: {90: number,180: number,270: number} = {90: (Math.PI/2),180: (Math.PI),270: ((3*Math.PI)/2)}
     constructor(settings: WorldGenerationOptions){
         this.settings = settings;
     }
@@ -592,3 +594,46 @@ export default class WorldGenerationV5{
         return Math.floor(rand);
     }
 }
+
+
+
+export class WorldLoader extends LocalStorageLoader{
+    parse(map: any){
+
+    }
+    saveLocal(id: string = "sp"){
+        const map = {};
+        this.write(id, map);
+    }
+    async saveOnline(host: boolean, id: string){
+        if(host){
+            try {
+                fetch(`${window.location.origin}/map/${id}`,{
+                    method: "POST",
+                    headers:{},
+                    body: ""
+                });
+            } catch (error) {console.error(error);}
+        }
+    }
+    loadLocal(id: string = "sp"): void{
+        const map = this.read(id);
+        this.parse(map);
+    }
+    async loadOnline(id: Polytopia.UUID){
+        const mapjson = await fetch(`${window.location.origin}/map/${id}`,{
+            method: "GET",
+            headers: {}
+        }).then(e=>e.json());
+        await this.parse(mapjson);
+        //route("/game");
+    }
+    async newOnline(){}
+}
+
+// new local singleplayer  <=
+// load local singleplayer <=
+// new local mp 
+// load local mp 
+// new online mp 
+// load online mp 

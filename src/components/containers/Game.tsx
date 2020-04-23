@@ -4,7 +4,7 @@ import { WEBGL } from 'three/examples/jsm/WebGL.js';
 import {init,destory} from '../../game/main';
 import {GameProvider} from '../providor/GameProvidor';
 import Files from '../../game/utils/FileLoader';
-import WorldGenerationV5 from '../../game/world/worldgeneration';
+import WorldGenerationV5, {WorldLoader} from '../../game/world/worldgeneration';
 import {route, getQuery} from '../../utils/history';
 import LoadingScreen from '../game/LoadingScreen';
 import GameState from '../../game/GameStateHandler';
@@ -64,18 +64,19 @@ const toBoolean = (value: string): boolean =>{
 }
 export default class Game extends Component{
     gameCanvas: RefObject<HTMLCanvasElement> = createRef();
+    worldLoader: WorldLoader = new WorldLoader();
     constructor(props:any){
         super(props);
     }
     componentDidMount(){ 
         const query = getQuery();
         route("/game/loading",{query});
-        const mp = toBoolean(query.mp as any);
-        const saved = toBoolean(query.saved as any);
-        if(mp && saved) this.init(()=>this.mutliplayerInit(saved));
-        if(mp && !saved) this.init(()=>this.mutliplayerInit(saved));
-        if(!mp && saved) this.init(()=>this.singleplayerInit(saved));
-        if(!mp && !saved) this.init(()=>this.singleplayerInit(saved));
+        const mp = toBoolean(query?.mp as any);
+        const saved = toBoolean(query?.saved as any);
+        if(mp && saved) this.init(()=>this.mutliplayerInit(saved));// load local mp // load online mp 
+        if(mp && !saved) this.init(()=>this.mutliplayerInit(saved)); // new local mp  // new online mp 
+        if(!mp && saved) this.init(()=>this.singleplayerInit(saved)); // load saved local singleplayer
+        if(!mp && !saved) this.init(()=>this.singleplayerInit(saved)); // new local singleplayer
         
         //this.init();
     }
@@ -92,12 +93,11 @@ export default class Game extends Component{
         if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
             const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
             if(saved){
-
+                    this.worldLoader.loadLocal();
             }else{
                 const {players,opp} = getQuery();
                 const userList = createPlayerList(players as string[],opp as number);
-                const gameState = new GameState();
-                gameState.init({ players: userList });
+                new GameState().init({ players: userList });
                 init(context as WebGL2RenderingContext,this.gameCanvas.current);
                 const wg = new WorldGenerationV5({worldSize: 11, players: userList});
                 wg.createDefaultWorld();
@@ -107,7 +107,30 @@ export default class Game extends Component{
             console.error(WEBGL.getWebGL2ErrorMessage());
         }
     }
-    mutliplayerInit(saved: boolean){}
+    mutliplayerInit(saved: boolean){
+        const query = getQuery();
+        const local = toBoolean(query.local as any);
+        if(saved && local){
+            this.worldLoader.loadLocal(query.uuid);
+        }
+        if(saved && !local){
+            this.worldLoader.loadOnline(query.uuid as Polytopia.UUID);
+        }
+        if(!saved && local){
+            if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
+                const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
+                const userList = createPlayerList(query.players as string[],query.opp as number);
+                new GameState().init({ players: userList });
+                init(context as WebGL2RenderingContext,this.gameCanvas.current);
+                const wg = new WorldGenerationV5({worldSize: 11, players: userList});
+                wg.createDefaultWorld();
+                route("/game",{replace:true});
+            }
+        }
+        if(!saved && !local){
+            this.worldLoader.newOnline();
+        }
+    }
     componentWillUnmount(){
         destory();
     }

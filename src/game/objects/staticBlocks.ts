@@ -15,9 +15,9 @@ export class StaticBlock extends Mesh implements Polytopia.Objects.Static.IStati
         }
         globalDispatcher.addListener("click",(data)=>{
             if(data.object === this.id){
-                //@ts-ignore
-                this.parent?.onClick(this.parent?.id);
+                (this.parent as Polytopia.Objects.Dynamic.IDynamicBlock).onClick({object: this.parent?.id as number, type:"click"});
             }
+            
         });
     }
     get variation(){

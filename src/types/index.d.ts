@@ -1,10 +1,13 @@
 declare namespace Polytopia{
+    type UUID = string;
     interface QueryParams{
-        saved?: boolean;
-        mp?: boolean;
+        saved?: boolean; // is a saved map
+        mp?: boolean; // is multiplayer game
         id?: number;
+        local?: boolean; // is a local game
         players?: string[],
         opp?: number;
+        uuid?: string; // The id of the map
     }
     type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | 'Polaris' | null;
     type ITech = "climbing" | "organization" | "hunting"| "riding" | "fishing" | "roads" | "trade"| "free_spirit" | "chivalry" | "farming" | "construction" | "shields" | "mining" | "smithery" | "meditation" | "philosophy" | "sailing" | "navigation" | "whaling" | "aquatism"| "spirtualism"| "archery" | "forestry" | "mathematics";
@@ -20,7 +23,7 @@ declare namespace Polytopia{
         ai: boolean;
     }
     interface IClickEvent{
-        type: IClickEvent;
+        type: string;
         object: number;
     }
     namespace Objects{
@@ -68,6 +71,7 @@ declare namespace Polytopia{
                 variation: number;
                 faction: IFaction;
                 resource: Resource;
+                onClick(data: IClickEvent);
             }
             interface IDynamicBlockParams {
                 position?: ICord;

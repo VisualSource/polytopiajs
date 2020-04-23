@@ -14,6 +14,7 @@ ReactDOM.render(<Auth0Provider
                     domain={"visualsource.auth0.com"}
                     client_id={"lMZtNGOs7ZZijZT2Xk0HChwHvyqRSHJX"}
                     redirect_uri={window.location.origin}
+                    audience="https://visualsource.herokuapp.com"
                     onRedirectCallback={onRedirectCallback}>
                     <App />
                 </Auth0Provider>,document.getElementById('root'));
