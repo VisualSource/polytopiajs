@@ -9,9 +9,11 @@ declare namespace Polytopia{
         opp?: number;
         uuid?: string; // The id of the map
     }
+    type IDifficulty = "Easy" | "Normal" | "Hard" | "Crazy";
     type IFaction = "Xin-xi" | "Imperius" | "Bardur" | "Oumaji" | 'Polaris' | null;
     type ITech = "climbing" | "organization" | "hunting"| "riding" | "fishing" | "roads" | "trade"| "free_spirit" | "chivalry" | "farming" | "construction" | "shields" | "mining" | "smithery" | "meditation" | "philosophy" | "sailing" | "navigation" | "whaling" | "aquatism"| "spirtualism"| "archery" | "forestry" | "mathematics";
     type IMouseEvent = "click" | "mouseover";
+    type IGameMode = "perfection" | "domination";
     interface IPlayerObject{
         faction: IFaction;
         id: string;

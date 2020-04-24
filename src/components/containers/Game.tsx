@@ -100,7 +100,7 @@ export default class Game extends Component{
                 new GameState().init({ players: userList });
                 init(context as WebGL2RenderingContext,this.gameCanvas.current);
                 const wg = new WorldGenerationV5({worldSize: 11, players: userList});
-                wg.createDefaultWorld();
+                wg.createLocalGame();
                 route("/game");
             }
         }else{

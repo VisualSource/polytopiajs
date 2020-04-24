@@ -33,7 +33,7 @@ export default class WorldGenerationV5{
         this.settings = settings;
     }
 
-    public createDevWorld(name: string = "overworld", visible: boolean = true): void{
+    public createDevWorld(name: string = "overworld", visible: boolean = true): Group{
         const {worldSize} = this.settings; 
         const world = new Group();
         world.name = name;
@@ -49,9 +49,9 @@ export default class WorldGenerationV5{
                 row = 0;
             }
         }
-        scene.add(world);
+        return world;
     }
-    public createDefaultWorld(){
+    public createDefaultWorld(): Group{
         let row = 0, 
             colum = 0, 
             map: Map[] = [], 
@@ -507,8 +507,11 @@ export default class WorldGenerationV5{
                     throw Error("Unknown block type"); 
             }
     });
-    scene.add(world);
-    
+    return world;
+    }
+    public createLocalGame(){
+        const overworld = this.createDefaultWorld();
+        scene.add(overworld);
     }
 
 
@@ -608,11 +611,7 @@ export class WorldLoader extends LocalStorageLoader{
     async saveOnline(host: boolean, id: string){
         if(host){
             try {
-                fetch(`${window.location.origin}/map/${id}`,{
-                    method: "POST",
-                    headers:{},
-                    body: ""
-                });
+              
             } catch (error) {console.error(error);}
         }
     }
@@ -621,14 +620,19 @@ export class WorldLoader extends LocalStorageLoader{
         this.parse(map);
     }
     async loadOnline(id: Polytopia.UUID){
-        const mapjson = await fetch(`${window.location.origin}/map/${id}`,{
-            method: "GET",
-            headers: {}
-        }).then(e=>e.json());
-        await this.parse(mapjson);
-        //route("/game");
+      try {
+          
+      } catch (error) {
+          
+      }
     }
-    async newOnline(){}
+    async newOnline(){
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
 }
 
 // new local singleplayer  <=
