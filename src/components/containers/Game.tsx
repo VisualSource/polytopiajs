@@ -93,6 +93,7 @@ export default class Game extends Component{
         if(this.gameCanvas.current && WEBGL.isWebGL2Available()){
             const context = this.gameCanvas.current.getContext( 'webgl2', { alpha: false } );
             if(saved){
+                    init(context as WebGL2RenderingContext,this.gameCanvas.current);
                     this.worldLoader.loadLocal();
             }else{
                 const {players,opp} = getQuery();
@@ -128,7 +129,7 @@ export default class Game extends Component{
             }
         }
         if(!saved && !local){
-            this.worldLoader.newOnline();
+           //this.worldLoader.newOnline();
         }
     }
     componentWillUnmount(){

@@ -5,6 +5,10 @@ interface InitParams{
 export default class GameState{
     static players: Polytopia.IPlayerObject[]
     static activePlayer = 0;
+    static difficulty: Polytopia.IDifficulty = "Normal";
+    static turns: number = 0;
+    static worldsize: number = 11;
+    static mode: Polytopia.IGameMode = "domination";
     public init({players}:InitParams){
         GameState.players = players;
     }

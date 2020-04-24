@@ -1,5 +1,25 @@
 declare namespace Polytopia{
     type UUID = string;
+
+    interface Map{
+        saved: string;
+        metadata: {
+            difficulty: IDifficulty;
+            mode: IGameMode;
+            players: IPlayerObject[],
+            size: number;
+            turns: number;
+            current: number;
+        }
+        mapdata: {
+            overworld: {
+                position: THREE.Vector3
+                userdata: {[name: string]: any}
+                visable: boolean;
+                children: any[]
+            }[] | undefined;
+        }
+    }
     interface QueryParams{
         saved?: boolean; // is a saved map
         mp?: boolean; // is multiplayer game

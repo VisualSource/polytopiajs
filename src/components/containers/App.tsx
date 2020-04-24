@@ -3,7 +3,7 @@ import MainMenu from '../menus/MainMenu';
 import Game from './Game';
 import history from '../../utils/history';
 import { Router, Switch, Route} from "react-router-dom";
-
+import Settings from '../menus/Settings';
 
 export default class App extends PureComponent{
   constructor(props: any){
@@ -17,6 +17,9 @@ export default class App extends PureComponent{
               <Switch>
                   <Route exact path="/">
                     <MainMenu/>
+                  </Route>
+                  <Route path="/settings">
+                      <Settings game={false}/>
                   </Route>
                   <Route path="/game">
                     <Game/>

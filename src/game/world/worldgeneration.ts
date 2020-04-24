@@ -5,6 +5,8 @@ import {scene} from '../main';
 import {Water, Ocean, Field, Village, Mountain, City, Forest} from '../objects/dynamicBlocks';
 import {probs} from '../../assets/config.json';
 import {LocalStorageLoader} from '../../utils/Loaders';
+import GameState from '../GameStateHandler'
+import { route } from '../../utils/history';
 //import {route} from '../../utils/history';
 interface WorldGenerationOptions{
     worldSize: number
@@ -601,39 +603,174 @@ export default class WorldGenerationV5{
 
 
 export class WorldLoader extends LocalStorageLoader{
-    parse(map: any){
-
+    parse(map: any[], name: string): Group{
+        const world = new Group();
+        world.name = name;
+        map.forEach(block=>{
+            switch (block.userdata.type) {
+                case "Water":{
+                    world.add(new Water({
+                        position: block.position,
+                        rotation: block.userdata.rotation,
+                        faction: block.userdata.faction,
+                        fish: (block.userdata.resource ? true : false),
+                        ruin: block.userdata.ruin,
+                        variation: block.userdata.variation
+                    }));
+                    break;
+                }
+                case "Ocean":{
+                    world.add(new Ocean({
+                        position: block.position,
+                        rotation: block.userdata.rotation,
+                        faction: block.userdata.faction,
+                        whale: (block.userdata.resource ? true : false),
+                        ruin: block.userdata.ruin,
+                        variation: block.userdata.variation
+                    }));
+                    break;
+                }
+                case "Field":{
+                    world.add(new Field({
+                        position: block.position,
+                        faction: block.userdata.faction,
+                        ruin: block.userdata.ruin,
+                        crop: (block.userdata.resource === "crop" ? true : false),
+                        fruit: (block.userdata.resource === "fruit" ? true : false)
+                    }));
+                    break;
+                }
+                case "Mountain":{
+                    world.add(new Mountain({
+                        position: block.position,
+                        faction: block.userdata.faction,
+                        metal: (block.userdata.resource ? true : false),
+                        ruin: block.userdata.ruin
+                    }));
+                    break;
+                }
+                case "Forest":{
+                    world.add(new Forest({
+                        position: block.position,
+                        faction: block.userdata.faction,
+                        wild_animal: (block.userdata.resource ? true : false),
+                        ruin: block.userdata.ruin
+                    }));
+                    break;
+                }
+                case "Village":{
+                    world.add(new Village({
+                        position: block.position,
+                        faction: block.faction
+                    }));
+                    break;
+                }
+                case "City":{
+                    world.add(new City({
+                        position: block.position,
+                        faction: block.faction
+                    }));
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+        return world;
     }
-    saveLocal(id: string = "sp"){
-        const map = {};
-        this.write(id, map);
+    save(): Polytopia.Map | undefined{
+        try {
+            const {difficulty,mode, players, worldsize, turns, activePlayer} = GameState;
+            const overworld = scene.getObjectByName("overworld")?.children.map(block=>{
+            const child = block.children.map(data=>{
+                return {
+                    position: data.position,
+                    userdata: data.userData,
+                    visable: data.visible
+                }
+            });
+            return {
+                position: block.position,
+                userdata: block.userData,
+                visable: block.visible,
+                children: child
+            }
+        })
+         const map: Polytopia.Map = {
+            saved: new Date().toUTCString(),
+            metadata: {
+                difficulty,
+                mode,
+                players,
+                size: worldsize,
+                turns,
+                current: activePlayer
+            },
+            mapdata: {
+                overworld
+            } 
+         }
+         return map;
+        } catch (error) {
+            console.error(error);
+        }  
     }
-    async saveOnline(host: boolean, id: string){
-        if(host){
-            try {
-              
-            } catch (error) {console.error(error);}
+    saveLocal(id: string = "sp_map"): void{
+        this.write(id,this.save());
+    }
+    loadLocal(id: string = "sp_map"): void{
+        try {
+            const map: Polytopia.Map = this.read(id);
+            new GameState().init({
+                players: map.metadata.players
+            });
+            const overworld = this.parse(map.mapdata.overworld as any[], "overworld");
+            scene.add(overworld);
+            route("/game",{replace: true});
+        } catch (error) {
+            console.error(error);
+            route("/",{replace: true});
         }
     }
-    loadLocal(id: string = "sp"): void{
-        const map = this.read(id);
-        this.parse(map);
+    async saveOnline(id: Polytopia.UUID){
+           try {
+            const map = await this.save();
+            await fetch(`http://localhost:8000/maps/${id}`,{
+                method: "POST",
+                body: JSON.stringify({
+                    method: "PATCH",
+                    map
+                }),
+                headers:{
+                    "Content-Type":"application/json",
+                    Accept: "application/json"
+                }
+            })
+            .then(data=>data.json())
+            .then(data=>{console.log(data);
+            });
+           } catch (error) {
+               console.error(error);
+           }
     }
     async loadOnline(id: Polytopia.UUID){
       try {
+          const map = await fetch(`http://localhost:8000/maps/${id}`,{
+              method:"POST",
+              body: JSON.stringify({method:"GET"}),
+              headers: {
+                "Content-Type":"application/json",
+                Accept: "application/json"
+              }
+          }).then(data=>data.json());
           
       } catch (error) {
           
       }
     }
-    async newOnline(){
-        try {
-            
-        } catch (error) {
-            
-        }
-    }
 }
+//@ts-ignore
+window.test = new WorldLoader();
 
 // new local singleplayer  <=
 // load local singleplayer <=

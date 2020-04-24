@@ -64,6 +64,7 @@ export class Water extends DynamicBlock{
             position, 
             rotation,
             faction,
+            variation,
             resource: (fish ? "fish" : null),
             material: Files.resources.water.material[variation],
             geometry: Files.resources.water.geometry[variation]
@@ -88,6 +89,7 @@ export class Ocean extends DynamicBlock{
             position,
             rotation,
             faction,
+            variation,
             resource: (whale ? "whale" : null),
             material: Files.resources.ocean.material[variation],
             geometry: Files.resources.ocean.geometry[variation]
