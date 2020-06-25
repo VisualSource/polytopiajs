@@ -3,7 +3,7 @@
   "version": "0.3.4-alpha-rc3",
   "private": false,
   "dependencies": {
-    "@auth0/auth0-spa-js": "^1.7.0",
+    "@auth0/auth0-spa-js": "^1.10.0",
     "camera-controls": "^1.21.0",
     "random-js": "^2.1.0",
     "react": "^16.13.1",
