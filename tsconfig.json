@@ -1,0 +1,24 @@
+{
+    "extends": "@tsconfig/svelte/tsconfig.json",
+    "include": ["src"],
+    "exclude": ["node_modules"],
+    "compilerOptions": {
+      "sourceMap": true,
+      "types": ["mocha", "snowpack-env"],
+      /* Visit https://aka.ms/tsconfig.json to read more about this file */
+      "module": "ESNext",
+      "jsx": "preserve",            
+      "isolatedModules": true,              
+      "resolveJsonModule": true,
+      "strict": true,                           
+      "strictPropertyInitialization": false,  
+      "noEmit": true,
+      "moduleResolution": "node",           
+      "esModuleInterop": true,                  
+      "allowSyntheticDefaultImports": true,
+      "useDefineForClassFields": true,
+      "skipLibCheck": true,                    
+      "forceConsistentCasingInFileNames": true  
+    }
+  }
+  

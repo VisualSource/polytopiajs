@@ -1,0 +1,19 @@
+[
+    {
+        "file": "assets/WATER_MATERIAL.mtl",
+        "name": "WATER_MATERIAL"
+    },
+    {
+        "file":"assets/LAND.glb",
+        "name":"LAND"
+    },
+    {
+        "file":"assets/SELECTOR.glb",
+        "name":"SELECOR"
+    },
+    {
+        "file":"assets/WATER_ZERO.obj",
+        "name": "WATER_ZERO",
+        "resource": "WATER_MATERIAL"
+    }
+]

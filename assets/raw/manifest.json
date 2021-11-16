@@ -1,0 +1,108 @@
+[
+    {
+        "type": "material",
+        "name": "WATER_MATERIAL",
+        "file": "assets/WATER_MATERIAL.mtl"
+    },
+    {
+        "type": "material",
+        "name": "OCEAN_MATERIAL",
+        "file": "assets/OCEAN_MATERIAL.mtl"
+    },
+    {   
+        "type":"model",
+        "name": "LAND",
+        "file": "assets/LAND.glb"
+    },
+    {
+        "type":"model",
+        "name": "UNIT",
+        "file": "assets/UNIT.glb"
+    },
+    {
+        "type":"model",
+        "name":"SELECTOR",
+        "file":"assets/SELECTOR.glb"
+    },
+    {
+        "type":"model",
+        "name":"FOREST",
+        "file": "assets/FOREST.glb"
+    },
+    {
+        "type":"model",
+        "name": "WATER_FOUR",
+        "file": "assets/WATER_FOUR.obj",
+        "resource": "WATER_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "WATER_FIVE",
+        "file": "assets/WATER_FIVE.obj",
+        "resource": "WATER_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "WATER_THREE",
+        "file": "assets/WATER_THREE.obj",
+        "resource": "WATER_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "WATER_TWO",
+        "file": "assets/WATER_TWO.obj",
+        "resource": "WATER_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "WATER_ONE",
+        "file": "assets/WATER_ONE.obj",
+        "resource": "WATER_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "WATER_ZERO",
+        "file": "assets/WATER_ZERO.obj",
+        "resource": "WATER_MATERIAL"
+    },
+    {
+        "name": "OCEAN_FIVE",
+        "file": "assets/OCEAN_FIVE.obj",
+        "resource": "OCEAN_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "OCEAN_FOUR",
+        "file": "assets/OCEAN_FOUR.obj",
+        "resource": "OCEAN_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "OCEAN_THREE",
+        "file": "assets/OCEAN_THREE.obj",
+        "resource": "OCEAN_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "OCEAN_TWO",
+        "file": "assets/OCEAN_TWO.obj",
+        "resource": "OCEAN_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "OCEAN_ONE",
+        "file": "assets/OCEAN_ONE.obj",
+        "resource": "OCEAN_MATERIAL"
+    },
+    {
+        "type":"model",
+        "name": "OCEAN_ZERO",
+        "file": "assets/OCEAN_ZERO.obj",
+        "resource": "OCEAN_MATERIAL"
+    },
+    {
+        "type":"partical",
+        "name":"FIRE_PARTICAL",
+        "file": "assets/fire_partical.json"
+    }
+]
