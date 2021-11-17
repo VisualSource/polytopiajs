@@ -12,6 +12,9 @@ export default class Game implements SystemEventListener {
     constructor() {
         if(Game.INSTANCE) return Game.INSTANCE;
         Game.INSTANCE = this;
+
+        //@ts-ignore
+        window.GAME = this;
     }
 
     public async init(){

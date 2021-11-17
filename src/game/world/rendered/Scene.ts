@@ -17,16 +17,7 @@ export default class WorldScene extends Scene {
     public createLevel(name: string): Group {
         const root = new Group();
         root.name = name;
-
-        const units = new Group();
-        units.name = "units";
-        const tiles = new Group();
-        tiles.name = "tiles";
-        const fog = new Group();
-        fog.name = "fog";
-
-        root.add(tiles,units,fog);
-
+        
         this.add(root);
 
         return root;

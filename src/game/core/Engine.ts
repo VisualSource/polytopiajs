@@ -5,6 +5,7 @@ import { WebGLRenderer, OrthographicCamera, Fog,
     MathUtils, MOUSE, Quaternion, Vector2 , Vector3, Vector4, Spherical, Matrix4, Raycaster, Box3, Sphere, TextureLoader,
     Group, HemisphereLight, DirectionalLight } from 'three';
 import EventEmitter, { SystemEventListener } from '../core/EventEmitter';
+import {ObjectEvents,SystemEvents} from '../events/systemEvents';
 
 import WorldScene from '../world/rendered/Scene';
 
@@ -22,10 +23,7 @@ export default class Engine implements SystemEventListener {
     private textureLoader: TextureLoader = new TextureLoader();
     private frustumSize: number = 1000;
     private touch: TouchTap | null = null;
-    private hover: {
-        INTERSECTION: any
-        pointer: Vector2
-    } = {
+    private hover: { INTERSECTION: any; pointer: Vector2; } = {
         INTERSECTION: null,
         pointer: new Vector2()
     };
@@ -34,6 +32,7 @@ export default class Engine implements SystemEventListener {
     public scene: WorldScene;
     public events: EventEmitter = new EventEmitter();
     constructor(public canvas: HTMLCanvasElement){
+        // install the camera controls lib
         CameraControls.install( { 
             THREE: { MOUSE, MathUtils, Quaternion, Spherical, Vector2, Vector3, Vector4, Matrix4, Raycaster, Box3, Sphere }
         });
@@ -56,6 +55,7 @@ export default class Engine implements SystemEventListener {
             1000 
         );
 
+        // Effect composer setup
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(new RenderPass(this.scene,this.camera));
         this.composer.setSize(window.innerWidth,window.innerHeight);
@@ -107,12 +107,12 @@ export default class Engine implements SystemEventListener {
         this.renderer.dispose();
     }
     public getActiveLevel(): THREE.Group | undefined {
-        return this.scene.getObjectByName(this.level) as (THREE.Group | undefined)
+        return this.scene.getLevel(this.level);
     }
     private selection_handler(pointer: Vector2) {
         this.raycaster.setFromCamera(pointer,this.camera);
 
-        const scene = this.scene.getObjectByName(this.level);
+        const scene = this.getActiveLevel();
         if(!scene) {
             console.error("Selection: Failed to find World Group");
             return;
@@ -121,14 +121,23 @@ export default class Engine implements SystemEventListener {
         const intersects = this.raycaster.intersectObjects(scene.children);
 
         if (!(intersects.length > 0) ) {
-            //this.events.send(SystemEvents.SELECTION,SelectionEventID.Deselection);
+            console.log("Deselection of object");
+          //  this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.OBJECT, id: ObjectEvents.DESELECTION, data: {} });
             return;
         }
 
-        let object = intersects[0];
+        let {object, instanceId } = intersects[0];
 
-        if((object.object as InstancedObject)?.isInstancedMesh){
-          //  this.events.send(SystemEvents.SELECTION,SelectionEventID.Selected,{ ref: (object.object as InstancedTile).data[object.instanceId as number], type: object.object.userData });
+        if((object as InstancedObject)?.isInstancedMesh){
+            console.log("select of instancedObject")
+            console.group("Selection");
+            console.log(object);
+            console.log("Instance", instanceId);
+            console.log("Instance Data",(object as InstancedObject).getItem(instanceId as number));
+            console.groupEnd();
+
+            const data = (object as InstancedObject).getItem(instanceId as number);
+            this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION, data: { owner: data.owner } });
             return;
         }
 
@@ -191,6 +200,6 @@ export default class Engine implements SystemEventListener {
     private animationLoop = (time: number) => {
         this.controls.update(time);
         this.composer.render(time);
-        if(this.is_mobile) this.hoverUpdate();
+        if(!this.is_mobile) this.hoverUpdate();
     }
 }

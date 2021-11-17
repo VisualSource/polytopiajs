@@ -1,11 +1,7 @@
-import { InstancedUniformsMesh } from 'three-instanced-uniforms-mesh';
+//import { InstancedUniformsMesh } from 'three-instanced-uniforms-mesh';
 import { DynamicDrawUsage, Object3D, InstancedMesh } from "three";
 import EventEmittter, { SystemEventListener } from '../../core/EventEmitter';
-import { SystemEvents } from '../../events/systemEvents';
-
-export enum ObjectEvents {
-    OBJECT_INDEX_CHANGE
-}
+//import { SystemEvents } from '../../events/systemEvents';
 
 interface WorldObjectData {
     x: number;
@@ -13,12 +9,8 @@ interface WorldObjectData {
     z: number;
     rotation: number;
     index: number;
-    shown: boolean,
-    owner: {
-        group: string;
-        index: number;
-        type: "base" | "building" | "unit";
-    }
+    shown: boolean;
+    owner: string;
 }
 /*
  Should make a version to use the 'InstancedUniformsMesh'
@@ -53,7 +45,7 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.setMatrixAt(index,this.dummy.matrix);
     }
     public getItem(index: number): WorldObjectData {
-        if(index > this.count || index < this.count) throw new Error("Index out of bounds");
+        if(index > this.count || index < 0) throw new Error("Index out of bounds");
         return this.data[index];
     }
    /**
@@ -62,7 +54,7 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
     * @param {number} x
     * @param {number} y
     * @param {number} z
-    * @return {*}  {number}
+    * @return {number}  {number}
     * @memberof InstancedObject
     */
    public getIndexFromPos(x: number, y: number, z: number): number {
@@ -98,7 +90,7 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.count = this.data.length;
         for(let i = 0; i < this.data.length; i++){
             this.data[i].index = i;
-            this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.OBJECT, id: ObjectEvents.OBJECT_INDEX_CHANGE, data: { owner: this.data[i].owner, index: i }});
+           // this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.OBJECT, id: ObjectEvents.OBJECT_INDEX_CHANGE, data: { index: i }});
             this.setPostion(i,this.data[i].x,this.data[i].y,this.data[i].z);
             this.setRotation(i,this.data[i].rotation);
         }

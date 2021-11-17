@@ -330,7 +330,7 @@ export default class WorldGenerator {
         const LEFT = Math.PI; 
         const DOWN = (3 * Math.PI) / 2; // 4.71...n
         for (let cell = 0; cell < worldsize**2; cell++) {
-            let row = cell /worldsize | 0;
+            let row = cell / worldsize | 0;
             let column = cell % worldsize;
             const tileId = map[row][column].base;
             if(tileId === "WATER" || tileId === "OCEAN"){

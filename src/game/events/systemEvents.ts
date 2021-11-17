@@ -1,9 +1,15 @@
 export enum SystemEvents {
-    "LOG" = "LOG",
-    "ERROR" = "ERROR",
-    "ASSET_LOADER" = "ASSET_LOADER",
-    "OBJECT" = "OBJECT"
+    LOG = "LOG",
+    ERROR = "ERROR",
+    ASSET_LOADER = "ASSET_LOADER",
+    OBJECT = "OBJECT",
+    INTERACTION = "INTERACTION"
 };
+
+export enum ObjectEvents {
+    DESELECTION,
+    SELECTION
+}
 
 export enum AssetLoaderEvents {
     ASSETS_LOADED,
