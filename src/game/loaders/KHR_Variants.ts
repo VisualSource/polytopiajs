@@ -34,13 +34,14 @@ export interface VariantGLTF extends GLTF {
        */
       copyVariantMaterials: (dst: THREE.Mesh, src: THREE.Mesh, doTraverse?: boolean) => void;
   }
-  userData:{
-      variants: string[]
+  userData: {
+      variants: string[];
   }
 }
 
-interface VariantGLTFReferene extends GLTFReference {
+interface VariantGLTFReference extends GLTFReference {
   primitives: any | undefined;
+  index: any;
 }
 
 
@@ -164,17 +165,13 @@ const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
         scene.traverse((object: any) => {
           const association = parser.associations.get(object);
   
-          if (!association || association.meshes === undefined || (association as VariantGLTFReferene).primitives === undefined) {
-            return;
-          }
+          if (!association || association.meshes === undefined || (association as VariantGLTFReference).primitives === undefined) return;
   
           const meshDef = json.meshes[association.meshes];
-          const primitiveDef = meshDef.primitives[(association as VariantGLTFReferene).primitives];
+          const primitiveDef = meshDef.primitives[(association as VariantGLTFReference).primitives];
           const extensionsDef = primitiveDef.extensions;
   
-          if (!extensionsDef || !extensionsDef[this.name]) {
-            return;
-          }
+          if (!extensionsDef || !extensionsDef[this.name]) return;
   
           // object should be Mesh
           object.userData.variantMaterials = mappingsArrayToTable(extensionsDef[this.name], variants);
@@ -202,10 +199,9 @@ const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
   
         if (variantName === null || !object.userData.variantMaterials[variantName]) {
           object.material = object.userData.originalMaterial;
-          //@ts-ignore
-          if (parser.associations.has(object.material)) {
-            //@ts-ignore
-            gltfMaterialIndex = parser.associations.get(object.material).index;
+    
+          if (parser.associations.has(object.material as (THREE.Material | THREE.Object3D<Event> | THREE.Texture) )) {
+            gltfMaterialIndex = (parser.associations.get(object.material as (THREE.Material | THREE.Object3D<Event> | THREE.Texture)) as VariantGLTFReference).index; 
           }
         } else {
           const variantMaterialParam = object.userData.variantMaterials[variantName];
