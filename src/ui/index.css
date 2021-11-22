@@ -1,0 +1,6 @@
+@use "../../node_modules/bootstrap/scss/bootstrap" {}html, body {
+  margin: 0;
+  height: 100vh;
+  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+/*# sourceMappingURL=index.css.map */

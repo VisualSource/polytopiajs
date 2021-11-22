@@ -1,57 +1,103 @@
-import { nanoid } from 'nanoid';
-import EventEmitter, { SystemEventListener } from '../core/EventEmitter';
+import { nanoid } from "nanoid";
+import type { Manifest } from "../loaders/AssetLoader";
 
-import type { Unit } from './Unit';
-
-type WorldReference = { id: string, index: number };
-
-enum SelectedID {
-    ROOT,
-    ABOVE,
-    UNIT,
-    SELECTOR
+interface ITile {
+    getType: (tribe: string) => string;
+    manifest: (tribe: string) => Manifest;
 }
 
-export class Tile {
-    constructor(public type: string, public worldRef: WorldReference){}
+const TO_TEXT = {
+    0: "ZERO",
+    1: "ONE",
+    2: "TWO",
+    3: "THREE",
+    4: "FOUR",
+    5: "FIVE"
+}
+export class Tile implements ITile {
+    public readonly id: string = nanoid(4);
+    constructor(public type: string, public metadata: { [name: string]: any } ){
 
-    get show(): boolean {
+    }
+
+    public get show(): boolean {
         return true;
     }
 
-    get terrainBounsMovement(): number {
+    public get terrainBounsMovement(): number {
         return 0
     }
-    get terrainBounsDefence(): number {
+    public get terrainBounsDefence(): number {
         return 0;
     }
-    
-}
 
-export class TileGroup implements SystemEventListener {
-    public events: EventEmitter = new EventEmitter();
-    public readonly id: string = nanoid();
-    // should be Field, Forest, Mountain, Shallow Water, Ocean or Ice everything else should be a building.
-    private base: Tile;
-    // Field => Farm, Windmill, Forge, Sawmill, Sanctuary, Customs House, Ice Bank, Temple, Monuments, Roads, Ruins, Fruit, Crop
-    // Forest => Lumber Hut, Sanctuary, Forest Temple, Roads, Runis, Wild animal
-    // Mountain => Mine, Sanctuary, Mountain Temple, Ruins, Metal
-    // Shallow Water => Fish, Port, Water temple, Monuments, Ruins
-    // Ocean => Water Temple, Whale, Runins
-    // Ice => Outpost, ice temple, Mounuments 
-    private building: Tile[] = [];
-    private unit: Unit | null = null;
-    private selected: SelectedID = SelectedID.ROOT;
-
-    constructor() {
-
+    public getType(tribe: string){
+        if(this.type === "OCEAN" || this.type === "WATER") {
+            return `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
+        } 
+        return `${this.type}_${tribe.toUpperCase()}`;
     }
-
-    public set setUnit(unit: Unit | null) {}
-
-    public addbuilding(tile: Tile){}
-    public removeBuilding(index: number) {}
+    public manifest(tribe: string): Manifest {
+        if(this.type === "OCEAN" || this.type === "WATER") {
+            let key = `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
+            return {
+                asset: key,
+                item: 0,
+                type: "obj"
+            }
+        } 
+        let key = `${this.type}_${tribe.toUpperCase()}`;
+        return {
+            asset: this.type === "CAPITAL" ?  key : this.type,
+            item: 0,
+            type: "gltf"
+        }
+    }
     
 }
+
+export class BuildTile implements ITile {
+    public id: string = nanoid(4);
+    public type: string;
+    public metadata: { [name: string]: any } = {
+        replaced_with: null
+    };
+    constructor(types: string[]){
+        // Ruins cover furit and game so we need to set the RUIN as the type to render,
+        // and save the other object to be render later
+        if(types.includes("RUIN")) {
+          this.type = types[types.findIndex((value=>value==="RUIN"))];
+          if(types.length > 1){
+            this.metadata.replaced_with = types[types.findIndex((value=>value!=="RUIN"))];
+          } 
+        }else {
+            this.type = types[0];
+        }
+       
+    }
+    public getType(tribe: string): string {
+        if(this.type === "GAME" || this.type === "FRUIT"){
+            return `${this.type}_${tribe.toUpperCase()}`;
+        }
+        return this.type;
+    }
+    public manifest(tribe: string): Manifest {
+        if(this.type === "GAME" || this.type === "FRUIT"){
+            let key = `${this.type}_${tribe.toUpperCase()}`;
+            return {
+                asset: key,
+                item: 0,
+                type: "gltf"
+            };
+        }
+        return {
+            asset: this.type,
+            item: 0,
+            type: "gltf"
+        };
+    }
+}
+
+
 
 

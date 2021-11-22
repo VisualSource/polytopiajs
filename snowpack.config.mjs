@@ -7,9 +7,12 @@ const packageJson = readFileSync("./package.json",{encoding:"utf-8"});
 const { version } = JSON.parse(packageJson)
 
 /** @type {import("snowpack").SnowpackUserConfig } */
-export default {
+const config = {
     env: {
         BUILD_VERSION: version
+    },
+    buildOptions: {
+        sourcemap: true
     },
     mount: {
         public: {url: '/', static: true},
@@ -57,3 +60,5 @@ export default {
         {"match": "routes", "src": ".*", "dest": "/index.html"},
     ],
 }
+
+export default config;

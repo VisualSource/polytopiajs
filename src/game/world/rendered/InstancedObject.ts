@@ -11,6 +11,7 @@ interface WorldObjectData {
     index: number;
     shown: boolean;
     owner: string;
+    id: string;
 }
 /*
  Should make a version to use the 'InstancedUniformsMesh'
@@ -48,6 +49,9 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         if(index > this.count || index < 0) throw new Error("Index out of bounds");
         return this.data[index];
     }
+    public getItemById(id: string): WorldObjectData | undefined {
+        return this.data.find(value=>value.id === id);
+    }
    /**
     * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
     *
@@ -57,16 +61,19 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
     * @return {number}  {number}
     * @memberof InstancedObject
     */
-   public getIndexFromPos(x: number, y: number, z: number): number {
+  /* public getIndexFromPos(x: number, y: number, z: number): number {
         return this.data.findIndex((value)=>{
             return value.x === x && value.y === y && value.z === z;
         });
-    }
+    }*/
     public createInstance(data: WorldObjectData){ 
         this.data.push(data);
         this.update();
     }
-    public removeInstance(index: number){
+    public removeInstanceById(id: string): void {
+        this.removeInstance(this.data.findIndex(data=>data.id === id));
+    }
+    public removeInstance(index: number): WorldObjectData {
         if (index < 0 || index >= this.data.length) throw new Error('Index out of bounds');
         const len = this.data.length - 1;
 

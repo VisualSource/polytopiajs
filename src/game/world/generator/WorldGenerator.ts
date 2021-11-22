@@ -2,7 +2,7 @@ import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise';
 import { terrain_props, biome, BORDER_EXPANSION } from './GenerationProps';
 import random from 'random';
 
-interface WorldTile {
+export interface WorldTile {
     col: number;
     row: number;
     base: string;

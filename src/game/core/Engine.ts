@@ -28,7 +28,6 @@ export default class Engine implements SystemEventListener {
         pointer: new Vector2()
     };
     private readonly is_mobile: boolean = isMobile();
-    public level: string = "overworld";
     public scene: WorldScene;
     public events: EventEmitter = new EventEmitter();
     constructor(public canvas: HTMLCanvasElement){
@@ -106,13 +105,10 @@ export default class Engine implements SystemEventListener {
         this.touch?.dispose(this.renderer.domElement);
         this.renderer.dispose();
     }
-    public getActiveLevel(): THREE.Group | undefined {
-        return this.scene.getLevel(this.level);
-    }
     private selection_handler(pointer: Vector2) {
         this.raycaster.setFromCamera(pointer,this.camera);
 
-        const scene = this.getActiveLevel();
+        const scene = this.scene.getActiveLevel();
         if(!scene) {
             console.error("Selection: Failed to find World Group");
             return;
@@ -121,28 +117,17 @@ export default class Engine implements SystemEventListener {
         const intersects = this.raycaster.intersectObjects(scene.children);
 
         if (!(intersects.length > 0) ) {
-            console.log("Deselection of object");
-          //  this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.OBJECT, id: ObjectEvents.DESELECTION, data: {} });
+           this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: {} });
             return;
         }
 
         let {object, instanceId } = intersects[0];
 
         if((object as InstancedObject)?.isInstancedMesh){
-            console.log("select of instancedObject")
-            console.group("Selection");
-            console.log(object);
-            console.log("Instance", instanceId);
-            console.log("Instance Data",(object as InstancedObject).getItem(instanceId as number));
-            console.groupEnd();
-
             const data = (object as InstancedObject).getItem(instanceId as number);
-            this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION, data: { owner: data.owner } });
+            this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION, data: { owner: data.owner, id: data.id, world: { row: data.x, col: data.z } } });
             return;
         }
-
-       // this.events.send(SystemEvents.SELECTION,SelectionEventID.Selected,{});
-
     }
     private selection_mobile = (event: any) => {
         this.selection_handler(
@@ -181,7 +166,7 @@ export default class Engine implements SystemEventListener {
     private hoverUpdate() {
         this.raycaster.setFromCamera(this.hover.pointer,this.camera);
 
-        const scene = this.scene.getObjectByName(this.level);
+        const scene = this.scene.getActiveLevel();
         if(!scene) return;
 
         const intersects = this.raycaster.intersectObjects(scene.children);

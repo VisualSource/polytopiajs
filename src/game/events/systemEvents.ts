@@ -8,7 +8,9 @@ export enum SystemEvents {
 
 export enum ObjectEvents {
     DESELECTION,
-    SELECTION
+    SELECTION,
+    RESET,
+    UNIT_SELECT
 }
 
 export enum AssetLoaderEvents {
