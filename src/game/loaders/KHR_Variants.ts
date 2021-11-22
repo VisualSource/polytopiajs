@@ -1,4 +1,4 @@
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import type { GLTF, GLTFLoaderPlugin, GLTFParser, GLTFReference } from 'three/examples/jsm/loaders/GLTFLoader';
 /**
  * Materials variants extension
  *
@@ -26,12 +26,23 @@ export interface VariantGLTF extends GLTF {
      * @param doTraverse {boolean} Default is true
      * @return {Promise}
      */
-      ensureLoadVariants: (object: THREE.Mesh, doTraverse?: boolean) => Promise<void[]>;
+      ensureLoadVariants: (object: THREE.Mesh, doTraverse?: boolean) => Promise<void | any[]>;
+      /**
+       * @param dst {THREE.Object3D}
+       * @param src {THREE.Object3D}
+       * @param doTraverse {boolean} Default is true
+       */
+      copyVariantMaterials: (dst: THREE.Mesh, src: THREE.Mesh, doTraverse?: boolean) => void;
   }
   userData:{
       variants: string[]
   }
 }
+
+interface VariantGLTFReferene extends GLTFReference {
+  primitives: any | undefined;
+}
+
 
 /**
  * KHR_materials_variants specification allows duplicated variant names
@@ -43,113 +54,130 @@ export interface VariantGLTF extends GLTF {
  * @param variantNames {Array<string>}
  * @return {Array<string>}
  */
- const ensureUniqueNames = (variantNames: Array<string>): Array<string> => {
-    const uniqueNames = [];
-    const knownNames = {};
-  
-    for (const name of variantNames) {
-      let uniqueName = name;
-      let suffix = 0;
-      // @TODO: An easy solution.
-      //        O(N^2) in the worst scenario where N is variantNames.length.
-      //        Fix me if needed.
-      while ((knownNames as any)[uniqueName] !== undefined) {
-        uniqueName = name + '.' + (++suffix);
-      }
-      (knownNames as any)[uniqueName] = true;
-      uniqueNames.push(uniqueName);
+ const ensureUniqueNames = (variantNames: string[]) => {
+  const uniqueNames = [];
+  const knownNames = new Set();
+
+  for (const name of variantNames) {
+    let uniqueName = name;
+    let suffix = 0;
+    // @TODO: An easy solution.
+    //        O(N^2) in the worst scenario where N is variantNames.length.
+    //        Fix me if needed.
+    while (knownNames.has(uniqueName)) {
+      uniqueName = name + '.' + (++suffix);
     }
+    knownNames.add(uniqueName);
+    uniqueNames.push(uniqueName);
+  }
+
+  return uniqueNames;
+};
   
-    return uniqueNames;
-  };
+/**
+ * Convert mappings array to table object to make handling the extension easier.
+ *
+ * @param extensionDef {glTF.meshes[n].primitive.extensions.KHR_materials_variants}
+ * @param variantNames {Array<string>} Required to be unique names
+ * @return {Object}
+ */
+const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
+  const table: any = {};
+  for (const mapping of extensionDef.mappings) {
+    for (const variant of mapping.variants) {
+      table[variantNames[variant]] = {
+        material: null,
+        gltfMaterialIndex: mapping.material
+      };
+    }
+  }
+  return table;
+};
+  
+/**
+ * @param object {THREE.Mesh}
+ * @return {boolean}
+ */
+ const compatibleObject = (object: THREE.Mesh) => {
+  return object.material !== undefined && // easier than (!object.isMesh && !object.isLine && !object.isPoints)
+    object.userData && // just in case
+    object.userData.variantMaterials;
+};
+
+
+/**
+ * @param obj1 {THREE.Object3D}
+ * @param obj2 {THREE.Object3D}
+ * @param callback {function}
+ */
+ const traversePair = (obj1: THREE.Object3D, obj2: THREE.Object3D, callback: Function) => {
+  callback(obj1, obj2);
+  // Assume obj1 and obj2 have the same tree structure
+  for (let i = 0; i < obj1.children.length; i++) {
+    traversePair(obj1.children[i], obj2.children[i], callback);
+  }
+};
+
+// Variant materials and original material instances are stored under
+// object.userData.variantMaterials/originalMaterial.
+// Three.js Object3D.cppy/clone() doesn't copy/clone Three.js objects under
+// .userData so this function is a workaround.
+/**
+ * @param dst {THREE.Object3D}
+ * @param src {THREE.Object3D}
+ * @param callback {function}
+ */
+ const copyVariantMaterials = (dst: THREE.Object3D, src: THREE.Object3D) => {
+  if (src.userData.variantMaterials !== undefined) {
+    dst.userData.variantMaterials = Object.assign({}, src.userData.variantMaterials);
+  }
+  if (src.userData.originalMaterial !== undefined) {
+    dst.userData.originalMaterial = src.userData.originalMaterial;
+  }
+};
   
   /**
-   * Convert mappings array to table object to make handling the extension easier.
+   * @see https://github.com/takahirox/three-gltf-extensions/blob/main/loaders/KHR_materials_variants/KHR_materials_variants.js
    *
-   * @param extensionDef {glTF.meshes[n].primitive.extensions.KHR_materials_variants}
-   * @param variantNames {Array<string>} Required to be unique names
-   * @return {Object}
+   * @export
+   * @class KHR_Variants
    */
-  const mappingsArrayToTable = (extensionDef: any, variantNames: Array<string>) => {
-    const table = {};
-    for (const mapping of extensionDef.mappings) {
-      for (const variant of mapping.variants) {
-        (table as any)[variantNames[variant] as any] = {
-          material: null,
-          gltfMaterialIndex: mapping.material
-        };
-      }
-    }
-    return table;
-  };
-  
-  /**
-   * @param object {THREE.Mesh}
-   * @return {boolean}
-   */
-  const compatibleObject = (object: THREE.Mesh): boolean => {
-    return object.material !== undefined && // easier than (!object.isMesh && !object.isLine && !object.isPoints)
-      object.userData && // just in case
-      object.userData.variantMaterials;
-  };
-  
-  export default class KHR_Variants {
-    constructor(parser: any) {
-        (this as any).parser = parser;
-      (this as any).name = 'KHR_materials_variants';
-    }
+   export default class KHR_Variants implements GLTFLoaderPlugin {
+    public name = 'KHR_materials_variants';
+    constructor(public parser: GLTFParser) {}
   
     // Note that the following properties will be overridden even if they are pre-defined
     // - gltf.userData.variants
     // - mesh.userData.variantMaterials
-    afterRoot(gltf: any) {
-      const parser = (this as any).parser;
+    afterRoot(gltf: GLTF): Promise<void> | null {
+      const parser = this.parser;
       const json = parser.json;
   
-      if (!json.extensions || !json.extensions[(this as any).name]) {
-        return null;
-      }
-  
-      const extensionDef = json.extensions[(this as any).name];
+      if (!json.extensions || !json.extensions[this.name]) return null;
+      
+      const extensionDef = json.extensions[this.name];
       const variantsDef = extensionDef.variants || [];
       const variants = ensureUniqueNames(variantsDef.map((v: any) => v.name));
   
       for (const scene of gltf.scenes) {
         // Save the variants data under associated mesh.userData
         scene.traverse((object: any) => {
-          // The following code can be simplified if parser.associations directly supports meshes.
           const association = parser.associations.get(object);
   
-          if (!association || association.type !== 'nodes') {
+          if (!association || association.meshes === undefined || (association as VariantGLTFReferene).primitives === undefined) {
             return;
           }
   
-          const nodeDef = json.nodes[association.index];
-          const meshIndex = nodeDef.mesh;
+          const meshDef = json.meshes[association.meshes];
+          const primitiveDef = meshDef.primitives[(association as VariantGLTFReferene).primitives];
+          const extensionsDef = primitiveDef.extensions;
   
-          if (meshIndex === undefined) {
+          if (!extensionsDef || !extensionsDef[this.name]) {
             return;
           }
   
-          // Two limitations:
-          // 1. The nodeDef shouldn't have any objects (camera, light, or nodeDef.extensions object)
-          //    other than nodeDef.mesh
-          // 2. Other plugins shouldn't change any scene graph hierarchy
-          // The following code can cause error if hitting the either or both limitations
-          // If parser.associations will directly supports meshes these limitations can be removed
-  
-          const meshDef = json.meshes[meshIndex];
-          const primitivesDef = meshDef.primitives;
-          const meshes = object.isMesh ? [object] : object.children;
-  
-          for (let i = 0; i < primitivesDef.length; i++) {
-            const primitiveDef = primitivesDef[i];
-            const extensionsDef = primitiveDef.extensions;
-            if (!extensionsDef || !extensionsDef[(this as any).name]) {
-              continue;
-            }
-            meshes[i].userData.variantMaterials = mappingsArrayToTable(extensionsDef[(this as any).name], variants);
-          }
+          // object should be Mesh
+          object.userData.variantMaterials = mappingsArrayToTable(extensionsDef[this.name], variants);
         });
       }
   
@@ -157,39 +185,55 @@ export interface VariantGLTF extends GLTF {
   
       // @TODO: Adding new unofficial property .functions.
       //        It can be problematic especially with TypeScript?
-      gltf.functions = gltf.functions || {};
+      (gltf as VariantGLTF).functions = (gltf as VariantGLTF).functions || {};
   
       /**
-       * @param object {THREE.Object3D}
+       * @param object {THREE.Mesh}
        * @param variantName {string|null}
        * @return {Promise}
        */
-      const switchMaterial = async (object: any, variantName: string|null): Promise<void> => {
+      const switchMaterial = async (object: THREE.Mesh, variantName: string | null, onUpdate: any) => {
         if (!object.userData.originalMaterial) {
           object.userData.originalMaterial = object.material;
         }
   
+        const oldMaterial = object.material;
+        let gltfMaterialIndex = null;
+  
         if (variantName === null || !object.userData.variantMaterials[variantName]) {
-          object.material = object.userData.originalMaterial; 
-          return;
+          object.material = object.userData.originalMaterial;
+          //@ts-ignore
+          if (parser.associations.has(object.material)) {
+            //@ts-ignore
+            gltfMaterialIndex = parser.associations.get(object.material).index;
+          }
+        } else {
+          const variantMaterialParam = object.userData.variantMaterials[variantName];
+  
+          if (variantMaterialParam.material) {
+            object.material = variantMaterialParam.material;
+            if (variantMaterialParam.gltfMaterialIndex !== undefined) {
+              gltfMaterialIndex = variantMaterialParam.gltfMaterialIndex;
+            }
+          } else {
+            // Assume the variant material is defined in glTF
+            gltfMaterialIndex = variantMaterialParam.gltfMaterialIndex;
+            object.material = await parser.getDependency('material', gltfMaterialIndex);
+            parser.assignFinalMaterial(object);
+            variantMaterialParam.material = object.material;
+          }
         }
   
-        if (object.userData.variantMaterials[variantName].material) {
-          object.material = object.userData.variantMaterials[variantName].material;
-          return;
+        if (onUpdate !== null) {
+          onUpdate(object, oldMaterial, gltfMaterialIndex);
         }
-  
-        const materialIndex = object.userData.variantMaterials[variantName].gltfMaterialIndex;
-        object.material = await parser.getDependency('material', materialIndex);
-        parser.assignFinalMaterial(object);
-        object.userData.variantMaterials[variantName].material = object.material;
       };
   
       /**
        * @param object {THREE.Mesh}
        * @return {Promise}
        */
-      const ensureLoadVariants = (object: THREE.Mesh): Promise<void | any[]> => {
+      const ensureLoadVariants = (object: THREE.Mesh) => {
         const currentMaterial = object.material;
         const variantMaterials = object.userData.variantMaterials;
         const pending = [];
@@ -199,7 +243,7 @@ export interface VariantGLTF extends GLTF {
             continue;
           }
           const materialIndex = variantMaterial.gltfMaterialIndex;
-          pending.push(parser.getDependency('material', materialIndex).then((material: any) => {
+          pending.push(parser.getDependency('material', materialIndex).then(material => {
             object.material = material;
             parser.assignFinalMaterial(object);
             variantMaterials[variantName].material = object.material;
@@ -211,17 +255,17 @@ export interface VariantGLTF extends GLTF {
       };
   
       /**
-       * @param object {THREE.Mesh}
+       * @param object {THREE.Object3D}
        * @param variantName {string|null}
        * @param doTraverse {boolean} Default is true
        * @return {Promise}
        */
-      gltf.functions.selectVariant = (object: THREE.Mesh, variantName: string|null, doTraverse: boolean = true): Promise<void[]> => {
+      (gltf as VariantGLTF).functions.selectVariant = (object: THREE.Mesh, variantName: string | null, doTraverse = true, onUpdate = null) => {
         const pending = [];
         if (doTraverse) {
-          object.traverse((o: any) => compatibleObject(o) && pending.push(switchMaterial(o, variantName)));
+          object.traverse(o => compatibleObject(o as THREE.Mesh) && pending.push(switchMaterial(o as THREE.Mesh, variantName, onUpdate)));
         } else {
-          compatibleObject(object) && pending.push(switchMaterial(object, variantName));
+          compatibleObject(object) && pending.push(switchMaterial(object, variantName, onUpdate));
         }
         return Promise.all(pending);
       };
@@ -231,14 +275,30 @@ export interface VariantGLTF extends GLTF {
        * @param doTraverse {boolean} Default is true
        * @return {Promise}
        */
-      gltf.functions.ensureLoadVariants = (object: THREE.Mesh, doTraverse: boolean = true): Promise<void | any[]> => {
+       (gltf as VariantGLTF).functions.ensureLoadVariants = (object: THREE.Mesh, doTraverse = true) => {
         const pending = [];
         if (doTraverse) {
-          object.traverse((o: any) => compatibleObject(o) && pending.push(ensureLoadVariants(o)));
+          object.traverse(o => compatibleObject(o as THREE.Mesh) && pending.push(ensureLoadVariants(o as THREE.Mesh)));
         } else {
           compatibleObject(object) && pending.push(ensureLoadVariants(object));
         }
         return Promise.all(pending);
       };
+  
+      /**
+       * @param dst {THREE.Object3D}
+       * @param src {THREE.Object3D}
+       * @param doTraverse {boolean} Default is true
+       */
+      (gltf as VariantGLTF).functions.copyVariantMaterials = (dst: THREE.Mesh, src: THREE.Mesh, doTraverse: boolean = true) => {
+        if (doTraverse) {
+          traversePair(dst, src, (dst: THREE.Mesh, src: THREE.Mesh) => copyVariantMaterials(dst, src));
+        } else {
+          copyVariantMaterials(dst, src);
+        }
+      };
+
+
+      return null;
     }
   }

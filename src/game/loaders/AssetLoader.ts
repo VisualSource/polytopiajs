@@ -128,7 +128,7 @@ export default class AssetLoader  {
                 localStorage.setItem("pak_installed",version.toString());
             } else {
               //  const pak = await (await fetch(import.meta.env.SNOWPACK_PUBLIC_PAK_VERSION)).json();
-                localStorage.setItem("pak_installed","0"/*pak.version.toString()*/);
+                localStorage.setItem("pak_installed","1"/*pak.version.toString()*/);
             }
 
         } catch (error) {
@@ -168,7 +168,7 @@ export default class AssetLoader  {
         const gltfLoader = new GLTFLoader(loaderManager);
         //const texLoader = new TextureLoader();
 
-        gltfLoader.register(parser => new KHR_Variants(parser) as GLTFLoaderPlugin);
+        gltfLoader.register(parser => new KHR_Variants(parser));
 
         for (const [name,data] of cachedAssets) {
             switch (data.blob.type) {
@@ -183,9 +183,7 @@ export default class AssetLoader  {
                                 Using the `in` key word, should be better then checking if the value is truty.
                             */
                             if("functions" in gltfAsset){
-                                for(const obj of gltfAsset.scene.children) {
-                                    await (gltfAsset as VariantGLTF).functions.ensureLoadVariants(obj as THREE.Mesh);
-                                }
+                                await (gltfAsset as VariantGLTF).functions.ensureLoadVariants(gltfAsset.scene.children[0] as THREE.Mesh);
                             }
 
                             ok({

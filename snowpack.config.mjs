@@ -12,7 +12,7 @@ const config = {
         BUILD_VERSION: version
     },
     buildOptions: {
-        sourcemap: true
+        sourcemap: false
     },
     mount: {
         public: {url: '/', static: true},

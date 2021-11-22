@@ -10,8 +10,7 @@ export default class SelectorTile implements SystemEventListener {
     constructor(private asset: VariantGLTF){
         this.mesh = asset.scene.children[0] as THREE.Mesh;
         this.mesh.visible = false;
-        console.log(asset)
-        console.log(this.mesh)
+        this.mesh.name = "Selector";
         this.events.on(SystemEvents.INTERACTION,(event)=>{
           //  console.log("SELECTOR TILE",event.id,event.data);
             switch (event.id) {
