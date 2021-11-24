@@ -1,6 +1,7 @@
 //import { InstancedUniformsMesh } from 'three-instanced-uniforms-mesh';
 import { DynamicDrawUsage, Object3D, InstancedMesh } from "three";
 import EventEmittter, { SystemEventListener } from '../../core/EventEmitter';
+import type { UUID } from "../../core/types";
 //import { SystemEvents } from '../../events/systemEvents';
 
 interface WorldObjectData {
@@ -11,7 +12,16 @@ interface WorldObjectData {
     index: number;
     shown: boolean;
     owner: string;
-    id: string;
+    id: UUID;
+}
+
+interface IEditableWorldObjectData {
+    row?: number;
+    y?: number; 
+    col?: number;
+    rotation?: number;
+    shown?: boolean;
+    owner?: UUID;
 }
 /*
  Should make a version to use the 'InstancedUniformsMesh'
@@ -49,28 +59,30 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         if(index > this.count || index < 0) throw new Error("Index out of bounds");
         return this.data[index];
     }
-    public getItemById(id: string): WorldObjectData | undefined {
+   
+    public getItemById(id: UUID): WorldObjectData | undefined {
         return this.data.find(value=>value.id === id);
     }
-   /**
-    * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
-    *
-    * @param {number} x
-    * @param {number} y
-    * @param {number} z
-    * @return {number}  {number}
-    * @memberof InstancedObject
-    */
-  /* public getIndexFromPos(x: number, y: number, z: number): number {
-        return this.data.findIndex((value)=>{
-            return value.x === x && value.y === y && value.z === z;
-        });
-    }*/
+    public editInstance(id: UUID, data: IEditableWorldObjectData): void {
+        const inst = this.getItemById(id);
+        if(!inst) return;
+
+        for(const item in data){
+            if(item === "row" || item === "col") {
+                (inst as any)[item] = (data as any)[item] * InstancedObject.WORLD_TILE_OFFSET;
+                continue;
+            }
+            (inst as any)[item] = (data as any)[item];
+        }
+
+        this.update();
+
+    }
     public createInstance(data: WorldObjectData){ 
         this.data.push(data);
         this.update();
     }
-    public removeInstanceById(id: string): void {
+    public removeInstanceById(id: UUID): void {
         this.removeInstance(this.data.findIndex(data=>data.id === id));
     }
     public removeInstance(index: number): WorldObjectData {

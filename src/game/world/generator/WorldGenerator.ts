@@ -1,20 +1,21 @@
 import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise';
 import { terrain_props, biome, BORDER_EXPANSION } from './GenerationProps';
 import random from 'random';
+import type {Tribe} from '../../core/types';
 
 export interface WorldTile {
     col: number;
     row: number;
     base: string;
     buldings: string[],
-    tribe: string;
+    tribe: Tribe;
     metadata: {
         [name: string]: any
     }
 }
 
 export default class WorldGenerator {
-    static gen(tribes: string[], worldsize: number = 11){
+    static gen(tribes: Tribe[], worldsize: number = 11){
         //random.patch();
         //
         //

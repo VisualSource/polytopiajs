@@ -20,7 +20,7 @@ export interface VariantGLTF extends GLTF {
      * @param doTraverse {boolean} Default is true
      * @return {Promise}
      */
-      selectVariant: (object: THREE.Mesh, varName: string, doTranerse?: boolean) => Promise<void[]>;
+      selectVariant: (object: THREE.Mesh, varName: string, doTranerse?: boolean, onUpdate?: any | null) => Promise<void[]>;
        /**
      * @param object {THREE.Mesh}
      * @param doTraverse {boolean} Default is true
@@ -36,6 +36,8 @@ export interface VariantGLTF extends GLTF {
   }
   userData: {
       variants: string[];
+      variantMaterials:  any;
+      originalMaterial: any;
   }
 }
 
@@ -189,7 +191,7 @@ const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
        * @param variantName {string|null}
        * @return {Promise}
        */
-      const switchMaterial = async (object: THREE.Mesh, variantName: string | null, onUpdate: any) => {
+      const switchMaterial = async (object: THREE.Mesh, variantName: string | null, onUpdate: (object: THREE.Mesh, oldMaterial: THREE.Material | THREE.Material[], gltfMaterialIndex: any) => void | null ) => {
         if (!object.userData.originalMaterial) {
           object.userData.originalMaterial = object.material;
         }

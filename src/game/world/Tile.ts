@@ -1,9 +1,10 @@
 import { nanoid } from "nanoid";
 import type { Manifest } from "../loaders/AssetLoader";
+import type {Tribe, UUID} from '../core/types';
 
 interface ITile {
-    getType: (tribe: string) => string;
-    manifest: (tribe: string) => Manifest;
+    getType: (tribe: Tribe) => string;
+    manifest: (tribe: Tribe) => Manifest;
 }
 
 const TO_TEXT = {
@@ -15,7 +16,7 @@ const TO_TEXT = {
     5: "FIVE"
 }
 export class Tile implements ITile {
-    public readonly id: string = nanoid(4);
+    public readonly id: UUID = nanoid(4);
     constructor(public type: string, public metadata: { [name: string]: any } ){
 
     }
@@ -31,13 +32,13 @@ export class Tile implements ITile {
         return 0;
     }
 
-    public getType(tribe: string){
+    public getType(tribe: Tribe){
         if(this.type === "OCEAN" || this.type === "WATER") {
             return `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
         } 
         return `${this.type}_${tribe.toUpperCase()}`;
     }
-    public manifest(tribe: string): Manifest {
+    public manifest(tribe: Tribe): Manifest {
         if(this.type === "OCEAN" || this.type === "WATER") {
             let key = `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
             return {
@@ -57,7 +58,7 @@ export class Tile implements ITile {
 }
 
 export class BuildTile implements ITile {
-    public id: string = nanoid(4);
+    public id: UUID = nanoid(4);
     public type: string;
     public metadata: { [name: string]: any } = {
         replaced_with: null
@@ -75,13 +76,13 @@ export class BuildTile implements ITile {
         }
        
     }
-    public getType(tribe: string): string {
+    public getType(tribe: Tribe): string {
         if(this.type === "GAME" || this.type === "FRUIT"){
             return `${this.type}_${tribe.toUpperCase()}`;
         }
         return this.type;
     }
-    public manifest(tribe: string): Manifest {
+    public manifest(tribe: Tribe): Manifest {
         if(this.type === "GAME" || this.type === "FRUIT"){
             let key = `${this.type}_${tribe.toUpperCase()}`;
             return {

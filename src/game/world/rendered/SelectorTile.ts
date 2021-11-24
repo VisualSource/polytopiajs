@@ -1,4 +1,3 @@
-import { Mesh } from 'three';
 import EventEmitter from '../../core/EventEmitter';
 import type { SystemEventListener } from '../../core/EventEmitter';
 import type { VariantGLTF } from '../../loaders/KHR_Variants';
@@ -28,7 +27,6 @@ export default class SelectorTile implements SystemEventListener {
                     this.setVisible();
                     break;
                 case ObjectEvents.UNIT_SELECT:
-                    console.log("UNIT SELECTION")
                     this.setStyle("UnitSelector"); 
                     break;
                 default:
@@ -40,6 +38,7 @@ export default class SelectorTile implements SystemEventListener {
         if(!this.mesh.visible) this.mesh.visible = true;
     }
     public async setStyle(key: string){
+        // add check to see if the current material is already is this variant
         await this.asset.functions.selectVariant(this.mesh,key);
     }
 }
