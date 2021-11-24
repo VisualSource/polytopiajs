@@ -117,7 +117,7 @@ export default class Engine implements SystemEventListener {
         const intersects = this.raycaster.intersectObjects(scene.children);
 
         if (!(intersects.length > 0) ) {
-           this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: {} });
+            this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: {} });
             return;
         }
 

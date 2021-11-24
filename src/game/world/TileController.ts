@@ -52,6 +52,9 @@ export default class TileController implements SystemEventListener {
         if(tile_data.buldings.length > 0) this.top = new BuildTile(tile_data.buldings);
 
     }
+    public setUnit(id: UUID | null = null) {
+        this.unit = id;
+    }
     private deselectionHandle = (): void => {
         this.selected = Selected.TILE;
         this.isSelected = false;
@@ -62,7 +65,7 @@ export default class TileController implements SystemEventListener {
     }
     private selectionHandle = (event: any): void => {
         if(event.data.owner !== this.uuid) return;
-
+      
         if(this.override) {
             return;
         }

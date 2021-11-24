@@ -1,6 +1,7 @@
 import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise';
 import { terrain_props, biome, BORDER_EXPANSION } from './GenerationProps';
 import random from 'random';
+import NArray from '../../../utils/NArray';
 import type {Tribe} from '../../core/types';
 
 export interface WorldTile {
@@ -16,56 +17,35 @@ export interface WorldTile {
 
 export default class WorldGenerator {
     static gen(tribes: Tribe[], worldsize: number = 11){
-        //random.patch();
-        //
-        //
-        // INIT START
-        //
-        //
-        let map: WorldTile[][] = [];
+        let map: NArray<WorldTile> = new NArray(worldsize);
         const sn = new SimplexNoise();
 
         const noise = (nx: number, ny: number) => {
             return sn.noise(nx,ny) / 2 + 0.5;
-        }
+        }   
 
-        for(let col = 0 ; col < worldsize; col++){
-            map.push([]);
-            for(let row = 0; row < worldsize; row++){
-                map[col][row] = {
+        for(let row = 0 ; row < worldsize; row++){
+            for(let col = 0; col < worldsize; col++){
+                map.set(row,col,{
                     col,
                     row,
                     base: biome(noise(
-                        col / worldsize - 0.5, 
-                        row / worldsize - 0.5
+                        row / worldsize - 0.5, 
+                        col / worldsize - 0.5
                     )),
                     metadata: {},
-                    buldings: [],
+                    buldings: [],  
                     tribe: "xin-xi"
-                };
+                });
             }
         }
-
-        //
-        //
-        // INIT END
-        //
-        //
-
-
-        //
-        //
-        // Capital Generation setup START
-        //
-        //
-        
+ 
         let capital_cells: any[] = [];
         let capital_map: { [cell: number]: number } = {};
-
         for (let _ of tribes){
             for(let row = 2; row < worldsize - 2; row++){
                 for(let column = 2; column < worldsize - 2; column++) {
-                    if(map[row][column]["base"] === "LAND") { 
+                    if(map.isValid(row,column)?.base === "LAND") { 
                         capital_map[row * worldsize + column] = 0;
                     }
                 }
@@ -101,8 +81,8 @@ export default class WorldGenerator {
         for(let i = 0; i < capital_cells.length; i++) { 
             const row = (capital_cells[i] / worldsize | 0);
             const col = (capital_cells[i] % worldsize);
-            map[row][col].base = "CAPITAL";
-            map[row][col].tribe = tribes[i];
+            map.get(row,col).base = "CAPITAL";
+            map.get(row,col).tribe = tribes[i];
         }
         
         //
@@ -125,14 +105,14 @@ export default class WorldGenerator {
                     let rand_number = random.int(0, active_tiles[i].length - 1);
                     let rand_cell = active_tiles[i][rand_number];
                     let neighbours = circle(rand_cell,1,worldsize);
-                    let valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1 && map[value / worldsize | 0][value % worldsize].base !== "WATER");
+                    let valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1 && (map.get(value / worldsize | 0,value % worldsize).base !== "WATER"));
                     if(!valid_neighbours.length) {
                         valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1);
                     } // if there are no land tiles around, accept water tiles
                     if(valid_neighbours.length) {
                         let new_rand_number = random.int(0,valid_neighbours.length - 1);
                         let new_rand_cell = valid_neighbours[new_rand_number];
-                        map[(new_rand_cell / worldsize | 0)][(new_rand_cell % worldsize)].tribe = tribes[i];
+                        map.get((new_rand_cell / worldsize | 0),(new_rand_cell % worldsize)).tribe = tribes[i];
                         active_tiles[i].push(new_rand_cell);
                         done_tiles.push(new_rand_cell);
                     } else {
@@ -145,16 +125,19 @@ export default class WorldGenerator {
     
            // generate forest, mountains, and extra water according to terrain underneath
         for(let cell = 0; cell < worldsize**2; cell++) {
-            if(map[(cell / worldsize | 0)][cell % worldsize]) {
+            if(map.get((cell / worldsize | 0),cell % worldsize)) {
+                const row = (cell / worldsize | 0);
+                const col = cell % worldsize;
+                let tribe = map.get(row,col).tribe;
                 let rand = random.float(0,1);
-                if(rand < (terrain_props.forest.default * (terrain_props.forest as any)[map[(cell / worldsize | 0)][cell % worldsize].tribe])){
-                    map[(cell / worldsize | 0)][cell % worldsize].base = "FOREST";
-                } else if (rand > (1 - terrain_props.mountain.default *  (terrain_props.mountain as any)[map[(cell / worldsize | 0)][cell % worldsize].tribe])) {
-                    map[(cell / worldsize | 0)][cell % worldsize].base = "MOUNTAIN";
+                if(rand < (terrain_props.forest.default * (terrain_props.forest as any)[tribe])){
+                    map.get(row,col).base = "FOREST";
+                } else if (rand > (1 - terrain_props.mountain.default *  (terrain_props.mountain as any)[tribe])) {
+                    map.get(row,col).base = "MOUNTAIN";
                 }
                 rand = random.float(0,1);
-                if(rand < (terrain_props.water as any)[map[(cell / worldsize | 0)][cell % worldsize].tribe]){
-                    map[(cell / worldsize | 0)][cell % worldsize].base = "OCEAN";
+                if(rand < (terrain_props.water as any)[tribe]){
+                    map.get(row,col).base = "OCEAN";
                 }
             }
         }
@@ -169,7 +152,7 @@ export default class WorldGenerator {
         for(let cell = 0; cell < worldsize**2; cell++) {
             let row = cell / worldsize | 0;
             let column = cell % worldsize;
-            if(map[row][column].base === "OCEAN" || map[row][column].base === "MOUNTAIN") {
+            if(map.get(row,column).base === "OCEAN" || map.get(row,column).base === "MOUNTAIN") {
                 village_map[cell] = -1;
             } else if(row === 0 || row === (worldsize - 1) || column === 0 || column === (worldsize - 1) ) {
                 village_map[cell] = -1;
@@ -212,44 +195,45 @@ export default class WorldGenerator {
         for(let cell = 0; cell < worldsize**2; cell++){
             let row = cell / worldsize | 0;
             let column = cell % worldsize;
-            switch(map[row][column].base){
+            let tribe = map.get(row,column).tribe;
+            switch(map.get(row,column).base){
                 case "LAND":{
-                    let fruit = terrain_props.fruit.default * (terrain_props.fruit as any)[map[row][column].tribe];
-                    let crop = terrain_props.crop.default * (terrain_props.crop as any)[map[row][column].tribe];
+                    let fruit = terrain_props.fruit.default * (terrain_props.fruit as any)[tribe];
+                    let crop = terrain_props.crop.default * (terrain_props.crop as any)[tribe];
                     if(village_map[cell] === 3){
-                        map[row][column].buldings.push("VILLAGE");
-                        map[row][column].base = "LAND";
+                        map.get(row,column).buldings.push("VILLAGE");
+                        map.get(row,column).base = "LAND";
                     } else if(proc(cell,fruit * (1 - crop / 2))) {
-                        map[row][column].buldings.push("FRUIT");
+                        map.get(row,column).buldings.push("FRUIT");
                     } else if(proc(cell, crop * (1 - fruit / 2))) {
-                        map[row][column].buldings.push("CROP");
+                        map.get(row,column).buldings.push("CROP");
                     }
                     break;
                 }
                 case "FOREST": {
                     if(village_map[cell] === 3) {
-                        map[row][column].buldings.push("VILLAGE");
-                        map[row][column].base = "LAND";
-                    } else if(proc(cell,terrain_props.game.default * (terrain_props.game as any)[map[row][column].tribe])) {
-                        map[row][column].buldings.push("GAME");
+                        map.get(row,column).buldings.push("VILLAGE");
+                        map.get(row,column).base = "LAND";
+                    } else if(proc(cell,terrain_props.game.default * (terrain_props.game as any)[tribe])) {
+                        map.get(row,column).buldings.push("GAME");
                     }
                     break;
                 }
                 case "WATER":{
-                    if(proc(cell,terrain_props.fish.default * (terrain_props.fish as any)[map[row][column].tribe] )) {
-                        map[row][column].buldings.push("FISH");
+                    if(proc(cell,terrain_props.fish.default * (terrain_props.fish as any)[tribe] )) {
+                        map.get(row,column).buldings.push("FISH");
                     }
                     break;
                 }
                 case "OCEAN":{
-                    if(proc(cell,terrain_props.whale.default * (terrain_props.whale as any)[map[row][column].tribe] )){
-                        map[row][column].buldings.push("WHALE");
+                    if(proc(cell,terrain_props.whale.default * (terrain_props.whale as any)[tribe] )){
+                        map.get(row,column).buldings.push("WHALE");
                     }
                     break;
                 }
                 case "MOUNTAIN":{
-                    if(proc(cell,terrain_props.metal.default * (terrain_props.metal as any)[map[row][column].tribe] )) {
-                        map[row][column].buldings.push("METAL");
+                    if(proc(cell,terrain_props.metal.default * (terrain_props.metal as any)[tribe] )) {
+                        map.get(row,column).buldings.push("METAL");
                     } 
                     break;
                 }
@@ -263,9 +247,9 @@ export default class WorldGenerator {
         while(ruins_count < ruins_number) {
             let ruin = random_element(village_map.map((cell,i)=>cell === 0 || cell === 1 || cell === -1 ? i : null).filter(cell => cell !== null));
 
-            let terrain = map[ruin / worldsize | 0][ruin % worldsize].base;
+            let terrain = map.get(ruin / worldsize | 0,ruin % worldsize).base;
             if(terrain !== "WATER" && (water_ruins_count < water_ruins_number || terrain !== "OCEAN")) {
-                map[ruin / worldsize | 0][ruin % worldsize].buldings.push("RUIN");
+                map.get(ruin / worldsize | 0,ruin % worldsize).buldings.push("RUIN");
                 if(terrain === "OCEAN") {
                     water_ruins_count ++;
                 }
@@ -280,7 +264,7 @@ export default class WorldGenerator {
         const check_resources = (resource: string, capital: number) => {
             let resources = 0;
             for(let neighbour of circle(capital,1,worldsize)) {
-                if(map[neighbour / worldsize | 0][neighbour % worldsize].buldings.includes(resource)) {
+                if(map.get(neighbour / worldsize | 0,neighbour % worldsize).buldings.includes(resource)) {
                     resources++;
                 }
             }
@@ -290,15 +274,15 @@ export default class WorldGenerator {
         const post_generate = (resource: string, base: string, quantity: number, capital: number) => {
             let resources = check_resources(resource,capital);
             while(resources < quantity) {
-                let pos = random.int(0,8);
+                let pos = random.int(0,7);
                 let territory = circle(capital,1,worldsize);
                 let row = territory[pos] / worldsize | 0;
                 let column = territory[pos] % worldsize;
-                map[row][column].base = base;
-                map[row][column].buldings = [resource];
+                map.get(row,column).base = base;
+                map.get(row,column).buldings = [resource];
                 for(let neighbour of plus_sign(territory[pos],worldsize)) {
-                    if(map[neighbour / worldsize | 0][neighbour % worldsize].base === "OCEAN") {
-                        map[neighbour / worldsize | 0][neighbour % worldsize].base = "WATER";
+                    if(map.get(neighbour / worldsize | 0,neighbour % worldsize).base === "OCEAN") {
+                        map.get(neighbour / worldsize | 0,neighbour % worldsize).base = "WATER";
                     }
                 }
                 resources = check_resources(resource,capital);
@@ -306,7 +290,7 @@ export default class WorldGenerator {
         }
 
         for(let capital of capital_cells){
-            switch(map[capital / worldsize | 0][capital % worldsize].tribe){
+            switch(map.get(capital / worldsize | 0,capital % worldsize).tribe){
                 case "imperius": {
                     post_generate("FRUIT","LAND",2,capital);
                     break;
@@ -325,7 +309,7 @@ export default class WorldGenerator {
             }
         }
 
-
+        // water tiles side selection.
         const RIGHT = 0;
         const UP = Math.PI / 2; //1.57...
         const LEFT = Math.PI; 
@@ -333,15 +317,15 @@ export default class WorldGenerator {
         for (let cell = 0; cell < worldsize**2; cell++) {
             let row = cell / worldsize | 0;
             let column = cell % worldsize;
-            const tileId = map[row][column].base;
+            const tileId = map.get(row,column).base;
             if(tileId === "WATER" || tileId === "OCEAN"){
                 let sides = 4;
                 let dir = RIGHT;
-                const up = map[row - 1] && map[row - 1][column]?.base === tileId;
-                const down = map[row + 1] && map[row + 1][column]?.base === tileId;
-                const left = map[row][column - 1]?.base === tileId;
-                const right = map[row][column + 1]?.base === tileId;
-
+                const up = map.isValid(row, column - 1)?.base === tileId;
+                const down = map.isValid(row,column + 1)?.base === tileId;
+                const left = map.isValid(row - 1,column)?.base === tileId;
+                const right = map.isValid(row + 1,column)?.base === tileId;
+        
                 if(up) sides--;
                 if(down) sides--;
                 if(left) sides--;
@@ -383,13 +367,12 @@ export default class WorldGenerator {
                     }
                 }
                 
-                map[row][column].metadata = {
+                map.get(row,column).metadata = {
                     model_id: sides,
                     rotation: dir
                 };
             }
         }
-
 
         return map;
     }

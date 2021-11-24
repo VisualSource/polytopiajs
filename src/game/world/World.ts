@@ -2,6 +2,7 @@ import WorldGenerator from "./generator/WorldGenerator";
 import TileController from './TileController';
 import SelectorTile from "./rendered/SelectorTile";
 import { Unit } from "./Unit";
+import NArray from "../../utils/NArray";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
 import type { Position, Tribe, UUID } from "../core/types";
 import type Engine from "../core/Engine";
@@ -9,23 +10,24 @@ import type AssetLoader from "../loaders/AssetLoader";
 
 export default class World {
     // this problily will need to be a map for when working with different dimensions and the like.
-    public level: TileController[][];
+    public level: NArray<TileController>;
     public units: Map<string,Unit> = new Map();
     public selector: SelectorTile;
     constructor(private engine: Engine, private assets: AssetLoader){
         // this is here for testing, in production this is not a great place to do this.
         this.createWorld(["imperius","bardur"],11).then(a=>{
-           this.level = a;
+            this.createUnit("imperius","warrior",{row: 4, col: 2});
        });
     }
-    public async createUnit(tribe: Tribe, type: string, position: Position, tile_owner: UUID){
+    public async createUnit(tribe: Tribe, type: string, position: Position){
         const unit = new Unit(this.engine,this.assets,{
             type,
             tribe,
             position
         });
         this.units.set(unit.uuid,unit);
-        await unit.render(tile_owner);
+        this.level.get(position.row,position.col).setUnit(unit.uuid);
+        await unit.render(this.level.get(position.row,position.col).uuid);
     }
     public async destoryUnit(id: UUID){
         const unit = this.units.get(id);
@@ -33,7 +35,7 @@ export default class World {
         unit.destory();
         this.units.delete(id);
     }
-    public async createWorld(tribes: Tribe[], size: number): Promise<TileController[][]> {
+    public async createWorld(tribes: Tribe[], size: number): Promise<NArray<TileController>> {
        
         // Add selector to scene
         try {
@@ -50,22 +52,35 @@ export default class World {
 
         const leveldata = WorldGenerator.gen(tribes,size);
         
-        const level: TileController[][] = [];
+        const level: NArray<TileController> = new NArray(size)
 
         this.engine.scene.activeLevelReady();
-        for (const row of leveldata){
-            level.push([]);
+
+        for(const tile of leveldata){
+            level.set(tile.row,tile.col,new TileController({
+                engine: this.engine,
+                assets: this.assets,
+                world: this,
+                tile_data: tile,
+            }));
+        
+            await level.get(tile.row,tile.col).render();
+        }
+     /*   for (const row of leveldata){
             for(const tile of row){
-                
-                level[tile.col][tile.row] = new TileController({
+
+                level.set(tile.row,tile.col,new TileController({
                     engine: this.engine,
                     assets: this.assets,
                     world: this,
                     tile_data: tile,
-                });
-                await level[tile.col][tile.row].render();
+                }));
+            
+                await level.get(tile.row,tile.col).render();
             }
-        }
+        }*/   
+
+        this.level = level;
 
         return level;
     }
