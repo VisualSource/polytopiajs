@@ -1,7 +1,6 @@
 import { nanoid } from "nanoid";
 import type { Manifest } from "../loaders/AssetLoader";
 import type {Tribe, UUID} from '../core/types';
-
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -15,6 +14,13 @@ const TO_TEXT = {
     4: "FOUR",
     5: "FIVE"
 }
+/**
+ *
+ *
+ * @export
+ * @class Tile
+ * @implements {ITile}
+ */
 export class Tile implements ITile {
     public readonly id: UUID = nanoid(4);
     constructor(public type: string, public metadata: { [name: string]: any } ){
@@ -56,7 +62,13 @@ export class Tile implements ITile {
     }
     
 }
-
+/**
+ *
+ *
+ * @export
+ * @class BuildTile
+ * @implements {ITile}
+ */
 export class BuildTile implements ITile {
     public id: UUID = nanoid(4);
     public type: string;

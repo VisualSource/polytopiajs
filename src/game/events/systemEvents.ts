@@ -3,14 +3,22 @@ export enum SystemEvents {
     ERROR = "ERROR",
     ASSET_LOADER = "ASSET_LOADER",
     OBJECT = "OBJECT",
-    INTERACTION = "INTERACTION"
+    INTERACTION = "INTERACTION",
+    UNIT = "UNIT"
 };
+
+export enum UnitEvent {
+    MOVE,
+    ATTACK,
+    GENERATE
+}
 
 export enum ObjectEvents {
     DESELECTION,
     SELECTION,
     RESET,
-    UNIT_SELECT
+    UNIT_SELECT,
+    TILE_SELECT
 }
 
 export enum AssetLoaderEvents {

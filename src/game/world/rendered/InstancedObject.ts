@@ -13,12 +13,13 @@ interface WorldObjectData {
     shown: boolean;
     owner: string;
     id: UUID;
+    type: "unit" | "tile";
 }
 
 interface IEditableWorldObjectData {
-    row?: number;
+    x?: number;
     y?: number; 
-    col?: number;
+    z?: number;
     rotation?: number;
     shown?: boolean;
     owner?: UUID;
@@ -68,10 +69,6 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         if(!inst) return;
 
         for(const item in data){
-            if(item === "row" || item === "col") {
-                (inst as any)[item] = (data as any)[item] * InstancedObject.WORLD_TILE_OFFSET;
-                continue;
-            }
             (inst as any)[item] = (data as any)[item];
         }
 
@@ -103,6 +100,7 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
     }
     public removeAll() {
         this.data = [];
+        this.count = 0;
         this.update();
     }
     public update(){

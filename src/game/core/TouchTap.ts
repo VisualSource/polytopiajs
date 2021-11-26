@@ -1,9 +1,13 @@
 /**
- * @license
- * touchtap-event <http://github.com/Tyriar/touchtap-event>
- * Copyright 2014 Daniel Imms <http://www.growingwiththeweb.com>
- * Released under the MIT license <http://github.com/Tyriar/touchtap-event/blob/master/LICENSE>
- * Moddifed VisualSource
+ * @name touchtap-event
+ * @description A lightweight JavaScript library that adds a touchtap custom event to the document which can be listened to on any element. This will only emit an event on touch enabled devices or those emulating touch devices. It works by listening to various touch events to dispatch the event if the touchstart and touchend events were in approximately the same position and took <= 200ms.
+ * @version V2.0.1
+ * @event touchtap 
+ * @author Daniel Imms
+ * @see http://github.com/Tyriar/touchtap-event
+ * @copyright Copyright 2014 Daniel Imms
+ * @license MIT license <http://github.com/Tyriar/touchtap-event/blob/master/LICENSE>
+ * @modifed VisualSource
  */
  export default class TouchTap {
     private touchTapEvent: any;

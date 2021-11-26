@@ -1,5 +1,6 @@
 import WorldGenerator from "./generator/WorldGenerator";
 import TileController from './TileController';
+import UnitController from "./UnitController";
 import SelectorTile from "./rendered/SelectorTile";
 import { Unit } from "./Unit";
 import NArray from "../../utils/NArray";
@@ -13,10 +14,13 @@ export default class World {
     public level: NArray<TileController>;
     public units: Map<string,Unit> = new Map();
     public selector: SelectorTile;
+    public unit_controller: UnitController;
     constructor(private engine: Engine, private assets: AssetLoader){
         // this is here for testing, in production this is not a great place to do this.
         this.createWorld(["imperius","bardur"],11).then(a=>{
-            this.createUnit("imperius","warrior",{row: 4, col: 2});
+            this.createUnit("imperius","warrior",{row: 4, col: 2}).then(unit=>{
+               // this.unit_controller.generateMovementArea({row: 4, col: 2},["LAND"],unit.uuid,1);
+            });
        });
     }
     public async createUnit(tribe: Tribe, type: string, position: Position){
@@ -28,6 +32,7 @@ export default class World {
         this.units.set(unit.uuid,unit);
         this.level.get(position.row,position.col).setUnit(unit.uuid);
         await unit.render(this.level.get(position.row,position.col).uuid);
+        return unit;
     }
     public async destoryUnit(id: UUID){
         const unit = this.units.get(id);
@@ -37,22 +42,20 @@ export default class World {
     }
     public async createWorld(tribes: Tribe[], size: number): Promise<NArray<TileController>> {
        
-        // Add selector to scene
+        // Add ui and selector objects
         try {
             const model = this.assets.getVarient("SELECTOR") as VariantGLTF;
             this.selector = new SelectorTile(model);
-            // Don't add the selector to the level group.
-            // this stops the ray from hitting it so,
-            // we don't need to worry about having to deal with it.
-            this.engine.scene.add(this.selector.mesh);
-            
+            this.selector.render(this.engine);
+            this.unit_controller = new UnitController(this.engine,this.assets,this);
+            await this.unit_controller.init();
         } catch (error) {
             console.error(error);
         }
 
         const leveldata = WorldGenerator.gen(tribes,size);
         
-        const level: NArray<TileController> = new NArray(size)
+        const level: NArray<TileController> = new NArray(size);
 
         this.engine.scene.activeLevelReady();
 

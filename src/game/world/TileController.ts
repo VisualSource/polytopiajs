@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
 import { Tile, BuildTile } from "./Tile";
-import { ObjectEvents, SystemEvents } from "../events/systemEvents";
+import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type { WorldTile } from "./generator/WorldGenerator";
@@ -9,6 +9,11 @@ import type { SystemEventListener } from "../core/EventEmitter";
 import type {Position, Tribe, UUID} from '../core/types';
 import type World from "./World";
 
+/**
+ * The selected object on this tile.
+ *
+ * @enum {number}
+ */
 enum Selected {
     TILE,
     UNIT
@@ -21,6 +26,14 @@ interface ITileControllerProps {
     tile_data: WorldTile;
 }
 
+/**
+ * @listens INTERACTION
+ * @emits UNIT 
+ * @emits INTERACTION
+ * @export
+ * @class TileController
+ * @implements {SystemEventListener}
+ */
 export default class TileController implements SystemEventListener {
     private selected: Selected = Selected.TILE; 
     private isSelected: boolean = false;
@@ -28,8 +41,8 @@ export default class TileController implements SystemEventListener {
     private assets: AssetLoader;
     private world: World;
     private top: BuildTile | null = null;
-    private base: Tile;
-    private unit: UUID | null = null; 
+    public base: Tile;
+    public unit: UUID | null = null; 
     public readonly uuid: UUID = nanoid();
     public events: EventEmitter = new EventEmitter();
     public position: Position;
@@ -37,10 +50,13 @@ export default class TileController implements SystemEventListener {
     public override: {
         type: string;
         id: number;
+        data: {
+            [prop: string]: any;
+        }
     } | null = null;
 
     constructor({ engine, assets, world, tile_data }: ITileControllerProps){
-        this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION },this.selectionHandle);
+        this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
         this.engine = engine;
@@ -61,12 +77,14 @@ export default class TileController implements SystemEventListener {
     }
     private resetHandle = (event: any): void => {
         if(event.data.uuid === this.uuid) return;
+        this.override = null;
         this.deselectionHandle();
     }
     private selectionHandle = (event: any): void => {
         if(event.data.owner !== this.uuid) return;
       
         if(this.override) {
+            this.events.dispatchEvent(this.override);
             return;
         }
 
@@ -74,26 +92,35 @@ export default class TileController implements SystemEventListener {
             this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: this.uuid } });
             this.isSelected = true;
             if(this.unit) {
-                this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.UNIT_SELECT, data: {}});
                 this.selected = Selected.UNIT;
+                this.selectionEvent("unit");
+                this.events.emit<SystemEvents,UnitEvent>({ type: SystemEvents.UNIT, id: UnitEvent.GENERATE, data: { unit: this.unit } });
                 return;
             }
             this.selected = Selected.TILE;
+            this.selectionEvent("tile");
             return;
         }
 
         if(this.selected === Selected.UNIT) {
             this.selected = Selected.TILE;
+            this.selectionEvent("tile");
             return;
         }
 
         this.deselectionHandle();
         this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { tile_deselection: true } });
     }
+    public selectionEvent(type: "unit" | "tile"){
+        this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION, data: {
+            world: this.position,
+            type
+        }});
+    }
     public addBuilding(){}
     public removeBuilding(){}
     public async destory(){
-        this.events.offId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION },this.selectionHandle);
+        this.events.offId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
     }
     /**
      * Generate tiles and add them to threejs scene
@@ -119,7 +146,8 @@ export default class TileController implements SystemEventListener {
                 x: this.position.row,
                 z: this.position.col,
                 y: 0,
-                id: this.base.id
+                id: this.base.id,
+                type: "tile"
             });
 
             if(this.top){
@@ -139,7 +167,8 @@ export default class TileController implements SystemEventListener {
                     x: this.position.row,
                     z: this.position.col,
                     y: 1,
-                    id: this.top.id
+                    id: this.top.id,
+                    type: "tile"
                 });
             }
 

@@ -14,27 +14,37 @@ export class Unit {
     public position: Position;
     public tribe: Tribe;
     public type: string;
-    public movement: number = 0;
-    public range: number = 0;
+    public movement: number = 1;
+    public range: number = 1;
     public isVeteran: boolean = false;
     public skills: any[] = [];
-    private _health: number = 0;
+    private _health: number = 1;
     private _defence: number = 0;
     private model_id: string;
     constructor(private engine: Engine, private asset: AssetLoader, data: IUnit){
         this.position = data.position;
         this.type = data.type;
         this.tribe = data.tribe;
-        // use the commented part when we have models to use for the diffenent tribes.
+        // use the commented part when we have models to use for the diffenent tribes and unit types.
         this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
     }    
+    get canMove(): boolean {
+        return true;
+    }
+    get canAttack(): boolean {
+        return false;
+    }
+    get vaild_terrian(): string[] {
+        return ["LAND","FOREST"];
+    }
     public setPostion(next_tile_owner: UUID, postion: Position){
         const model = this.engine.scene.getObjectInstance(this.model_id);
         if(!model) return;
 
+        this.position = postion;
         model.editInstance(this.uuid,{
-            row: postion.row,
-            col: postion.col,
+            x: postion.row,
+            z: postion.col,
             owner: next_tile_owner
         });
     }
@@ -85,6 +95,7 @@ export class Unit {
                 x: this.position.row,
                 z: this.position.col,
                 y: 0,
+                type: "unit"
             });
 
         } catch (error) {

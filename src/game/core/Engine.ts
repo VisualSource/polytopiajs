@@ -125,7 +125,7 @@ export default class Engine implements SystemEventListener {
 
         if((object as InstancedObject)?.isInstancedMesh){
             const data = (object as InstancedObject).getItem(instanceId as number);
-            this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION, data: { owner: data.owner, id: data.id, world: { row: data.x, col: data.z } } });
+            this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT, data: { type: data.type, owner: data.owner, id: data.id } });
             return;
         }
     }
