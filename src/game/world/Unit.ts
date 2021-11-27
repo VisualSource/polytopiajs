@@ -8,8 +8,16 @@ interface IUnit {
     tribe: Tribe;
     position: Position;
 }
+export interface UnitJson {
+    position: Position;
+    tribe: Tribe,
+    type: string;
+    health: number;
+    is_veteran: boolean;
+} 
 
 export class Unit {
+    static createFromJson(json: UnitJson){}
     public readonly uuid: UUID = nanoid(8);
     public position: Position;
     public tribe: Tribe;
@@ -19,6 +27,7 @@ export class Unit {
     public isVeteran: boolean = false;
     public skills: any[] = [];
     private _health: number = 1;
+    private _healthMax: number = 1;
     private _defence: number = 0;
     private model_id: string;
     constructor(private engine: Engine, private asset: AssetLoader, data: IUnit){
@@ -28,6 +37,15 @@ export class Unit {
         // use the commented part when we have models to use for the diffenent tribes and unit types.
         this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
     }    
+    public toJSON(): UnitJson {
+        return {
+            position: this.position,
+            tribe: this.tribe,
+            type: this.type,
+            health: this._health,
+            is_veteran: this.isVeteran,
+        }
+    }
     get canMove(): boolean {
         return true;
     }

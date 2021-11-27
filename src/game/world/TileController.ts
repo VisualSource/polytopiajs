@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
-import { Tile, BuildTile } from "./Tile";
+import { Tile, BuildTile, TileJson } from "./Tile";
 import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
@@ -26,6 +26,13 @@ interface ITileControllerProps {
     tile_data: WorldTile;
 }
 
+export interface TileControllerJson {
+    tribe: Tribe;
+    position: Position;
+    top: TileJson | null;
+    base: TileJson;
+}
+
 /**
  * @listens INTERACTION
  * @emits UNIT 
@@ -35,6 +42,7 @@ interface ITileControllerProps {
  * @implements {SystemEventListener}
  */
 export default class TileController implements SystemEventListener {
+    static createFromJson(json: TileControllerJson){}
     private selected: Selected = Selected.TILE; 
     private isSelected: boolean = false;
     private engine: Engine;
@@ -67,6 +75,14 @@ export default class TileController implements SystemEventListener {
         this.base = new Tile(tile_data.base, tile_data.metadata);
         if(tile_data.buldings.length > 0) this.top = new BuildTile(tile_data.buldings);
 
+    }
+    public toJSON(): TileControllerJson {
+        return {
+            top: this.top?.toJSON() ?? null,
+            base: this.base.toJSON(),
+            tribe: this.tribe,
+            position: this.position
+        };
     }
     public setUnit(id: UUID | null = null) {
         this.unit = id;

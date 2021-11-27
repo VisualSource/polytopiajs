@@ -20,7 +20,6 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![CodeFactor](https://www.codefactor.io/repository/github/visualsource/polytopiajs/badge)](https://www.codefactor.io/repository/github/visualsource/polytopiajs?style=for-the-badge)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/VisualSource/polytopiajs.svg?style=for-the-badge&logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/VisualSource/polytopiajs/alerts/)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/VisualSource/polytopiajs.svg?style=for-the-badge&logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/VisualSource/polytopiajs/context:javascript)
 

@@ -1,13 +1,22 @@
 import WorldGenerator from "./generator/WorldGenerator";
-import TileController from './TileController';
+import TileController, { TileControllerJson } from './TileController';
 import UnitController from "./UnitController";
 import SelectorTile from "./rendered/SelectorTile";
-import { Unit } from "./Unit";
+import { Unit, UnitJson } from "./Unit";
 import NArray from "../../utils/NArray";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
 import type { Position, Tribe, UUID } from "../core/types";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
+
+
+export interface WorldJson {
+    size: number;
+    leveldata: {
+        [levelname: string]: TileControllerJson[];
+    }
+    units: UnitJson[];
+}
 
 export default class World {
     // this problily will need to be a map for when working with different dimensions and the like.
@@ -19,7 +28,9 @@ export default class World {
         // this is here for testing, in production this is not a great place to do this.
         this.createWorld(["imperius","bardur"],11).then(a=>{
             this.createUnit("imperius","warrior",{row: 4, col: 2}).then(unit=>{
-               // this.unit_controller.generateMovementArea({row: 4, col: 2},["LAND"],unit.uuid,1);
+                this.saveWorld().then(value=>{
+                    console.log(value);
+                });
             });
        });
     }
@@ -87,7 +98,54 @@ export default class World {
 
         return level;
     }
-    public async loadWorld(){}
-    public async saveWorld(){}
+    public async loadWorld(worlddata: WorldJson){
+
+        try {
+            const model = this.assets.getVarient("SELECTOR") as VariantGLTF;
+            this.selector = new SelectorTile(model);
+            this.selector.render(this.engine);
+            this.unit_controller = new UnitController(this.engine,this.assets,this);
+            await this.unit_controller.init();
+        } catch (error) {
+            console.error(error);
+        }
+
+        const level: NArray<TileController> = new NArray(worlddata.size);
+
+        this.engine.scene.activeLevelReady();
+
+        for(const tile of worlddata.leveldata["overworld"]) {
+
+        }
+
+        for(const unit of worlddata.units) {
+
+        }
+
+        this.level = level;
+        return level;
+    }
+    public async saveWorld(): Promise<WorldJson> {
+        let world: TileControllerJson[] = [];
+        let units: UnitJson[] = [];
+
+        for(const level of this.level){
+            world.push(level.toJSON());
+        }
+
+        this.units.forEach((value)=>{
+            units.push(value.toJSON());
+        });
+
+
+        return {
+            size: this.level.size,
+            leveldata: {
+                "overworld": world,
+            },
+            units
+        }
+    }
+        
 } 
 

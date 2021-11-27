@@ -14,6 +14,12 @@ const TO_TEXT = {
     4: "FOUR",
     5: "FIVE"
 }
+export interface TileJson {
+    type: string;
+    metadata: {
+        [key: string]: any;
+    }
+}
 /**
  *
  *
@@ -22,11 +28,9 @@ const TO_TEXT = {
  * @implements {ITile}
  */
 export class Tile implements ITile {
+    static createFromJson(json: TileJson){}
     public readonly id: UUID = nanoid(4);
-    constructor(public type: string, public metadata: { [name: string]: any } ){
-
-    }
-
+    constructor(public type: string, public metadata: { [name: string]: any } ){ }
     public get show(): boolean {
         return true;
     }
@@ -60,6 +64,12 @@ export class Tile implements ITile {
             type: "gltf"
         }
     }
+    public toJSON(): TileJson {
+        return {
+            type: this.type,
+            metadata: this.metadata
+        }
+    }
     
 }
 /**
@@ -70,6 +80,7 @@ export class Tile implements ITile {
  * @implements {ITile}
  */
 export class BuildTile implements ITile {
+    static createFromJson(json: TileJson){}
     public id: UUID = nanoid(4);
     public type: string;
     public metadata: { [name: string]: any } = {
@@ -87,6 +98,12 @@ export class BuildTile implements ITile {
             this.type = types[0];
         }
        
+    }
+    public toJSON(): TileJson {
+        return {
+            type: this.type,
+            metadata: this.metadata
+        }
     }
     public getType(tribe: Tribe): string {
         if(this.type === "GAME" || this.type === "FRUIT"){

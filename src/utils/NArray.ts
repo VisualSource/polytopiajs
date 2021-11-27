@@ -15,7 +15,7 @@ export default class NArray<T> {
     *   2 => COL
     */
     private _data: T[][] = []; 
-    constructor(private size: number){
+    constructor(public readonly size: number){
         for(let i = 0; i < this.size; i++) this._data.push([]);
     }
     public set(row: number, col: number, data: T): void {
