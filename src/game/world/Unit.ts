@@ -17,7 +17,12 @@ export interface UnitJson {
 } 
 
 export class Unit {
-    static createFromJson(json: UnitJson){}
+    static createFromJson(engine: Engine, asset: AssetLoader, json: UnitJson): Unit {
+        return new Unit().initFromJson(engine,asset,json);
+    }
+    static createNew(engine: Engine, asset: AssetLoader, data: IUnit): Unit {
+        return new Unit().initDefault(engine,asset,data);
+    }
     public readonly uuid: UUID = nanoid(8);
     public position: Position;
     public tribe: Tribe;
@@ -30,13 +35,30 @@ export class Unit {
     private _healthMax: number = 1;
     private _defence: number = 0;
     private model_id: string;
-    constructor(private engine: Engine, private asset: AssetLoader, data: IUnit){
+    private engine: Engine;
+    private asset: AssetLoader;
+    constructor(){}    
+    public initDefault(engine: Engine, asset: AssetLoader, data: IUnit): this {
+        this.engine = engine;
+        this.asset = asset;
         this.position = data.position;
         this.type = data.type;
         this.tribe = data.tribe;
-        // use the commented part when we have models to use for the diffenent tribes and unit types.
+         // use the commented part when we have models to use for the diffenent tribes and unit types.
         this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
-    }    
+        return this;
+    }
+    public initFromJson(engine: Engine, asset: AssetLoader, json: UnitJson): this {
+        this.engine = engine;
+        this.asset = asset;
+        this.position = json.position;
+        this.type = json.type;
+        this.tribe = json.tribe;
+        this.isVeteran = json.is_veteran;
+        this._health = json.health;
+        this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
+        return this;
+    }
     public toJSON(): UnitJson {
         return {
             position: this.position,
@@ -98,6 +120,8 @@ export class Unit {
     }
     public async render(tile_owner: UUID){
         try {
+            if(!this.engine || !this.asset ) throw new Error(`Unit was not init correctly`);
+            
             let model = this.engine.scene.getObjectInstance(this.model_id);
             if(!model) {
                 const asset = await this.asset.getAsset(this.model_id,0,"gltf");

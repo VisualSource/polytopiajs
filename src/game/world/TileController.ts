@@ -42,13 +42,37 @@ export interface TileControllerJson {
  * @implements {SystemEventListener}
  */
 export default class TileController implements SystemEventListener {
-    static createFromJson(json: TileControllerJson){}
+    /**
+     * @constructor
+     *
+     * @static
+     * @param {Engine} engine
+     * @param {AssetLoader} assets
+     * @param {World} world
+     * @param {TileControllerJson} json
+     * @return {TileController}  {TileController}
+     * @memberof TileController
+     */
+    static createFromJson(engine: Engine, assets: AssetLoader, world: World, json: TileControllerJson): TileController {
+        return new TileController(engine,assets,world).initFromJson(json);
+    }
+    /**
+     * @constructor
+     *
+     * @static
+     * @param {Engine} engine
+     * @param {AssetLoader} assets
+     * @param {World} world
+     * @param {WorldTile} tile_data
+     * @return {TileController}  {TileController}
+     * @memberof TileController
+     */
+    static createNew(engine: Engine, assets: AssetLoader, world: World, tile_data: WorldTile): TileController {
+        return new TileController(engine,assets,world).init(tile_data);
+    }
     private selected: Selected = Selected.TILE; 
     private isSelected: boolean = false;
-    private engine: Engine;
-    private assets: AssetLoader;
-    private world: World;
-    private top: BuildTile | null = null;
+    public top: BuildTile | null = null;
     public base: Tile;
     public unit: UUID | null = null; 
     public readonly uuid: UUID = nanoid();
@@ -63,18 +87,38 @@ export default class TileController implements SystemEventListener {
         }
     } | null = null;
 
-    constructor({ engine, assets, world, tile_data }: ITileControllerProps){
+    constructor(private engine: Engine, private assets: AssetLoader, private world: World){
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
-        this.engine = engine;
-        this.assets = assets;
-        this.world = world;
+    }
+    /**
+     * @constructor
+     *
+     * @param {WorldTile} tile_data
+     * @return {*}  {this}
+     * @memberof TileController
+     */
+    public init(tile_data: WorldTile): this {
         this.position = { row: tile_data.row, col: tile_data.col };
         this.tribe = tile_data.tribe;
-        this.base = new Tile(tile_data.base, tile_data.metadata);
-        if(tile_data.buldings.length > 0) this.top = new BuildTile(tile_data.buldings);
-
+        this.base = Tile.createNew(tile_data.base, tile_data.metadata);
+        if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
+        return this;
+    }
+    /**
+     * @constructor
+     *
+     * @param {TileControllerJson} json
+     * @return {*} 
+     * @memberof TileController
+     */
+    public initFromJson(json: TileControllerJson){
+        this.position = json.position;
+        this.tribe = json.tribe;
+        this.base = Tile.createFromJson(json.base);
+        this.top = BuildTile.createFromJson(json.top);
+        return this;
     }
     public toJSON(): TileControllerJson {
         return {
@@ -84,8 +128,9 @@ export default class TileController implements SystemEventListener {
             position: this.position
         };
     }
-    public setUnit(id: UUID | null = null) {
+    public setUnit(id: UUID | null = null): this {
         this.unit = id;
+        return this;
     }
     private deselectionHandle = (): void => {
         this.selected = Selected.TILE;

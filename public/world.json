@@ -1,0 +1,1866 @@
+{
+    "size": 11,
+    "leveldata": {
+        "overworld": [{
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 4.71238898038469
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 0
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 1
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "WHALE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "RUIN",
+                "metadata": {
+                    "replaced_with": "GAME"
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 4
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "WHALE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 6
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 5,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 7
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 9
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 2,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 0,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 2,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 0
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 5,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 5,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 2
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 2,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 6
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 7
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 1,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "METAL",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 1,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 6
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 2,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 7
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "METAL",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 9
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 2,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 3,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 4
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 5
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 1,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 6
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 1,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 7
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 5,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 8
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 2,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 9
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 3,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 4,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 6
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 7
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 4,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 4,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 4,
+                "col": 10
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 5,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 5,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 5,
+                "col": 2
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 5,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 5,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 5,
+                "col": 5
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 5,
+                "col": 6
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 5,
+                "col": 7
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 5,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "imperius",
+            "position": {
+                "row": 5,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 5,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 6
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 7
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 8
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 4.71238898038469
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 6,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 0
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 4
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 6
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 7
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 7,
+                "col": 10
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 3
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "CAPITAL",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 5
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 6
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 7
+            }
+        }, {
+            "top": {
+                "type": "METAL",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 8
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 8,
+                "col": 10
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "VILLAGE",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 1
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 2
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 4
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 5
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 3.141592653589793
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 6
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 5,
+                    "rotation": 1.5707963267948966
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 7
+            }
+        }, {
+            "top": {
+                "type": "FISH",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "WATER",
+                "metadata": {
+                    "model_id": 3,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 8
+            }
+        }, {
+            "top": {
+                "type": "CROP",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 9
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 9,
+                "col": 10
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "OCEAN",
+                "metadata": {
+                    "model_id": 4,
+                    "rotation": 0
+                }
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 0
+            }
+        }, {
+            "top": {
+                "type": "GAME",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 1
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "MOUNTAIN",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 2
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 3
+            }
+        }, {
+            "top": {
+                "type": "FRUIT",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "LAND",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 4
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 5
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 6
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 7
+            }
+        }, {
+            "top": {
+                "type": "RUIN",
+                "metadata": {
+                    "replaced_with": null
+                }
+            },
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 8
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 9
+            }
+        }, {
+            "top": null,
+            "base": {
+                "type": "FOREST",
+                "metadata": {}
+            },
+            "tribe": "bardur",
+            "position": {
+                "row": 10,
+                "col": 10
+            }
+        }]
+    },
+    "units": [{
+        "position": {
+            "row": 4,
+            "col": 2
+        },
+        "tribe": "imperius",
+        "type": "warrior",
+        "health": 1,
+        "is_veteran": false
+    }]
+}

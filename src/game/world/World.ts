@@ -25,24 +25,25 @@ export default class World {
     public selector: SelectorTile;
     public unit_controller: UnitController;
     constructor(private engine: Engine, private assets: AssetLoader){
+
+        fetch("/world.json").then(value=>value.json()).then(world=>{
+            this.loadWorld(world);
+        });
+
         // this is here for testing, in production this is not a great place to do this.
-        this.createWorld(["imperius","bardur"],11).then(a=>{
+       /* this.createWorld(["imperius","bardur"],11).then(a=>{
             this.createUnit("imperius","warrior",{row: 4, col: 2}).then(unit=>{
                 this.saveWorld().then(value=>{
-                    console.log(value);
+                    console.log(JSON.stringify(value));
                 });
             });
-       });
+       });*/
     }
     public async createUnit(tribe: Tribe, type: string, position: Position){
-        const unit = new Unit(this.engine,this.assets,{
-            type,
-            tribe,
-            position
-        });
+        const unit = Unit.createNew(this.engine,this.assets,{ type, tribe, position });
         this.units.set(unit.uuid,unit);
-        this.level.get(position.row,position.col).setUnit(unit.uuid);
-        await unit.render(this.level.get(position.row,position.col).uuid);
+        const tile = this.level.get(position.row,position.col).setUnit(unit.uuid);
+        await unit.render(tile.uuid);
         return unit;
     }
     public async destoryUnit(id: UUID){
@@ -71,28 +72,9 @@ export default class World {
         this.engine.scene.activeLevelReady();
 
         for(const tile of leveldata){
-            level.set(tile.row,tile.col,new TileController({
-                engine: this.engine,
-                assets: this.assets,
-                world: this,
-                tile_data: tile,
-            }));
-        
+            level.set(tile.row,tile.col,TileController.createNew(this.engine,this.assets,this,tile));
             await level.get(tile.row,tile.col).render();
-        }
-     /*   for (const row of leveldata){
-            for(const tile of row){
-
-                level.set(tile.row,tile.col,new TileController({
-                    engine: this.engine,
-                    assets: this.assets,
-                    world: this,
-                    tile_data: tile,
-                }));
-            
-                await level.get(tile.row,tile.col).render();
-            }
-        }*/   
+        }   
 
         this.level = level;
 
@@ -115,11 +97,16 @@ export default class World {
         this.engine.scene.activeLevelReady();
 
         for(const tile of worlddata.leveldata["overworld"]) {
-
+            level.set(tile.position.row,tile.position.col,TileController.createFromJson(this.engine,this.assets,this,tile));
+            await level.get(tile.position.row,tile.position.col).render();
         }
 
         for(const unit of worlddata.units) {
+            const json_unit = Unit.createFromJson(this.engine,this.assets,unit);
 
+            this.units.set(json_unit.uuid,json_unit);
+            const tile = level.get(unit.position.row,unit.position.col).setUnit(json_unit.uuid);
+            await json_unit.render(tile.uuid);
         }
 
         this.level = level;

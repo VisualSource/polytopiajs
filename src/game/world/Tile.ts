@@ -28,9 +28,25 @@ export interface TileJson {
  * @implements {ITile}
  */
 export class Tile implements ITile {
-    static createFromJson(json: TileJson){}
+    static createFromJson(json: TileJson): Tile {
+        return new Tile().initFromJson(json);
+    }
+    static createNew(type: string, metadata: { [name: string]: any }): Tile {
+        return new Tile().init(type,metadata);
+    }
     public readonly id: UUID = nanoid(4);
-    constructor(public type: string, public metadata: { [name: string]: any } ){ }
+    public type: string;
+    public metadata: { [name: string]: any } = {};
+    public init(type: string, metadata: { [name: string]: any }): this {
+        this.type = type;
+        this.metadata = metadata;
+        return this;
+    }
+    public initFromJson(json: TileJson): this {
+        this.type = json.type;
+        this.metadata = json.metadata;
+        return this;
+    }
     public get show(): boolean {
         return true;
     }
@@ -80,24 +96,49 @@ export class Tile implements ITile {
  * @implements {ITile}
  */
 export class BuildTile implements ITile {
-    static createFromJson(json: TileJson){}
+    static createFromJson(json: TileJson | null): BuildTile | null {
+        if(!json) return null;
+        return new BuildTile().initFromJson(json);
+    }
+    static createNew(types: string[]): BuildTile {
+        return new BuildTile().init(types);
+    }
     public id: UUID = nanoid(4);
     public type: string;
     public metadata: { [name: string]: any } = {
         replaced_with: null
     };
-    constructor(types: string[]){
+    /**
+     * @constructor
+     *
+     * @param {string[]} types
+     * @return {*}  {this}
+     * @memberof BuildTile
+     */
+    public init(types: string[]): this {
         // Ruins cover furit and game so we need to set the RUIN as the type to render,
         // and save the other object to be render later
         if(types.includes("RUIN")) {
-          this.type = types[types.findIndex((value=>value==="RUIN"))];
-          if(types.length > 1){
-            this.metadata.replaced_with = types[types.findIndex((value=>value!=="RUIN"))];
-          } 
+            this.type = types[types.findIndex((value=>value==="RUIN"))];
+            if(types.length > 1){
+              this.metadata.replaced_with = types[types.findIndex((value=>value!=="RUIN"))];
+            } 
         }else {
             this.type = types[0];
         }
-       
+        return this;
+    }
+    /**
+     * @constructor
+     *
+     * @param {TileJson} json
+     * @return {*}  {this}
+     * @memberof BuildTile
+     */
+    public initFromJson(json: TileJson): this {
+        this.type = json.type;
+        this.metadata = json.metadata;
+        return this;
     }
     public toJSON(): TileJson {
         return {
