@@ -10,7 +10,8 @@ export enum SystemEvents {
 export enum UnitEvent {
     MOVE,
     ATTACK,
-    GENERATE
+    GENERATE,
+    HIDE_SELECTOR
 }
 
 export enum ObjectEvents {

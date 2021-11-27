@@ -42,6 +42,10 @@ export default class UnitController implements SystemEventListener {
                     this.generateMovementArea(unit.position,unit.vaild_terrian,unit.uuid,unit.movement);
                     break;
                 }
+                case UnitEvent.HIDE_SELECTOR: {
+                    this.hideMovement();
+                    break;
+                }
                 default:
                     break;
             }

@@ -115,12 +115,14 @@ export default class TileController implements SystemEventListener {
             }
             this.selected = Selected.TILE;
             this.selectionEvent("tile");
+            this.events.emit<SystemEvents,UnitEvent>({ type: SystemEvents.UNIT, id: UnitEvent.HIDE_SELECTOR, data: {} });
             return;
         }
 
         if(this.selected === Selected.UNIT) {
             this.selected = Selected.TILE;
             this.selectionEvent("tile");
+            this.events.emit<SystemEvents,UnitEvent>({ type: SystemEvents.UNIT, id: UnitEvent.HIDE_SELECTOR, data: {} });
             return;
         }
 

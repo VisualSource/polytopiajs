@@ -1,7 +1,7 @@
 import EventEmitter from '../../core/EventEmitter';
 import type { SystemEventListener } from '../../core/EventEmitter';
 import type { VariantGLTF } from '../../loaders/KHR_Variants';
-import { ObjectEvents, SystemEvents } from '../../events/systemEvents';
+import { ObjectEvents, SystemEvents, UnitEvent } from '../../events/systemEvents';
 import type Engine from '../../core/Engine';
 
 /**
@@ -24,6 +24,7 @@ export default class SelectorTile implements SystemEventListener {
             switch (event.id) {
                 case ObjectEvents.DESELECTION: {
                     this.hide();
+                    this.events.emit<SystemEvents,UnitEvent>({ type: SystemEvents.UNIT, id: UnitEvent.HIDE_SELECTOR, data: {} });
                     break;
                 }
                 case ObjectEvents.SELECTION: {
