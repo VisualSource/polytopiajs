@@ -174,6 +174,10 @@ export default class AssetLoader  {
             switch (data.blob.type) {
                 case "model/gltf-binary":
                 case "model/gltf+json":{
+                    /** 
+                     * @todo Change to parseAsync
+                     * @body After updating to threeJS change `.parse` to `.parseAsync` due to r135 of threeJS having this method now. Currntly waiting for types to update
+                    */
                     yield await new Promise( async (ok,err)=>{
                         gltfLoader.parse(await data.blob.arrayBuffer(),"", async (gltfAsset) => {
                             /* 
