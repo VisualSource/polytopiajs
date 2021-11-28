@@ -1,5 +1,5 @@
 import type Engine from "../core/Engine";
-import type { Position, UUID } from "../core/types";
+import type { Position, Tribe, UUID } from "../core/types";
 import type AssetLoader from "../loaders/AssetLoader";
 import type World from "./World";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
@@ -9,8 +9,10 @@ import {SystemEvents, UnitEvent, ObjectEvents} from '../events/systemEvents';
 import { nanoid } from "nanoid";
 import type { SystemEventListener } from "../core/EventEmitter";
 import EventEmitter from "../core/EventEmitter";
+import { Unit } from "./Unit";
 
 export default class UnitController implements SystemEventListener {
+    static readonly ACCELERATOR: number = 4.5;
     public events: EventEmitter = new EventEmitter();
     private mesh_movement: InstancedObject;
     private mesh_attack: InstancedObject;
@@ -23,16 +25,52 @@ export default class UnitController implements SystemEventListener {
         this.events.on(SystemEvents.UNIT,event=>{
             switch (event.id) {
                 case UnitEvent.ATTACK:{
-                    console.log("ATTACK",event.data);
+                    const attacker = this.world.units.get(event.data.attacker);
+                    const defender = this.world.units.get(event.data.defender);
+                    if(!attacker || !defender) break;
+                    console.log("ATTACK",event.data, attacker,defender);
+                    /**
+                     * @todo Defense Bouns
+                     * @body The Defending unit gets its bouns from the tile its standing on and/or tech.
+                     */
+                    const defenseBouns = 1;
+                    /**
+                     * @see https://frothfrenzy.github.io/polytopiacalculator/
+                     * @summary uses the same formula posted by the developer on the game wikia forums some time ago.
+                     */
+                    const attackForce = attacker.attack * (attacker.health / attacker.maxHealth);
+                    const defenseForce = defender.defence * (defender.health / defender.maxHealth) * defenseBouns;
+                    const totalDamage = attackForce + defenseForce;
+
+                    const attackResult = Math.round((attackForce / totalDamage) * attacker.attack * UnitController.ACCELERATOR);
+                    const defenseResult = Math.round((defenseForce / totalDamage) * defender.defence * UnitController.ACCELERATOR);
+                    
+               
+                    const defenderHealth = defender.health - defenseResult;
+
+                    if(defenderHealth <= 0) {
+                        console.log("Kill unit");
+                        const pos = defender.position;
+                        this.destoryUnit(defender.uuid)
+                        .then(()=>{
+                            this.moveUnit(attacker.uuid,pos);
+                        });
+                    } else {
+                        defender.health = defenderHealth;
+                        attacker.health -= attackResult;
+                    }
+               
+                    console.log("Attack Result", attackResult, "Health", attacker.health, "Defense Result",defenseResult, "Health",defender.health);
+                 
+                    this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
+                    this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
+
                     break;
                 }
                 case UnitEvent.MOVE:{
-                    this.world.level.get(event.data.from.row,event.data.from.col).setUnit();
-                    this.world.level.get(event.data.to.row,event.data.to.col).setUnit(event.data.unit);
+                    this.moveUnit(event.data.unit,event.data.to);
                     this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
                     this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
-                    const id = this.world.level.get(event.data.to.row,event.data.to.col);
-                    this.world.units.get(event.data.unit)?.setPostion(id.uuid,id.position);
                     console.log("MOVE",event.data);
                     break;
                 }
@@ -40,10 +78,12 @@ export default class UnitController implements SystemEventListener {
                     const unit = this.world.units.get(event.data.unit);
                     if(!unit) break;
                     this.generateMovementArea(unit.position,unit.vaild_terrian,unit.uuid,unit.movement);
+                    this.generateAttackArea(unit.position,unit.range,unit.uuid);
                     break;
                 }
                 case UnitEvent.HIDE_SELECTOR: {
                     this.hideMovement();
+                    this.hideAttack();
                     break;
                 }
                 default:
@@ -51,7 +91,7 @@ export default class UnitController implements SystemEventListener {
             }
         });
     }
-    async init(): Promise<void> {
+    public async init(): Promise<void> {
         try {
             const data = await this.assets.getVarient("SELECTOR") as VariantGLTF;
     
@@ -73,6 +113,19 @@ export default class UnitController implements SystemEventListener {
             console.error(error);
         }
     }
+    public async destoryUnit(id: UUID){
+        const unit = this.world.units.get(id);
+        if(!unit) return;
+        unit.destory();
+        this.world.units.delete(id);
+    }
+    public async createUnit(tribe: Tribe, type: string, position: Position){
+        const unit = Unit.createNew(this.engine,this.assets,{ type, tribe, position });
+        this.world.units.set(unit.uuid,unit);
+        const tile = this.world.level.get(position.row,position.col).setUnit(unit.uuid);
+        await unit.render(tile.uuid);
+        return unit;
+    }
     public generateMovementArea(center: Position, vaild_terrian: string[], unit_uuid: UUID, range: number){
 
         this.hideMovement();
@@ -90,7 +143,7 @@ export default class UnitController implements SystemEventListener {
                 // 0,0 is the center
                 if(!data || (i === 0 && j === 0) ) continue;
 
-                if(vaild_terrian.includes(data.base.type)){
+                if(vaild_terrian.includes(data.base.type) && !data.unit){
                     this.mesh_movement.createInstance({
                         index: 0,
                         id: nanoid(10),
@@ -106,8 +159,7 @@ export default class UnitController implements SystemEventListener {
                         type: SystemEvents.UNIT,
                         id: UnitEvent.MOVE,
                         data: {
-                            from: center,
-                            to: {col,row},
+                            to: { col,row },
                             unit: unit_uuid
                         }
                     };
@@ -122,19 +174,22 @@ export default class UnitController implements SystemEventListener {
         const self = this.world.units.get(unit_uuid);
         if(!self) return;
 
-        for(let i = -range; i < range; i++) {
-            for(let j = -range; j < range; j++){
+        this.hideAttack();
+        this.mesh_attack.removeAll();
+
+        for(let i = -range; i <= range; i++) {
+            for(let j = -range; j <= range; j++){
                 let row = center.row + i;
                 let col = center.col + j;
                 const data = this.world.level.isValid(row, col);
                 // 0,0 is the center
                 if(!data || (i === 0 && j === 0) || !data.unit ) continue;
 
-                const unit = this.world.units.get(data.unit);
-                if(!unit) continue;
+                const enemy = this.world.units.get(data.unit);
+                if(!enemy) continue;
 
-                if(unit.tribe !== self.tribe) {
-                    this.mesh_movement.createInstance({
+                if(enemy.tribe !== self.tribe) {
+                    this.mesh_attack.createInstance({
                         index: 0,
                         id: nanoid(10),
                         owner: data.uuid,
@@ -150,17 +205,28 @@ export default class UnitController implements SystemEventListener {
                         id: UnitEvent.ATTACK,
                         data: {
                             attacker: self.uuid,
-                            defender: unit.uuid
+                            defender: enemy.uuid
                         }
                     };
                 }
             }
         }
+
+
+        this.mesh_attack.visible = true;
     }
     public hideMovement(){
         this.mesh_movement.visible = false;
     }
     public hideAttack(){
         this.mesh_attack.visible = false;
+    }
+    public moveUnit(id: UUID, pos: Position) {
+        const unit = this.world.units.get(id);
+        if(!unit) return;
+        const tile = this.world.level.get(pos.row,pos.col);
+        tile.setUnit(unit.uuid);
+        this.world.level.get(unit.position.row,unit.position.col).setUnit(null);
+        unit.setPostion(tile.uuid,pos);
     }
 }

@@ -3,6 +3,9 @@ import type { GLTF, GLTFLoaderPlugin, GLTFParser, GLTFReference } from 'three/ex
  * Materials variants extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_variants
+ * 
+ * Code orgin: https://github.com/takahirox/three-gltf-extensions/blob/main/loaders/KHR_materials_variants/KHR_materials_variants.js
+ * 
  */
 
 /**

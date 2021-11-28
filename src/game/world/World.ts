@@ -27,7 +27,9 @@ export default class World {
     constructor(private engine: Engine, private assets: AssetLoader){
 
         fetch("/world.json").then(value=>value.json()).then(world=>{
-            this.loadWorld(world);
+            this.loadWorld(world).then(level=>{
+                this.unit_controller.createUnit("bardur","warrior",{row: 5, col: 2});
+            });
         });
 
         // this is here for testing, in production this is not a great place to do this.
@@ -38,19 +40,6 @@ export default class World {
                 });
             });
        });*/
-    }
-    public async createUnit(tribe: Tribe, type: string, position: Position){
-        const unit = Unit.createNew(this.engine,this.assets,{ type, tribe, position });
-        this.units.set(unit.uuid,unit);
-        const tile = this.level.get(position.row,position.col).setUnit(unit.uuid);
-        await unit.render(tile.uuid);
-        return unit;
-    }
-    public async destoryUnit(id: UUID){
-        const unit = this.units.get(id);
-        if(!unit) return;
-        unit.destory();
-        this.units.delete(id);
     }
     public async createWorld(tribes: Tribe[], size: number): Promise<NArray<TileController>> {
        

@@ -1860,7 +1860,7 @@
         },
         "tribe": "imperius",
         "type": "warrior",
-        "health": 1,
+        "health": 10,
         "is_veteran": false
     }]
 }

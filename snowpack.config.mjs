@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
+import { InjectManifest } from 'workbox-webpack-plugin';
 
 
 const packageJson = readFileSync("./package.json",{encoding:"utf-8"});
@@ -32,6 +33,10 @@ const config = {
                 extendConfig: config => {
                     //delete config.optimization.splitChunks;
                     delete config.optimization.runtimeChunk;
+
+                   /* config.plugins.push(new InjectManifest({
+                        swSrc: "./dist/service-worker.js"
+                    }));*/
 
                     config.output.path = resolve("./dist");
                     config.module.rules[0] = {

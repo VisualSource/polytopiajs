@@ -31,9 +31,10 @@ export class Unit {
     public range: number = 1;
     public isVeteran: boolean = false;
     public skills: any[] = [];
-    private _health: number = 1;
-    private _healthMax: number = 1;
-    private _defence: number = 0;
+    public attack: number = 2;
+    public defence: number = 2;
+    public health: number = 10;
+    private _healthMax: number = 10
     private model_id: string;
     private engine: Engine;
     private asset: AssetLoader;
@@ -55,7 +56,7 @@ export class Unit {
         this.type = json.type;
         this.tribe = json.tribe;
         this.isVeteran = json.is_veteran;
-        this._health = json.health;
+        this.health = json.health;
         this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
         return this;
     }
@@ -64,9 +65,12 @@ export class Unit {
             position: this.position,
             tribe: this.tribe,
             type: this.type,
-            health: this._health,
+            health: this.health,
             is_veteran: this.isVeteran,
         }
+    }
+    public get maxHealth(): number {
+        return this._healthMax;
     }
     get canMove(): boolean {
         return true;
