@@ -3,17 +3,20 @@ import AssetLoader from '../loaders/AssetLoader';
 import Engine from './Engine';
 import World from '../world/World';
 import PlayerController from '../managers/PlayerController';
+import {init} from './debug';
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
     public events: EventEmitter = new EventEmitter();
     public assets: AssetLoader;
     public engine: Engine;
-    private world: World;
+    public world: World;
     private players: PlayerController;
     
     constructor() {
         if(Game.INSTANCE) return Game.INSTANCE;
         Game.INSTANCE = this;
+
+        init(this);
 
         //@ts-ignore
         window.POLYTOPIA_GAME = this;

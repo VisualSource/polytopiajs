@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
-import type {Position, Tribe, UUID} from "../core/types";
+import type {Position, Tribe, UUID, Skill} from "../core/types";
 import type PlayerController from "../managers/PlayerController";
 
 interface IUnit {
@@ -31,11 +31,12 @@ export class Unit {
     public movement: number = 1;
     public range: number = 1;
     public isVeteran: boolean = false;
-    public skills: any[] = [];
+    public skills: Skill[] = ["DASH"];
     public attack: number = 2;
     public defence: number = 2;
     public health: number = 10;
-    public ap: number = 1;
+    public hasMoved: boolean = false;
+    public hasAttacked: boolean = false;
     public maxHealth: number = 10;
     private model_id: string;
     constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}    
@@ -90,10 +91,23 @@ export class Unit {
             shown: show
         });
     }
+    public reset(){
+        this.hasMoved = false;
+        this.hasAttacked = false;
+    }
     public destory(){
         const model = this.engine.scene.getObjectInstance(this.model_id);
         if(!model) throw new Error(`Failed to destory non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
         model.removeInstanceById(this.uuid);
+    }
+    public canMove(): boolean {
+        return !this.hasAttacked && !this.hasMoved;
+    }
+    public canAttack(): boolean {
+        if(!this.hasAttacked && this.hasMoved && this.skills.includes("DASH")){
+            return true;
+        }
+        return !this.hasAttacked && !this.hasMoved;
     }
     public async setTribe(tribe: Tribe){
         if(this.tribe === tribe) return;

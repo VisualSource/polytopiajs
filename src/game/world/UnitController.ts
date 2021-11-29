@@ -29,7 +29,7 @@ export default class UnitController implements SystemEventListener {
                     const attacker = this.world.units.get(event.data.attacker);
                     const defender = this.world.units.get(event.data.defender);
                     if(!attacker || !defender) break;
-                    console.log("ATTACK",event.data, attacker,defender);
+                  //  console.log("ATTACK",event.data, attacker,defender);
 
                     const defenderTile = this.world.level.get(defender.position.row,defender.position.col);
                     if(!defenderTile) return;
@@ -60,8 +60,8 @@ export default class UnitController implements SystemEventListener {
                         attacker.health -= attackResult;
                     }
                
-                    console.log("Attack Result", attackResult, "Health", attacker.health, "Defense Result",defenseResult, "Health",defender.health);
-                 
+                   // console.log("Attack Result", attackResult, "Health", attacker.health, "Defense Result",defenseResult, "Health",defender.health);
+                    attacker.hasAttacked = true;
                     this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
                     this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
 
@@ -71,13 +71,13 @@ export default class UnitController implements SystemEventListener {
                     this.moveUnit(event.data.unit,event.data.to);
                     this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
                     this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
-                    console.log("MOVE",event.data);
+                    //console.log("MOVE",event.data);
                     break;
                 }
                 case UnitEvent.GENERATE: {
                     const unit = this.world.units.get(event.data.unit);
                     if(!unit) break;
-                    this.generateMovementArea(unit.position,unit.vaild_terrian,unit.uuid,unit.movement);
+                    this.generateMovementArea(event.data.unit);
                     this.generateAttackArea(unit.position,unit.range,unit.uuid);
                     break;
                 }
@@ -127,18 +127,12 @@ export default class UnitController implements SystemEventListener {
         return unit;
     }
     /**
-     * @todo Rewrite to use Chebyshev distance
-     * @body So, the real Polytopia is said to use Chebyshev distance
-     * @see https://en.wikipedia.org/wiki/Chebyshev_distance
-     * @see https://polytopia.fandom.com/wiki/Movement
      *
-     * @param {Position} center
-     * @param {string[]} vaild_terrian
+     * @see https://polytopia.fandom.com/wiki/Movement
      * @param {UUID} unit_uuid
-     * @param {number} range
      * @memberof UnitController
      */
-    public generateMovementArea(center: Position, vaild_terrian: string[], unit_uuid: UUID, range: number){
+    public generateMovementArea(unit_uuid: UUID){
         /** 
         @see https://polytopia.fandom.com/wiki/Movement#Terrain
         Certain types of terrain impact movement. 
@@ -149,48 +143,50 @@ export default class UnitController implements SystemEventListener {
         Most land units moving into a port will be turned into Boats and will be unable to perform actions for the rest of that turn, 
         even if they had excess movement points or had not attacked. 
         However, units with the float or Fly skills are not affected. 
-        
         */
-        this.hideMovement();
 
+        const unit = this.world.units.get(unit_uuid);
+        if(!unit || !unit.canMove()) return;
+        const center = unit.position;
+        const unitOnRoad = this.world.level.get(unit.position.row,unit.position.col).road;
+
+
+        //reset
+        this.hideMovement();
         this.mesh_movement.removeAll();
 
-       // debugger;
-
-        for(let i = -this.world.level.size; i <= this.world.level.size; i++) {
-            for(let j = -this.world.level.size; j <= this.world.level.size; j++){
+        for(let i = 0; i <= this.world.level.size; i++) {
+            for(let j = 0; j <= this.world.level.size; j++){
                 const data = this.world.level.isValid(i, j);
                 if(!data) continue;
-                let valu = 1;
-                if(data.road) valu = 0.5;
+                let roadModifer = 1;
+                if(data.road && unitOnRoad) roadModifer  = 0.5;
 
-                const dis = chebyshev_distance(center,{row: i, col: j}) * valu;
+                const dis = chebyshev_distance(center,{row: i, col: j}) * roadModifer ;
 
-                if(!(dis <= 1) || (dis === 0) ) continue;
+                if(!(dis <= 1) || (dis === 0) || data.unit || !unit.vaild_terrian.includes(data.base.type)) continue;
 
-                console.log("Vaild Postion",i,j);
-
-                if(vaild_terrian.includes(data.base.type) && !data.unit){
-                    this.mesh_movement.createInstance({
-                        index: 0,
-                        id: nanoid(10),
-                        owner: data.uuid,
-                        rotation: 0,
-                        shown: true,
-                        type: "tile",
-                        x: i,
-                        z: j,
-                        y: 0
-                    });
-                    this.world.level.get(i,j).override = {
-                        type: SystemEvents.UNIT,
-                        id: UnitEvent.MOVE,
-                        data: {
-                            to: { col: i, row: j },
-                            unit: unit_uuid
-                        }
-                    };
-                }
+                
+                this.mesh_movement.createInstance({
+                    index: 0,
+                    id: nanoid(10),
+                    owner: data.uuid,
+                    rotation: 0,
+                    shown: true,
+                    type: "tile",
+                    x: i,
+                    z: j,
+                    y: 0
+                });
+                this.world.level.get(i,j).override = {
+                    type: SystemEvents.UNIT,
+                    id: UnitEvent.MOVE,
+                    data: {
+                        to: { row: i , col: j},
+                        unit: unit_uuid
+                    }
+                };
+    
             }
         }
 
@@ -199,7 +195,7 @@ export default class UnitController implements SystemEventListener {
     }
     public generateAttackArea(center: Position, range: number, unit_uuid: UUID){
         const self = this.world.units.get(unit_uuid);
-        if(!self) return;
+        if(!self || !self.canAttack()) return;
 
         this.hideAttack();
         this.mesh_attack.removeAll();
@@ -255,5 +251,6 @@ export default class UnitController implements SystemEventListener {
         tile.setUnit(unit.uuid);
         this.world.level.get(unit.position.row,unit.position.col).setUnit(null);
         unit.setPostion(tile.uuid,pos);
+        unit.hasMoved = true;
     }
 }

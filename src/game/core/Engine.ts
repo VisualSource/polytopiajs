@@ -13,6 +13,7 @@ import { isMobile } from '../../utils/mobile';
 import TouchTap from './TouchTap';
 
 import type InstancedObject from '../world/rendered/InstancedObject';
+import { DEG2RAD } from 'three/src/math/MathUtils';
 
 export default class Engine implements SystemEventListener {
     private controls: CameraControls;
@@ -53,6 +54,7 @@ export default class Engine implements SystemEventListener {
             1, 
             1000 
         );
+        this.scene.add(this.camera);
 
         // Effect composer setup
         this.composer = new EffectComposer(this.renderer);
@@ -61,9 +63,24 @@ export default class Engine implements SystemEventListener {
         this.composer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth,window.innerHeight, true);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.camera.lookAt(this.scene.position);
 
         this.controls = new CameraControls(this.camera,this.renderer.domElement);
         this.controls.setPosition(0,0,5);
+        this.controls.maxZoom = 20;
+        this.controls.minZoom = 10;
+        this.controls.zoom(10,false);
+        this.controls.azimuthAngle = 3.913;
+        this.controls.polarAngle = 0.825;
+       // this.controls.setBoundary(new Box3(new Vector3(-50,-50,-50),new Vector3(50,10,50)))
+        this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
+        this.controls.mouseButtons.right = CameraControls.ACTION.NONE;
+        this.controls.mouseButtons.middle = CameraControls.ACTION.NONE;
+        this.controls.touches.one = CameraControls.ACTION.TOUCH_TRUCK;
+        this.controls.touches.two = CameraControls.ACTION.TOUCH_ZOOM;
+        this.controls.touches.three = CameraControls.ACTION.NONE;
+
+        
 
         const background = this.textureLoader.load(this.is_mobile ? "/background/mobile_bg.jpg" : "/background/desktop_bg.jpg");
 
@@ -164,6 +181,7 @@ export default class Engine implements SystemEventListener {
     }
 
     private hoverUpdate() {
+        if(this.is_mobile) return;
         this.raycaster.setFromCamera(this.hover.pointer,this.camera);
 
         const scene = this.scene.getActiveLevel();
@@ -185,6 +203,6 @@ export default class Engine implements SystemEventListener {
     private animationLoop = (time: number) => {
         this.controls.update(time);
         this.composer.render(time);
-        if(!this.is_mobile) this.hoverUpdate();
+        this.hoverUpdate();
     }
 }
