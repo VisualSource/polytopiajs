@@ -6,7 +6,7 @@ import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type { WorldTile } from "./generator/WorldGenerator";
 import type { SystemEventListener } from "../core/EventEmitter";
-import type {Position, Tribe, UUID} from '../core/types';
+import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type World from "./World";
 
 /**
@@ -31,6 +31,7 @@ export interface TileControllerJson {
     position: Position;
     top: TileJson | null;
     base: TileJson;
+    road: boolean;
 }
 
 /**
@@ -72,10 +73,11 @@ export default class TileController implements SystemEventListener {
     }
     private selected: Selected = Selected.TILE; 
     private isSelected: boolean = false;
+    public readonly uuid: UUID = nanoid();
+    public road: boolean = false;
     public top: BuildTile | null = null;
     public base: Tile;
-    public unit: UUID | null = null; 
-    public readonly uuid: UUID = nanoid();
+    public unit: UUID | null = null;
     public events: EventEmitter = new EventEmitter();
     public position: Position;
     public tribe: Tribe;
@@ -86,11 +88,30 @@ export default class TileController implements SystemEventListener {
             [prop: string]: any;
         }
     } | null = null;
-
     constructor(private engine: Engine, private assets: AssetLoader, private world: World){
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
         this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
+    }
+    public terrainBouns(): number {
+        switch (this.base.type) {
+            case "LAND":
+                return 1;
+            case "FOREST":
+                if(this.world.players.playerHasTech(this.tribe,"archery")) return 1.5;
+                return 1;
+            case "WATER":
+            case "OCEAN":
+                if(this.world.players.playerHasTech(this.tribe,"aquatism")) return 1.5;
+                return 1;
+            case "MOUNTAIN":
+                if(this.world.players.playerHasTech(this.tribe,"meditation")) return 1.5;
+                return 1;
+            case "CAPITAL":
+                return 1;
+            default:
+                return 1;
+        }
     }
     /**
      * @constructor
@@ -102,7 +123,7 @@ export default class TileController implements SystemEventListener {
     public init(tile_data: WorldTile): this {
         this.position = { row: tile_data.row, col: tile_data.col };
         this.tribe = tile_data.tribe;
-        this.base = Tile.createNew(tile_data.base, tile_data.metadata);
+        this.base = Tile.createNew(tile_data.base as TileBase, tile_data.metadata);
         if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
         return this;
     }
@@ -118,6 +139,7 @@ export default class TileController implements SystemEventListener {
         this.tribe = json.tribe;
         this.base = Tile.createFromJson(json.base);
         this.top = BuildTile.createFromJson(json.top);
+        this.road = json.road;
         return this;
     }
     public toJSON(): TileControllerJson {
@@ -125,7 +147,8 @@ export default class TileController implements SystemEventListener {
             top: this.top?.toJSON() ?? null,
             base: this.base.toJSON(),
             tribe: this.tribe,
-            position: this.position
+            position: this.position,
+            road: this.road
         };
     }
     public setUnit(id: UUID | null = null): this {

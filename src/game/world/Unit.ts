@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type {Position, Tribe, UUID} from "../core/types";
+import type PlayerController from "../managers/PlayerController";
 
 interface IUnit {
     type: string;
@@ -17,11 +18,11 @@ export interface UnitJson {
 } 
 
 export class Unit {
-    static createFromJson(engine: Engine, asset: AssetLoader, json: UnitJson): Unit {
-        return new Unit().initFromJson(engine,asset,json);
+    static createFromJson(engine: Engine, asset: AssetLoader, players: PlayerController, json: UnitJson): Unit {
+        return new Unit(engine,asset,players).initFromJson(json);
     }
-    static createNew(engine: Engine, asset: AssetLoader, data: IUnit): Unit {
-        return new Unit().initDefault(engine,asset,data);
+    static createNew(engine: Engine, asset: AssetLoader,players: PlayerController, data: IUnit): Unit {
+        return new Unit(engine,asset,players).initDefault(data);
     }
     public readonly uuid: UUID = nanoid(8);
     public position: Position;
@@ -34,14 +35,11 @@ export class Unit {
     public attack: number = 2;
     public defence: number = 2;
     public health: number = 10;
-    private _healthMax: number = 10
+    public ap: number = 1;
+    public maxHealth: number = 10;
     private model_id: string;
-    private engine: Engine;
-    private asset: AssetLoader;
-    constructor(){}    
-    public initDefault(engine: Engine, asset: AssetLoader, data: IUnit): this {
-        this.engine = engine;
-        this.asset = asset;
+    constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}    
+    public initDefault(data: IUnit): this {
         this.position = data.position;
         this.type = data.type;
         this.tribe = data.tribe;
@@ -49,9 +47,7 @@ export class Unit {
         this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
         return this;
     }
-    public initFromJson(engine: Engine, asset: AssetLoader, json: UnitJson): this {
-        this.engine = engine;
-        this.asset = asset;
+    public initFromJson(json: UnitJson): this {
         this.position = json.position;
         this.type = json.type;
         this.tribe = json.tribe;
@@ -69,16 +65,10 @@ export class Unit {
             is_veteran: this.isVeteran,
         }
     }
-    public get maxHealth(): number {
-        return this._healthMax;
-    }
-    get canMove(): boolean {
-        return true;
-    }
-    get canAttack(): boolean {
-        return false;
-    }
     get vaild_terrian(): string[] {
+        if(this.players.playerHasTech(this.tribe,"climbing")){
+            return ["LAND","FOREST","MOUNTAIN"];
+        }
         return ["LAND","FOREST"];
     }
     public setPostion(next_tile_owner: UUID, postion: Position){
@@ -92,7 +82,7 @@ export class Unit {
             owner: next_tile_owner
         });
     }
-    public set visable(show: boolean) {
+    public set visible(show: boolean) {
         const model = this.engine.scene.getObjectInstance(this.model_id);
         if(!model) throw new Error(`Failed to set visablity on non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
 

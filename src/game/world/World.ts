@@ -5,9 +5,10 @@ import SelectorTile from "./rendered/SelectorTile";
 import { Unit, UnitJson } from "./Unit";
 import NArray from "../../utils/NArray";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
-import type { Position, Tribe, UUID } from "../core/types";
+import type { Tribe } from "../core/types";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
+import type PlayerController from "../managers/PlayerController";
 
 
 export interface WorldJson {
@@ -24,7 +25,7 @@ export default class World {
     public units: Map<string,Unit> = new Map();
     public selector: SelectorTile;
     public unit_controller: UnitController;
-    constructor(private engine: Engine, private assets: AssetLoader){
+    constructor(private engine: Engine, private assets: AssetLoader, public players: PlayerController){
 
         fetch("/world.json").then(value=>value.json()).then(world=>{
             this.loadWorld(world).then(level=>{
@@ -91,7 +92,7 @@ export default class World {
         }
 
         for(const unit of worlddata.units) {
-            const json_unit = Unit.createFromJson(this.engine,this.assets,unit);
+            const json_unit = Unit.createFromJson(this.engine,this.assets,this.players,unit);
 
             this.units.set(json_unit.uuid,json_unit);
             const tile = level.get(unit.position.row,unit.position.col).setUnit(json_unit.uuid);

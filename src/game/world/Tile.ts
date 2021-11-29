@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import type { Manifest } from "../loaders/AssetLoader";
-import type {Tribe, UUID} from '../core/types';
+import type {TileBase, Tribe, UUID} from '../core/types';
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -31,33 +31,25 @@ export class Tile implements ITile {
     static createFromJson(json: TileJson): Tile {
         return new Tile().initFromJson(json);
     }
-    static createNew(type: string, metadata: { [name: string]: any }): Tile {
+    static createNew(type: TileBase, metadata: { [name: string]: any }): Tile {
         return new Tile().init(type,metadata);
     }
     public readonly id: UUID = nanoid(4);
-    public type: string;
+    public type: TileBase;
     public metadata: { [name: string]: any } = {};
-    public init(type: string, metadata: { [name: string]: any }): this {
+    public init(type: TileBase, metadata: { [name: string]: any }): this {
         this.type = type;
         this.metadata = metadata;
         return this;
     }
     public initFromJson(json: TileJson): this {
-        this.type = json.type;
+        this.type = json.type as TileBase;
         this.metadata = json.metadata;
         return this;
     }
     public get show(): boolean {
         return true;
     }
-
-    public get terrainBounsMovement(): number {
-        return 0
-    }
-    public get terrainBounsDefence(): number {
-        return 0;
-    }
-
     public getType(tribe: Tribe){
         if(this.type === "OCEAN" || this.type === "WATER") {
             return `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;

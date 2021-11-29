@@ -10,6 +10,7 @@ import { nanoid } from "nanoid";
 import type { SystemEventListener } from "../core/EventEmitter";
 import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
+import { chebyshev_distance } from "../../utils/math";
 
 export default class UnitController implements SystemEventListener {
     static readonly ACCELERATOR: number = 4.5;
@@ -29,17 +30,16 @@ export default class UnitController implements SystemEventListener {
                     const defender = this.world.units.get(event.data.defender);
                     if(!attacker || !defender) break;
                     console.log("ATTACK",event.data, attacker,defender);
-                    /**
-                     * @todo Defense Bouns
-                     * @body The Defending unit gets its bouns from the tile its standing on and/or tech.
-                     */
-                    const defenseBouns = 1;
+
+                    const defenderTile = this.world.level.get(defender.position.row,defender.position.col);
+                    if(!defenderTile) return;
+
                     /**
                      * @see https://frothfrenzy.github.io/polytopiacalculator/
                      * @summary uses the same formula posted by the developer on the game wikia forums some time ago.
                      */
                     const attackForce = attacker.attack * (attacker.health / attacker.maxHealth);
-                    const defenseForce = defender.defence * (defender.health / defender.maxHealth) * defenseBouns;
+                    const defenseForce = defender.defence * (defender.health / defender.maxHealth) * defenderTile.terrainBouns();
                     const totalDamage = attackForce + defenseForce;
 
                     const attackResult = Math.round((attackForce / totalDamage) * attacker.attack * UnitController.ACCELERATOR);
@@ -120,28 +120,55 @@ export default class UnitController implements SystemEventListener {
         this.world.units.delete(id);
     }
     public async createUnit(tribe: Tribe, type: string, position: Position){
-        const unit = Unit.createNew(this.engine,this.assets,{ type, tribe, position });
+        const unit = Unit.createNew(this.engine,this.assets,this.world.players, { type, tribe, position });
         this.world.units.set(unit.uuid,unit);
         const tile = this.world.level.get(position.row,position.col).setUnit(unit.uuid);
         await unit.render(tile.uuid);
         return unit;
     }
+    /**
+     * @todo Rewrite to use Chebyshev distance
+     * @body So, the real Polytopia is said to use Chebyshev distance
+     * @see https://en.wikipedia.org/wiki/Chebyshev_distance
+     * @see https://polytopia.fandom.com/wiki/Movement
+     *
+     * @param {Position} center
+     * @param {string[]} vaild_terrian
+     * @param {UUID} unit_uuid
+     * @param {number} range
+     * @memberof UnitController
+     */
     public generateMovementArea(center: Position, vaild_terrian: string[], unit_uuid: UUID, range: number){
+        /** 
+        @see https://polytopia.fandom.com/wiki/Movement#Terrain
+        Certain types of terrain impact movement. 
+        Forests without roads and mountains block movement. 
+        Units cannot move through them (they can move onto them, but no further in the same turn). 
+        Also, units cannot move into clouds (the fog of war).
 
+        Most land units moving into a port will be turned into Boats and will be unable to perform actions for the rest of that turn, 
+        even if they had excess movement points or had not attacked. 
+        However, units with the float or Fly skills are not affected. 
+        
+        */
         this.hideMovement();
 
         this.mesh_movement.removeAll();
 
        // debugger;
 
-        for(let i = -range; i <= range; i++) {
-            for(let j = -range; j <= range; j++){
-                let row = center.row + i;
-                let col = center.col + j;
-                const data = this.world.level.isValid(row, col);
+        for(let i = -this.world.level.size; i <= this.world.level.size; i++) {
+            for(let j = -this.world.level.size; j <= this.world.level.size; j++){
+                const data = this.world.level.isValid(i, j);
+                if(!data) continue;
+                let valu = 1;
+                if(data.road) valu = 0.5;
 
-                // 0,0 is the center
-                if(!data || (i === 0 && j === 0) ) continue;
+                const dis = chebyshev_distance(center,{row: i, col: j}) * valu;
+
+                if(!(dis <= 1) || (dis === 0) ) continue;
+
+                console.log("Vaild Postion",i,j);
 
                 if(vaild_terrian.includes(data.base.type) && !data.unit){
                     this.mesh_movement.createInstance({
@@ -151,15 +178,15 @@ export default class UnitController implements SystemEventListener {
                         rotation: 0,
                         shown: true,
                         type: "tile",
-                        x: row,
-                        z: col,
+                        x: i,
+                        z: j,
                         y: 0
                     });
-                    this.world.level.get(row,col).override = {
+                    this.world.level.get(i,j).override = {
                         type: SystemEvents.UNIT,
                         id: UnitEvent.MOVE,
                         data: {
-                            to: { col,row },
+                            to: { col: i, row: j },
                             unit: unit_uuid
                         }
                     };
