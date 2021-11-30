@@ -13,6 +13,8 @@ interface ImportMeta {
 interface Window {
     opera: string;
     __SNOWPACK_ENV__: any
+    webkitAudioContext: AudioContext;
+    webkitOfflineAudioContext: OfflineAudioContext; 
 }
 
 declare module '*.svelte';

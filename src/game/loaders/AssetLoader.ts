@@ -3,12 +3,10 @@ import JsZip from 'jszip';
 
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
-import { GLTFLoader, GLTF, GLTFLoaderPlugin } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LoadingManager } from 'three';
-//import { TextureLoader } from 'three';
+import AudioLoader from './AudioLoader';
 
-//import EventEmitter, { SystemEventListener } from '../core/EventEmitter';
-//import {SystemEvents, AssetLoaderEvents} from '../events/systemEvents';
 import KHR_Variants, { VariantGLTF } from './KHR_Variants';
 
 type CachedAsset = { blob: Blob, name: string, date: string, resourceItem: string | null };
@@ -43,7 +41,9 @@ const mimeTypes = {
     "gltf": "model/gltf+json",
     "obj": "model/obj",
     "mtl": "model/mtl",
-    "json": "application/json"
+    "json": "application/json",
+    "webm": "audio/webm",
+    "mp3": "audio/mp3"
 }
 
 
@@ -73,7 +73,12 @@ export default class AssetLoader  {
 
         return (content as GLTF).scene.children[item as number] as THREE.Mesh;
     }
-
+    public playEffect(key: string){
+        /** 
+         * @todo implement sounds loader and player
+        */
+        //AudioLoader.playSound();
+    }
     public getVarient(asset: string): GLTF | THREE.Group {
         const content = this.assets.get(asset);
         if(!content) throw new Error(`Unkown asset "${asset}".`);
@@ -231,6 +236,11 @@ export default class AssetLoader  {
                     break;
                 }
                 case "application/json": {
+                    break;
+                }
+                case "audio/webm":
+                case "audio/mp3": {
+                    
                     break;
                 }
                 default:
