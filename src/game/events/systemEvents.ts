@@ -4,8 +4,15 @@ export enum SystemEvents {
     ASSET_LOADER = "ASSET_LOADER",
     OBJECT = "OBJECT",
     INTERACTION = "INTERACTION",
-    UNIT = "UNIT"
+    UNIT = "UNIT",
+    SOUND = "SOUND"
 };
+
+export enum SoundEvent {
+    PLAY,
+    STOP,
+    PAUSE
+}
 
 export enum UnitEvent {
     MOVE,

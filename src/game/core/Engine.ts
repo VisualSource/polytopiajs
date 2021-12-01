@@ -67,7 +67,7 @@ export default class Engine implements SystemEventListener {
 
         this.controls = new CameraControls(this.camera,this.renderer.domElement);
         this.controls.setPosition(0,0,5);
-        this.controls.maxZoom = 20;
+        this.controls.maxZoom = 30;
         this.controls.minZoom = 10;
         this.controls.zoom(10,false);
         this.controls.azimuthAngle = 3.913;

@@ -5,7 +5,6 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LoadingManager } from 'three';
-import AudioLoader from './AudioLoader';
 
 import KHR_Variants, { VariantGLTF } from './KHR_Variants';
 
@@ -50,13 +49,15 @@ const mimeTypes = {
 export default class AssetLoader  {
     static INSTANCE: AssetLoader | null = null;
     public assets: Map<string, GLTF | THREE.Group> = new Map();
+    public audio: Map<string,AudioBuffer> = new Map();
+    public context: AudioContext;
     constructor(init: boolean = false){
         if(AssetLoader.INSTANCE) return AssetLoader.INSTANCE;
         AssetLoader.INSTANCE = this;
         if(init) this.init();
 
         //@ts-ignore
-        if(import.meta.env.MODE === "development") window.assetLoader = AssetLoader.INSTANCE;
+       // if(import.meta.env.MODE === "development") window.assetLoader = AssetLoader.INSTANCE;
     }
 
     public async getAsset(asset: string, item: Variant = 0, type: ModelType = "gltf"){
@@ -73,20 +74,33 @@ export default class AssetLoader  {
 
         return (content as GLTF).scene.children[item as number] as THREE.Mesh;
     }
-    public playEffect(key: string){
-        /** 
-         * @todo implement sounds loader and player
-        */
-        //AudioLoader.playSound();
-    }
     public getVarient(asset: string): GLTF | THREE.Group {
         const content = this.assets.get(asset);
         if(!content) throw new Error(`Unkown asset "${asset}".`);
         return content;
     }
-  
+    /**
+     * @see https://www.html5rocks.com/en/tutorials/webaudio/intro/
+     *
+     * @export
+     * @class AudioLoader
+     */
+    public playSound(key: string){
+        const clip = this.audio.get(key);
+        if(!clip) throw new Error("Failed to get audio asset");
+
+        const source = this.context.createBufferSource();
+        source.buffer = clip;
+        source.connect(this.context.destination);
+        source.start(0);
+    }
     public async init(){
         try {
+
+            const context = window.AudioContext || window.webkitAudioContext;
+
+            this.context = new context();
+
         
             localforage.config({
                 name: "polytopia",
@@ -106,6 +120,15 @@ export default class AssetLoader  {
         } catch (error) {
             console.error(error);
         }
+    }
+    public async decodeAudio(raw: ArrayBuffer): Promise<AudioBuffer> {
+        return new Promise((ok,err)=>{
+            this.context.decodeAudioData(raw,(buffer)=>{
+                ok(buffer);
+            },(error)=>{
+                err(error);
+            });
+        });
     }
     public async install(src: string = "/raw.zip", version: number | undefined = undefined): Promise<void> {
         try {
@@ -133,7 +156,7 @@ export default class AssetLoader  {
                 localStorage.setItem("pak_installed",version.toString());
             } else {
               //  const pak = await (await fetch(import.meta.env.SNOWPACK_PUBLIC_PAK_VERSION)).json();
-                localStorage.setItem("pak_installed","1"/*pak.version.toString()*/);
+                localStorage.setItem("pak_installed","2"/*pak.version.toString()*/);
             }
 
         } catch (error) {
@@ -167,7 +190,7 @@ export default class AssetLoader  {
         }
         return null;
     }
-    private async *loadAsset(cachedAssets: Map<string, CachedAsset>): AsyncGenerator<{ name: string, asset: GLTF | THREE.Group }, null, any> {
+    private async *loadAsset(cachedAssets: Map<string, CachedAsset>): AsyncGenerator<{ type: "sound" | "asset", data: { name: string, asset: GLTF | THREE.Group | AudioBuffer } }, null, any> {
         const loaderManager = new LoadingManager(
             undefined, undefined,(url: string)=> {console.error("Loader Error |", url);});
         const gltfLoader = new GLTFLoader(loaderManager);
@@ -196,8 +219,11 @@ export default class AssetLoader  {
                             }
 
                             ok({
-                                name,
-                                asset: gltfAsset
+                                type: "asset",
+                                data: {
+                                    name,
+                                    asset: gltfAsset
+                                }
                             });
 
                         },(err)=>{
@@ -225,8 +251,11 @@ export default class AssetLoader  {
                             const model = objLoader.parse(await data.blob.text());
 
                             ok({
-                                name,
-                                asset: model
+                                type: "asset",
+                                data: {
+                                    name,
+                                    asset: model
+                                }
                             });
 
                         } catch (error: any) {
@@ -240,7 +269,23 @@ export default class AssetLoader  {
                 }
                 case "audio/webm":
                 case "audio/mp3": {
-                    
+                    yield await new Promise( async (ok,err)=>{
+                        try {
+                            const buffer = await data.blob.arrayBuffer()
+                            const clip = await this.decodeAudio(buffer);
+
+                            ok({
+                                type: "sound",
+                                data: {
+                                    name,
+                                    asset: clip
+                                }
+                            });
+                            
+                        } catch (error: any) {
+                            err(error);
+                        }
+                    });
                     break;
                 }
                 default:
@@ -256,7 +301,11 @@ export default class AssetLoader  {
         if(!pak) throw new Error("Failed to load asset.");
         
         for await (const asset of this.loadAsset(pak)) {
-            this.assets.set(asset.name,asset.asset);
+            if(asset.type === "asset") {
+                this.assets.set(asset.data.name,asset.data.asset as (GLTF | THREE.Group));
+            } else {
+                this.audio.set(asset.data.name,asset.data.asset as AudioBuffer);
+            }
         }
 
     }

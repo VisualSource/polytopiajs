@@ -4,6 +4,7 @@ import Engine from './Engine';
 import World from '../world/World';
 import PlayerController from '../managers/PlayerController';
 import {init} from './debug';
+import { SystemEvents } from '../events/systemEvents';
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
     public events: EventEmitter = new EventEmitter();
@@ -26,6 +27,15 @@ export default class Game implements SystemEventListener {
         console.info("Init | Starting loading of Assets");
         this.assets = new AssetLoader();
         await this.assets.init();
+
+        this.events.on(SystemEvents.SOUND,(event)=>{
+            try {
+                this.assets.playSound(event.data.sound);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
         return this;
     }
     public async initEngine(canvas: HTMLCanvasElement) {

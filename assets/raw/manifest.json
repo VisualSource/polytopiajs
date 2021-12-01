@@ -1,5 +1,10 @@
 [
     {
+        "type": "sound",
+        "name": "nature_1",
+        "file": "sound/nature_1.webm"
+    },
+    {
         "type": "material",
         "name": "WATER_MATERIAL",
         "file": "assets/WATER_MATERIAL.mtl"
