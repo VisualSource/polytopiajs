@@ -80,8 +80,6 @@ export default class Engine implements SystemEventListener {
         this.controls.touches.two = CameraControls.ACTION.TOUCH_ZOOM;
         this.controls.touches.three = CameraControls.ACTION.NONE;
 
-        
-
         const background = this.textureLoader.load(this.is_mobile ? "/background/mobile_bg.jpg" : "/background/desktop_bg.jpg");
 
         this.scene.background = background;

@@ -32,8 +32,11 @@ export interface TileControllerJson {
     top: TileJson | null;
     base: TileJson;
     road: boolean;
+    owning_tribe: Tribe | null;
 }
-
+/**
+ * @todo
+ */
 /**
  * @listens INTERACTION
  * @emits UNIT 
@@ -71,16 +74,90 @@ export default class TileController implements SystemEventListener {
     static createNew(engine: Engine, assets: AssetLoader, world: World, tile_data: WorldTile): TileController {
         return new TileController(engine,assets,world).init(tile_data);
     }
+    /**
+     * keeps track of want the current selected thing is on this tile.
+     * Unit => 0
+     * Tile => 1
+     * Deselection => 2
+     *
+     * @private
+     * @type {Selected}
+     * @memberof TileController
+     */
     private selected: Selected = Selected.TILE; 
+    /**
+     * Whether the tile is selected or not
+     *
+     * @private
+     * @type {boolean}
+     * @memberof TileController
+     */
     private isSelected: boolean = false;
+    /**
+     * Static id of the tile
+     *
+     * @type {UUID}
+     * @memberof TileController
+     */
     public readonly uuid: UUID = nanoid();
+    /**
+     * if the tile has a road placed on this tile
+     *
+     * @type {boolean}
+     * @memberof TileController
+     */
     public road: boolean = false;
+    /**
+     * the extra stuff on top of a tile 
+     * Example metal in a mountian or fruit
+     *
+     * @type {(BuildTile | null)}
+     * @memberof TileController
+     */
     public top: BuildTile | null = null;
+    /**
+     * The base props of this tile
+     *
+     * @type {Tile}
+     * @memberof TileController
+     */
     public base: Tile;
+    /**
+     * A UUID ref to a unit
+     *
+     * @type {(UUID | null)}
+     * @memberof TileController
+     */
     public unit: UUID | null = null;
     public events: EventEmitter = new EventEmitter();
     public position: Position;
-    public tribe: Tribe;
+    /**
+     * The tribe that this tile should be rendered as 
+     *
+     * @private
+     * @type {Tribe}
+     * @memberof TileController
+     */
+    private tribe: Tribe;
+    /**
+     * The tribe that this tile is owned by
+     *
+     * @type {(Tribe | null)}
+     * @memberof TileController
+     */
+    public owning_tribe: Tribe | null = null;
+    /**
+     * A event that overrides the default selection events in the `selectionHandle` function.
+     *
+     * @type {({
+     *         type: string;
+     *         id: number;
+     *         data: {
+     *             [prop: string]: any;
+     *         }
+     *     } | null)}
+     * @memberof TileController
+     */
     public override: {
         type: string;
         id: number;
@@ -140,6 +217,7 @@ export default class TileController implements SystemEventListener {
         this.base = Tile.createFromJson(json.base);
         this.top = BuildTile.createFromJson(json.top);
         this.road = json.road;
+        this.owning_tribe = json.owning_tribe;
         return this;
     }
     public toJSON(): TileControllerJson {
@@ -148,7 +226,8 @@ export default class TileController implements SystemEventListener {
             base: this.base.toJSON(),
             tribe: this.tribe,
             position: this.position,
-            road: this.road
+            road: this.road,
+            owning_tribe: this.owning_tribe
         };
     }
     public setUnit(id: UUID | null = null): this {
@@ -205,9 +284,6 @@ export default class TileController implements SystemEventListener {
     }
     public addBuilding(){}
     public removeBuilding(){}
-    public async destory(){
-        this.events.offId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
-    }
     /**
      * Generate tiles and add them to threejs scene
      *

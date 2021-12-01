@@ -3,6 +3,7 @@
     "leveldata": {
         "overworld": [{
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -18,6 +19,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -33,6 +35,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -45,6 +48,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "WHALE",
                 "metadata": {
@@ -65,6 +69,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "RUIN",
                 "metadata": {
@@ -82,6 +87,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -94,6 +100,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "WHALE",
                 "metadata": {
@@ -114,6 +121,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -129,6 +137,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -144,6 +153,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -164,6 +174,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -179,6 +190,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -199,6 +211,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -214,6 +227,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -234,6 +248,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -249,6 +264,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -266,6 +282,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -286,6 +303,7 @@
             }
         }, { 
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -306,6 +324,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -323,6 +342,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -338,6 +358,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -355,6 +376,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -375,6 +397,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -392,6 +415,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "METAL",
                 "metadata": {
@@ -409,6 +433,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -426,6 +451,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -443,6 +469,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -460,6 +487,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -477,6 +505,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -497,6 +526,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -517,6 +547,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "MOUNTAIN",
@@ -529,6 +560,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "METAL",
                 "metadata": {
@@ -546,6 +578,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "LAND",
@@ -558,6 +591,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -578,6 +612,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -595,6 +630,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -612,6 +648,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -629,6 +666,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -646,6 +684,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "MOUNTAIN",
@@ -658,6 +697,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -673,6 +713,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -688,6 +729,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -708,6 +750,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -723,6 +766,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -735,6 +779,7 @@
             }
         }, {
             "road": true,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -752,6 +797,7 @@
             }
         }, {
             "road": true,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -769,6 +815,7 @@
             }
         }, {
             "road": true,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -786,6 +833,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -803,6 +851,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -820,6 +869,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -837,6 +887,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -857,6 +908,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -869,6 +921,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -881,6 +934,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -901,6 +955,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -918,6 +973,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -930,6 +986,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -947,6 +1004,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -964,6 +1022,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "LAND",
@@ -976,6 +1035,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -993,6 +1053,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1010,6 +1071,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -1022,6 +1084,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -1037,6 +1100,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1054,6 +1118,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -1071,6 +1136,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1088,6 +1154,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1105,6 +1172,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1122,6 +1190,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1139,6 +1208,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1156,6 +1226,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1173,6 +1244,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1190,6 +1262,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1207,6 +1280,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -1224,6 +1298,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -1239,6 +1314,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "MOUNTAIN",
@@ -1251,6 +1327,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -1271,6 +1348,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -1291,6 +1369,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -1306,6 +1385,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1323,6 +1403,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1340,6 +1421,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1357,6 +1439,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "MOUNTAIN",
@@ -1369,6 +1452,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1386,6 +1470,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1403,6 +1488,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "MOUNTAIN",
@@ -1415,6 +1501,7 @@
             }
         }, { 
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1432,6 +1519,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -1452,6 +1540,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -1467,6 +1556,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1484,6 +1574,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1501,6 +1592,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1518,6 +1610,7 @@
             }
         }, {
             "road": true,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "CAPITAL",
@@ -1530,6 +1623,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1547,6 +1641,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1564,6 +1659,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -1581,6 +1677,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "METAL",
                 "metadata": {
@@ -1598,6 +1695,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -1613,6 +1711,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1630,6 +1729,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1647,6 +1747,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "VILLAGE",
                 "metadata": {
@@ -1664,6 +1765,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -1684,6 +1786,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1701,6 +1804,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1718,6 +1822,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1735,6 +1840,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "WATER",
@@ -1750,6 +1856,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -1770,6 +1877,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FISH",
                 "metadata": {
@@ -1790,6 +1898,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "CROP",
                 "metadata": {
@@ -1807,6 +1916,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1824,6 +1934,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "OCEAN",
@@ -1839,6 +1950,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "GAME",
                 "metadata": {
@@ -1856,6 +1968,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "MOUNTAIN",
@@ -1868,6 +1981,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "LAND",
@@ -1880,6 +1994,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "FRUIT",
                 "metadata": {
@@ -1897,6 +2012,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -1909,6 +2025,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -1921,6 +2038,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -1933,6 +2051,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": {
                 "type": "RUIN",
                 "metadata": {
@@ -1950,6 +2069,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",
@@ -1962,6 +2082,7 @@
             }
         }, {
             "road": false,
+            "owning_tribe": null,
             "top": null,
             "base": {
                 "type": "FOREST",

@@ -18,7 +18,7 @@ export default class UnitController implements SystemEventListener {
     private mesh_movement: InstancedObject;
     private mesh_attack: InstancedObject;
     constructor(private engine: Engine, private assets: AssetLoader, private world: World){
-        this.events.onId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, (event)=>{
+        this.events.onId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, ()=>{
             this.hideMovement();
             this.hideAttack();
         });
@@ -126,6 +126,15 @@ export default class UnitController implements SystemEventListener {
         await unit.render(tile.uuid);
         return unit;
     }
+    public moveUnit(id: UUID, pos: Position) {
+        const unit = this.world.units.get(id);
+        if(!unit) return;
+        const tile = this.world.level.get(pos.row,pos.col);
+        tile.setUnit(unit.uuid);
+        this.world.level.get(unit.position.row,unit.position.col).setUnit(null);
+        unit.setPostion(tile.uuid,pos);
+        unit.hasMoved = true;
+    }
     /**
      *
      * @see https://polytopia.fandom.com/wiki/Movement
@@ -149,8 +158,7 @@ export default class UnitController implements SystemEventListener {
         if(!unit || !unit.canMove()) return;
         const center = unit.position;
         const unitOnRoad = this.world.level.get(unit.position.row,unit.position.col).road;
-
-
+    
         //reset
         this.hideMovement();
         this.mesh_movement.removeAll();
@@ -160,7 +168,8 @@ export default class UnitController implements SystemEventListener {
                 const data = this.world.level.isValid(i, j);
                 if(!data) continue;
                 let roadModifer = 1;
-                if(data.road && unitOnRoad) roadModifer  = 0.5;
+                // only works on a frendly or nuture road
+                if(data.road && unitOnRoad && (data.owning_tribe === null || data.owning_tribe === unit.tribe)) roadModifer  = 0.5;
 
                 const dis = chebyshev_distance(center,{row: i, col: j}) * roadModifer ;
 
@@ -189,7 +198,6 @@ export default class UnitController implements SystemEventListener {
     
             }
         }
-
 
         this.mesh_movement.visible = true;
     }
@@ -235,7 +243,6 @@ export default class UnitController implements SystemEventListener {
             }
         }
 
-
         this.mesh_attack.visible = true;
     }
     public hideMovement(){
@@ -243,14 +250,5 @@ export default class UnitController implements SystemEventListener {
     }
     public hideAttack(){
         this.mesh_attack.visible = false;
-    }
-    public moveUnit(id: UUID, pos: Position) {
-        const unit = this.world.units.get(id);
-        if(!unit) return;
-        const tile = this.world.level.get(pos.row,pos.col);
-        tile.setUnit(unit.uuid);
-        this.world.level.get(unit.position.row,unit.position.col).setUnit(null);
-        unit.setPostion(tile.uuid,pos);
-        unit.hasMoved = true;
     }
 }
