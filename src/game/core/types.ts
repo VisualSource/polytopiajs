@@ -5,7 +5,7 @@ export interface Position {
 
 export type Tribe = "xin-xi" | "imperius" | "bardur" | "oumaji" | "kickoo" | "zebasi";
 export type Tech = "climbing" | "fishing" | "hunting" | "organization" | "riding" | "archery" | "farming" | "forestry" | "free_spirit" | "meditation" | "mining" | "roads" | "sailing" | "shields" | "whaling" | "aquatism" | "chivalry" | "construction" | "mathematics" | "navigation" | "smithery" | "spiritualism" | "trade" | "philosophy";
-export type TileBase = "LAND" | "WATER" | "OCEAN" | "FOREST" | "MOUNTAIN" | "CAPITAL";
+export type TileBase = "LAND" | "WATER" | "OCEAN" | "FOREST" | "MOUNTAIN" | "CITY";
 export type Skill = "CARRY" | "CONVERT" | "DASH" | "ESCAPE" | "FLOAT" | "FORTIFY" | "HEAL" | "PERSIST" | "SCOUT" | "BOOST" | "FLY" | "INDEPENDENT" | "NAVIGATE" | "SPLASH" | "SURPRISE";
 
 export type UUID = string;

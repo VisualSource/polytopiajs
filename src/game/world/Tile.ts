@@ -67,7 +67,7 @@ export class Tile implements ITile {
         } 
         let key = `${this.type}_${tribe.toUpperCase()}`;
         return {
-            asset: this.type === "CAPITAL" ?  key : this.type,
+            asset: this.type === "CITY" ?  key : this.type,
             item: 0,
             type: "gltf"
         }

@@ -42,7 +42,7 @@ export default class Game implements SystemEventListener {
         this.engine = new Engine(canvas);
         this.engine.init();
         console.info("Init Engine | Starting threejs env",canvas);
-        this.players = new PlayerController();
+        this.players = PlayerController.init(["bardur","imperius"]);
         this.world = new World(this.engine,this.assets,this.players);
     }
     public async destory(){

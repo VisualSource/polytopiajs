@@ -49,7 +49,7 @@ export default class World {
             const model = this.assets.getVarient("SELECTOR") as VariantGLTF;
             this.selector = new SelectorTile(model);
             this.selector.render(this.engine);
-            this.unit_controller = new UnitController(this.engine,this.assets,this);
+            this.unit_controller = new UnitController(this.engine,this.assets,this,this.players);
             await this.unit_controller.init();
         } catch (error) {
             console.error(error);
@@ -76,7 +76,7 @@ export default class World {
             const model = this.assets.getVarient("SELECTOR") as VariantGLTF;
             this.selector = new SelectorTile(model);
             this.selector.render(this.engine);
-            this.unit_controller = new UnitController(this.engine,this.assets,this);
+            this.unit_controller = new UnitController(this.engine,this.assets,this,this.players);
             await this.unit_controller.init();
         } catch (error) {
             console.error(error);

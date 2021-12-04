@@ -81,8 +81,17 @@ export default class WorldGenerator {
         for(let i = 0; i < capital_cells.length; i++) { 
             const row = (capital_cells[i] / worldsize | 0);
             const col = (capital_cells[i] % worldsize);
-            map.get(row,col).base = "CAPITAL";
-            map.get(row,col).tribe = tribes[i];
+            map.set(row,col,{
+                base: "CITY",
+                buldings: [],
+                metadata: {
+                    capital: true,
+                    cityWall: false
+                },
+                tribe: tribes[i],
+                row,
+                col 
+            });
         }
         
         //

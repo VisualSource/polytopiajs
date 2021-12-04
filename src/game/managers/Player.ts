@@ -78,4 +78,11 @@ export default class Player {
                 break;
         }
     }
+    public toJSON(){
+        return {
+            tribe: this.tribe,
+            uuid: this.uuid,
+            tech: this.tech
+        }
+    }
 }

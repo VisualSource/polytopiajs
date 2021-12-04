@@ -1,5 +1,20 @@
 [
     {
+        "type": "model",
+        "name": "MOUNTAIN",
+        "file": "assets/MOUNTAIN.glb"
+    },
+    {
+        "type": "model",
+        "name": "VILLAGE",
+        "file": "assets/VILLAGE.glb"
+    },
+    {
+        "type": "model",
+        "name": "RUIN",
+        "file": "assets/RUIN.glb"
+    },
+    {
         "type": "sound",
         "name": "nature_1",
         "file": "sound/nature_1.webm"

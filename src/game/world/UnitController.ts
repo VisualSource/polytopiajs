@@ -11,13 +11,14 @@ import type { SystemEventListener } from "../core/EventEmitter";
 import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
 import { chebyshev_distance } from "../../utils/math";
+import type PlayerController from "../managers/PlayerController";
 
 export default class UnitController implements SystemEventListener {
     static readonly ACCELERATOR: number = 4.5;
     public events: EventEmitter = new EventEmitter();
     private mesh_movement: InstancedObject;
     private mesh_attack: InstancedObject;
-    constructor(private engine: Engine, private assets: AssetLoader, private world: World){
+    constructor(private engine: Engine, private assets: AssetLoader, private world: World, private player: PlayerController){
         this.events.onId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, ()=>{
             this.hideMovement();
             this.hideAttack();
@@ -77,6 +78,8 @@ export default class UnitController implements SystemEventListener {
                 case UnitEvent.GENERATE: {
                     const unit = this.world.units.get(event.data.unit);
                     if(!unit) break;
+                    if(unit.tribe !== this.player.activePlayer) break;
+
                     this.generateMovementArea(event.data.unit);
                     this.generateAttackArea(unit.position,unit.range,unit.uuid);
                     break;

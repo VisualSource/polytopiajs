@@ -184,7 +184,8 @@ export default class TileController implements SystemEventListener {
             case "MOUNTAIN":
                 if(this.world.players.playerHasTech(this.tribe,"meditation")) return 1.5;
                 return 1;
-            case "CAPITAL":
+            case "CITY":
+                if(this.base.metadata?.cityWall && this.world.units.get(this.unit as string)?.skills.includes("FORTIFY")) return 4;
                 return 1;
             default:
                 return 1;
@@ -201,6 +202,10 @@ export default class TileController implements SystemEventListener {
         this.position = { row: tile_data.row, col: tile_data.col };
         this.tribe = tile_data.tribe;
         this.base = Tile.createNew(tile_data.base as TileBase, tile_data.metadata);
+        if(this.base.type === "CITY") {
+            this.owning_tribe = this.tribe;
+            this.road = true;
+        }
         if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
         return this;
     }
@@ -328,7 +333,7 @@ export default class TileController implements SystemEventListener {
                     shown: true,
                     x: this.position.row,
                     z: this.position.col,
-                    y: 1,
+                    y: 0,
                     id: this.top.id,
                     type: "tile"
                 });
