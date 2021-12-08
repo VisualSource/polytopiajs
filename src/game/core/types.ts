@@ -9,3 +9,8 @@ export type TileBase = "LAND" | "WATER" | "OCEAN" | "FOREST" | "MOUNTAIN" | "CIT
 export type Skill = "CARRY" | "CONVERT" | "DASH" | "ESCAPE" | "FLOAT" | "FORTIFY" | "HEAL" | "PERSIST" | "SCOUT" | "BOOST" | "FLY" | "INDEPENDENT" | "NAVIGATE" | "SPLASH" | "SURPRISE";
 
 export type UUID = string;
+
+export abstract class Constructable {
+    public abstract defaultConstructor(...params: any[]): this;
+    public abstract jsonConstructor(...params: any[]): this;
+}

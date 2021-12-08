@@ -32,7 +32,7 @@
     "@types/dat.gui": "^0.7.7",
     "@types/mocha": "^9.0.0",
     "@types/snowpack-env": "^2.3.4",
-    "@types/three": "^0.134.0",
+    "@types/three": "^0.135.0",
     "chai": "^4.3.4",
     "dat.gui": "^0.7.7",
     "esbuild-loader": "^2.16.0",

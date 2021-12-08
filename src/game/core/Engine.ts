@@ -13,7 +13,6 @@ import { isMobile } from '../../utils/mobile';
 import TouchTap from './TouchTap';
 
 import type InstancedObject from '../world/rendered/InstancedObject';
-import { DEG2RAD } from 'three/src/math/MathUtils';
 
 export default class Engine implements SystemEventListener {
     private controls: CameraControls;
@@ -111,7 +110,6 @@ export default class Engine implements SystemEventListener {
 
         this.renderer.setAnimationLoop(this.animationLoop);
     }
-
     public destory(){
         document.removeEventListener("resize",this.resize);
         this.renderer.domElement.removeEventListener("pointermove",this.onMouseMove);
@@ -177,7 +175,6 @@ export default class Engine implements SystemEventListener {
 
         this.camera.updateProjectionMatrix();
     }
-
     private hoverUpdate() {
         if(this.is_mobile) return;
         this.raycaster.setFromCamera(this.hover.pointer,this.camera);
@@ -197,10 +194,12 @@ export default class Engine implements SystemEventListener {
             this.hover.INTERSECTION = null;
         }
     }
-
     private animationLoop = (time: number) => {
         this.controls.update(time);
         this.composer.render(time);
         this.hoverUpdate();
+    }
+    public moveCameraTo(row: number, col: number) {
+        this.controls.moveTo(row * 4, 0, col * 4, true);
     }
 }

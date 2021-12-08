@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
-import { Tile, BuildTile, TileJson } from "./Tile";
+import { Tile, BuildTile, TileJson, City, CityJson } from "./Tile";
 import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
@@ -30,7 +30,7 @@ export interface TileControllerJson {
     tribe: Tribe;
     position: Position;
     top: TileJson | null;
-    base: TileJson;
+    base: TileJson | CityJson;
     road: boolean;
     owning_tribe: Tribe | null;
 }
@@ -121,7 +121,7 @@ export default class TileController implements SystemEventListener {
      * @type {Tile}
      * @memberof TileController
      */
-    public base: Tile;
+    public base: Tile | City;
     /**
      * A UUID ref to a unit
      *
@@ -166,26 +166,41 @@ export default class TileController implements SystemEventListener {
         }
     } | null = null;
     constructor(private engine: Engine, private assets: AssetLoader, private world: World){
-        this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
-        this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
-        this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
+        this.events.on(SystemEvents.INTERACTION,(event)=>{
+            switch (event.id) {
+                case ObjectEvents.TILE_SELECT:
+                    this.selectionHandle(event);
+                    break;
+                case ObjectEvents.RESET:
+                    this.resetHandle(event);
+                    break;
+                case ObjectEvents.DESELECTION:
+                    this.deselectionHandle();
+                default:
+                    break;
+            }
+        });
+       // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
+       // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
+       // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
     }
     public terrainBouns(): number {
         switch (this.base.type) {
             case "LAND":
                 return 1;
             case "FOREST":
-                if(this.world.players.playerHasTech(this.tribe,"archery")) return 1.5;
+                if(this.owning_tribe && this.world.players.playerHasTech(this.owning_tribe,"archery")) return 1.5;
                 return 1;
             case "WATER":
             case "OCEAN":
-                if(this.world.players.playerHasTech(this.tribe,"aquatism")) return 1.5;
+                if(this.owning_tribe && this.world.players.playerHasTech(this.owning_tribe,"aquatism")) return 1.5;
                 return 1;
             case "MOUNTAIN":
-                if(this.world.players.playerHasTech(this.tribe,"meditation")) return 1.5;
+                if(this.owning_tribe && this.world.players.playerHasTech(this.owning_tribe,"meditation")) return 1.5;
                 return 1;
             case "CITY":
-                if(this.base.metadata?.cityWall && this.world.units.get(this.unit as string)?.skills.includes("FORTIFY")) return 4;
+                const unit = this.world.units.get(this.unit as string);
+                if(this.base.metadata?.cityWall && unit?.tribe === this.owning_tribe && unit?.skills.includes("FORTIFY")) return 4;
                 return 1;
             default:
                 return 1;
@@ -201,12 +216,14 @@ export default class TileController implements SystemEventListener {
     public init(tile_data: WorldTile): this {
         this.position = { row: tile_data.row, col: tile_data.col };
         this.tribe = tile_data.tribe;
-        this.base = Tile.createNew(tile_data.base as TileBase, tile_data.metadata);
-        if(this.base.type === "CITY") {
+        if(tile_data.base === "CITY") {
             this.owning_tribe = this.tribe;
             this.road = true;
+            this.base = City.cityDefaultConstructor(tile_data.metadata as any);
+        } else {
+            this.base = Tile.defaultConstructor(tile_data.base as TileBase, tile_data.metadata);
+            if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
         }
-        if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
         return this;
     }
     /**
@@ -219,8 +236,12 @@ export default class TileController implements SystemEventListener {
     public initFromJson(json: TileControllerJson){
         this.position = json.position;
         this.tribe = json.tribe;
-        this.base = Tile.createFromJson(json.base);
-        this.top = BuildTile.createFromJson(json.top);
+        if(json.base.type === "CITY") {
+            this.base = City.cityJsonConstructor(json.base as CityJson)
+        } else {
+            this.base = Tile.jsonConstructor(json.base);
+            this.top = BuildTile.createFromJson(json.top);
+        }
         this.road = json.road;
         this.owning_tribe = json.owning_tribe;
         return this;
@@ -288,7 +309,36 @@ export default class TileController implements SystemEventListener {
         }});
     }
     public addBuilding(){}
-    public removeBuilding(){}
+    public removeBuilding(){
+        if(!this.top) return;
+        try {
+            const top_type = this.top.getType(this.tribe);
+            let obj = this.engine.scene.getObjectInstance(top_type);
+            if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);
+            obj.removeInstanceById(this.top.id);
+        } catch (error) {
+            console.warn(error);
+        }
+    }
+    /**
+     * destorys the renderable component of this tile it does not destory any of the data in this class
+     *
+     * @memberof TileController
+     */
+    public destory(){
+        try {
+            const base_type = this.base.getType(this.tribe);
+            let obj = this.engine.scene.getObjectInstance(base_type);
+            if(!obj) throw new Error(`Failed to destory object | ${base_type}:${this.base.id} | Why: Object type does not exist`);
+
+            obj.removeInstanceById(this.base.id);
+
+            this.removeBuilding();
+
+        } catch (error) {
+            console.warn(error);
+        }
+    }
     /**
      * Generate tiles and add them to threejs scene
      *
@@ -317,6 +367,7 @@ export default class TileController implements SystemEventListener {
                 type: "tile"
             });
 
+            // Genearte top level assets
             if(this.top){
                 const top_type = this.top.getType(this.tribe);
                 let obj = this.engine.scene.getObjectInstance(top_type);
@@ -339,7 +390,6 @@ export default class TileController implements SystemEventListener {
                 });
             }
 
-            // Genearte top level assets
             
         } catch (error: any) {
             console.warn(

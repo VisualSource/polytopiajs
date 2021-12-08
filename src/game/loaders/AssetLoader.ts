@@ -68,6 +68,7 @@ export default class AssetLoader  {
             return (content as THREE.Group).children[item as number] as THREE.Mesh;
         } else if(type === "gltf" && ((item as VarientComponent)?.child != undefined)){
             const mesh = (content as VariantGLTF).scene.children[(item as VarientComponent).child].clone(true) as THREE.Mesh;
+            (content as VariantGLTF).functions.copyVariantMaterials(mesh,(content as VariantGLTF).scene.children[(item as VarientComponent).child] as THREE.Mesh);
             await (content as VariantGLTF).functions.selectVariant(mesh,(item as VarientComponent).name);
             return mesh;
         }
@@ -202,34 +203,20 @@ export default class AssetLoader  {
             switch (data.blob.type) {
                 case "model/gltf-binary":
                 case "model/gltf+json":{
-                    /** 
-                     * @todo Change to parseAsync
-                     * @body After updating to threeJS change `.parse` to `.parseAsync` due to r135 of threeJS having this method now. Currntly waiting for types to update
-                    */
-                    yield await new Promise( async (ok,err)=>{
-                        gltfLoader.parse(await data.blob.arrayBuffer(),"", async (gltfAsset) => {
-                            /* 
-                                If the gltf file has variants we need to load them, here so 
-                                they can be accessed easier when we do need the asset.
+                    
+                    const gltfAsset = await gltfLoader.parseAsync(await data.blob.arrayBuffer(),"");
 
-                                Using the `in` key word, should be better then checking if the value is truty.
-                            */
-                            if("functions" in gltfAsset){
-                                await (gltfAsset as VariantGLTF).functions.ensureLoadVariants(gltfAsset.scene.children[0] as THREE.Mesh);
-                            }
-
-                            ok({
-                                type: "asset",
-                                data: {
-                                    name,
-                                    asset: gltfAsset
-                                }
-                            });
-
-                        },(err)=>{
-                            throw err;
-                        });
-                    });
+                    if("functions" in gltfAsset){
+                        await (gltfAsset as VariantGLTF).functions.ensureLoadVariants(gltfAsset.scene.children[0] as THREE.Mesh);
+                    }
+                    
+                    yield {
+                        type: "asset",
+                        data: {
+                            name,
+                            asset: gltfAsset
+                        }
+                    };
                     break;
                 }
                 case "model/obj": {

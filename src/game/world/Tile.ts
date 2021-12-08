@@ -20,6 +20,17 @@ export interface TileJson {
         [key: string]: any;
     }
 }
+export interface CityJson {
+    type: "CITY";
+    capital: boolean;
+    current_units: number;
+    city_wall: boolean;
+    city_level: number;
+    metadata: {
+        [key: string]: any;
+    };
+}
+
 /**
  *
  *
@@ -28,21 +39,21 @@ export interface TileJson {
  * @implements {ITile}
  */
 export class Tile implements ITile {
-    static createFromJson(json: TileJson): Tile {
-        return new Tile().initFromJson(json);
+    static jsonConstructor(json: TileJson): Tile {
+        return new Tile().jsonConstructor(json);
     }
-    static createNew(type: TileBase, metadata: { [name: string]: any }): Tile {
-        return new Tile().init(type,metadata);
+    static defaultConstructor(type: TileBase, metadata: { [name: string]: any }): Tile {
+        return new Tile().defaultConstructor(type,metadata);
     }
     public readonly id: UUID = nanoid(4);
     public type: TileBase;
-    public metadata: { [name: string]: any } = {};
-    public init(type: TileBase, metadata: { [name: string]: any }): this {
+    public metadata: { [name: string]: any } = {}
+    public defaultConstructor(type: TileBase, metadata: { [name: string]: any }): this {
         this.type = type;
         this.metadata = metadata;
         return this;
     }
-    public initFromJson(json: TileJson): this {
+    public jsonConstructor(json: TileJson): this {
         this.type = json.type as TileBase;
         this.metadata = json.metadata;
         return this;
@@ -57,19 +68,60 @@ export class Tile implements ITile {
         return `${this.type}_${tribe.toUpperCase()}`;
     }
     public manifest(tribe: Tribe): Manifest {
-        if(this.type === "OCEAN" || this.type === "WATER") {
-            let key = `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
-            return {
-                asset: key,
-                item: 0,
-                type: "obj"
-            }
-        } 
         let key = `${this.type}_${tribe.toUpperCase()}`;
-        return {
-            asset: this.type === "CITY" ?  key : this.type,
-            item: 0,
-            type: "gltf"
+        switch (this.type) {
+            case "WATER":
+            case "OCEAN":{
+                let key = `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
+                return {
+                    asset: key,
+                    item: 0,
+                    type: "obj"
+                }
+            }
+            case "LAND": {
+                return {
+                    asset: this.type,
+                    type: "gltf",
+                    item: {
+                        child: 0,
+                        name: tribe === "xin-xi" ? "LAND_IMPERIUS" : key
+                    }
+                }
+
+            }
+            case "MOUNTAIN": {
+                if(tribe === "bardur") return {
+                    asset: key,
+                    item: 0,
+                    type: "gltf"
+                }
+                return {
+                    asset: this.type,
+                    item: 0,
+                    type: "gltf"
+                }
+            }
+            case "FOREST": {
+                if(tribe === "bardur")  return {
+                    asset: key,
+                    item: 0,
+                    type: "gltf"
+                }
+                return {
+                    asset: this.type,
+                    item: 0,
+                    type: "gltf"
+                }
+            }
+        
+            default:{
+                return {
+                    asset: this.type === "CITY" ?  key : this.type,
+                    item: 0,
+                    type: "gltf"
+                }
+            }
         }
     }
     public toJSON(): TileJson {
@@ -79,6 +131,47 @@ export class Tile implements ITile {
         }
     }
     
+}
+
+export class City extends Tile {
+    static cityJsonConstructor(json: CityJson): City {
+        return new City().cityJsonConstructor(json);
+    }
+    static cityDefaultConstructor(data: { capital: boolean }): City {
+        return new City().cityDefaultConstructor(data);
+    }
+    public readonly isCity: boolean = true;
+    public type: TileBase = "CITY";
+    public capital: boolean = false;
+    public current_units: number = 0;
+    public city_wall: boolean = false;
+    public city_level: number = 1;
+    public cityJsonConstructor(json: CityJson): this {
+        this.capital = json.capital;
+        this.current_units = json.current_units;
+        this.city_wall = json.city_wall;
+        this.city_level = json.city_level;
+        this.metadata = json.metadata;
+        return this;
+    }
+    public cityDefaultConstructor(data: { capital: boolean }): this {
+        this.capital = data.capital;
+        return this;
+    }
+    public toJSON(): CityJson {
+        return {
+            capital: this.capital,
+            city_level: this.city_level,
+            city_wall: this.city_wall,
+            current_units: this.current_units,
+            type: "CITY",
+            metadata: this.metadata
+        };
+    }
+    public addCityWall(){}
+    public addUnit(){}
+    public removeUnit(){}
+    public levelCity(){}
 }
 /**
  *

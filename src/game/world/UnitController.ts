@@ -14,85 +14,81 @@ import { chebyshev_distance } from "../../utils/math";
 import type PlayerController from "../managers/PlayerController";
 
 export default class UnitController implements SystemEventListener {
-    static readonly ACCELERATOR: number = 4.5;
+    private readonly ACCELERATOR: number = 4.5;
     public events: EventEmitter = new EventEmitter();
     private mesh_movement: InstancedObject;
     private mesh_attack: InstancedObject;
     constructor(private engine: Engine, private assets: AssetLoader, private world: World, private player: PlayerController){
-        this.events.onId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, ()=>{
-            this.hideMovement();
-            this.hideAttack();
-        });
-        // handle unit movement and unit attacks here
+        this.events.onId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.eventHide);
         this.events.on(SystemEvents.UNIT,event=>{
             switch (event.id) {
-                case UnitEvent.ATTACK:{
-                    const attacker = this.world.units.get(event.data.attacker);
-                    const defender = this.world.units.get(event.data.defender);
-                    if(!attacker || !defender) break;
-                  //  console.log("ATTACK",event.data, attacker,defender);
-
-                    const defenderTile = this.world.level.get(defender.position.row,defender.position.col);
-                    if(!defenderTile) return;
-
-                    /**
-                     * @see https://frothfrenzy.github.io/polytopiacalculator/
-                     * @summary uses the same formula posted by the developer on the game wikia forums some time ago.
-                     */
-                    const attackForce = attacker.attack * (attacker.health / attacker.maxHealth);
-                    const defenseForce = defender.defence * (defender.health / defender.maxHealth) * defenderTile.terrainBouns();
-                    const totalDamage = attackForce + defenseForce;
-
-                    const attackResult = Math.round((attackForce / totalDamage) * attacker.attack * UnitController.ACCELERATOR);
-                    const defenseResult = Math.round((defenseForce / totalDamage) * defender.defence * UnitController.ACCELERATOR);
-                    
-               
-                    const defenderHealth = defender.health - defenseResult;
-
-                    if(defenderHealth <= 0) {
-                        console.log("Kill unit");
-                        const pos = defender.position;
-                        this.destoryUnit(defender.uuid)
-                        .then(()=>{
-                            this.moveUnit(attacker.uuid,pos);
-                        });
-                    } else {
-                        defender.health = defenderHealth;
-                        attacker.health -= attackResult;
-                    }
-               
-                   // console.log("Attack Result", attackResult, "Health", attacker.health, "Defense Result",defenseResult, "Health",defender.health);
-                    attacker.hasAttacked = true;
-                    this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
-                    this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
-
-                    break;
-                }
-                case UnitEvent.MOVE:{
-                    this.moveUnit(event.data.unit,event.data.to);
-                    this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
-                    this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
-                    //console.log("MOVE",event.data);
-                    break;
-                }
-                case UnitEvent.GENERATE: {
-                    const unit = this.world.units.get(event.data.unit);
-                    if(!unit) break;
-                    if(unit.tribe !== this.player.activePlayer) break;
-
-                    this.generateMovementArea(event.data.unit);
-                    this.generateAttackArea(unit.position,unit.range,unit.uuid);
-                    break;
-                }
-                case UnitEvent.HIDE_SELECTOR: {
-                    this.hideMovement();
-                    this.hideAttack();
-                    break;
-                }
+                case UnitEvent.ATTACK:
+                    return this.eventAttack(event);
+                case UnitEvent.MOVE:
+                   return this.eventMove(event);
+                case UnitEvent.GENERATE:
+                    return this.eventGenerate(event);
+                case UnitEvent.HIDE_SELECTOR: 
+                    return this.eventHide();
                 default:
                     break;
             }
         });
+    }
+    private eventAttack(event: any){
+        const attacker = this.world.units.get(event.data.attacker);
+        const defender = this.world.units.get(event.data.defender);
+        if(!attacker || !defender) return;
+      //  console.log("ATTACK",event.data, attacker,defender);
+
+        const defenderTile = this.world.level.get(defender.position.row,defender.position.col);
+        if(!defenderTile) return;
+
+        /**
+         * @see https://frothfrenzy.github.io/polytopiacalculator/
+         * @summary uses the same formula posted by the developer on the game wikia forums some time ago.
+         */
+        const attackForce = attacker.attack * (attacker.health / attacker.maxHealth);
+        const defenseForce = defender.defence * (defender.health / defender.maxHealth) * defenderTile.terrainBouns();
+        const totalDamage = attackForce + defenseForce;
+
+        const attackResult = Math.round((attackForce / totalDamage) * attacker.attack * this.ACCELERATOR);
+        const defenseResult = Math.round((defenseForce / totalDamage) * defender.defence * this.ACCELERATOR);
+        
+   
+        const defenderHealth = defender.health - defenseResult;
+
+        if(defenderHealth <= 0) {
+            console.log("Kill unit");
+            const pos = defender.position;
+            this.destoryUnit(defender.uuid)
+            this.moveUnit(attacker.uuid,pos);
+        } else {
+            defender.health = defenderHealth;
+            attacker.health -= attackResult;
+        }
+   
+       // console.log("Attack Result", attackResult, "Health", attacker.health, "Defense Result",defenseResult, "Health",defender.health);
+        attacker.hasAttacked = true;
+        this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
+        this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
+    }
+    private eventMove(event: any){
+        this.moveUnit(event.data.unit,event.data.to);
+        this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.INTERACTION, id: ObjectEvents.RESET, data: { uuid: null } });
+        this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
+    }
+    private eventGenerate(event: any){
+        const unit = this.world.units.get(event.data.unit);
+        if(!unit) return;
+        if(unit.tribe !== this.player.activePlayer) return;
+
+        this.generateMovementArea(event.data.unit);
+        this.generateAttackArea(unit.position,unit.range,unit.uuid);
+    }
+    private eventHide = () => {
+        this.hideMovement();
+        this.hideAttack();
     }
     public async init(): Promise<void> {
         try {
@@ -116,9 +112,10 @@ export default class UnitController implements SystemEventListener {
             console.error(error);
         }
     }
-    public async destoryUnit(id: UUID){
+    public destoryUnit(id: UUID){
         const unit = this.world.units.get(id);
         if(!unit) return;
+        this.world.level.get(unit.position.row,unit.position.col).setUnit();
         unit.destory();
         this.world.units.delete(id);
     }

@@ -6,6 +6,11 @@
     },
     {
         "type": "model",
+        "name": "MOUNTAIN_BARDUR",
+        "file": "assets/MOUNTAIN_BARDUR.glb"
+    },
+    {
+        "type": "model",
         "name": "VILLAGE",
         "file": "assets/VILLAGE.glb"
     },
@@ -43,6 +48,11 @@
         "type":"model",
         "name":"SELECTOR",
         "file":"assets/SELECTOR.gltf"
+    },
+    {
+        "type":"model",
+        "name":"FOREST_BARDUR",
+        "file": "assets/FOREST_BARDUR.glb"
     },
     {
         "type":"model",

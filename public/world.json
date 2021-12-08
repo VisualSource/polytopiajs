@@ -1610,10 +1610,14 @@
             }
         }, {
             "road": true,
-            "owning_tribe": null,
+            "owning_tribe": "bardur",
             "top": null,
             "base": {
-                "type": "CAPITAL",
+                "type": "CITY",
+                "capital": true,
+                "current_units": 1,
+                "city_wall": false,
+                "city_level": 1,
                 "metadata": {}
             },
             "tribe": "bardur",

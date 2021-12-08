@@ -85,8 +85,7 @@ export default class WorldGenerator {
                 base: "CITY",
                 buldings: [],
                 metadata: {
-                    capital: true,
-                    cityWall: false
+                    capital: true
                 },
                 tribe: tribes[i],
                 row,
