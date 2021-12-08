@@ -5,6 +5,6 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  target-branch: depend-update
+  target-branch: master
   reviwers:
     - VisualSource
