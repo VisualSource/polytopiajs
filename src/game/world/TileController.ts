@@ -8,6 +8,8 @@ import type { WorldTile } from "./generator/WorldGenerator";
 import type { SystemEventListener } from "../core/EventEmitter";
 import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type World from "./World";
+import type InstancedObject from "./rendered/InstancedObject";
+import type CityTile from "./rendered/CityTile";
 
 /**
  * The selected object on this tile.
@@ -313,7 +315,7 @@ export default class TileController implements SystemEventListener {
         if(!this.top) return;
         try {
             const top_type = this.top.getType(this.tribe);
-            let obj = this.engine.scene.getObjectInstance(top_type);
+            let obj = this.engine.scene.getObject<InstancedObject>(top_type);
             if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);
             obj.removeInstanceById(this.top.id);
         } catch (error) {
@@ -328,7 +330,7 @@ export default class TileController implements SystemEventListener {
     public destory(){
         try {
             const base_type = this.base.getType(this.tribe);
-            let obj = this.engine.scene.getObjectInstance(base_type);
+            let obj = this.engine.scene.getObject<InstancedObject>(base_type);
             if(!obj) throw new Error(`Failed to destory object | ${base_type}:${this.base.id} | Why: Object type does not exist`);
 
             obj.removeInstanceById(this.base.id);
@@ -346,9 +348,26 @@ export default class TileController implements SystemEventListener {
      */
     public async render(){
         try {
+            if((this.base as City)?.isCity) {
+                
+                const key = `CITY_${this.base.id}`;
+                let city = this.engine.scene.getObject<CityTile>(key);
+
+                if(!city) {
+                    const model_type = {
+                        child: 0,
+                        name: `LAND_${ this.owning_tribe === "xin-xi" ? "IMPERIUS" : this.owning_tribe?.toUpperCase() }`
+                    }
+                    const model = await this.assets.getAsset("LAND",model_type,"gltf");
+                    city = this.engine.scene.createCityInstance(key, this.position, this.uuid ,model.geometry,model.material);
+                }
+
+                return;
+            }
+
             // Generate base level asset
             const base_type = this.base.getType(this.tribe);
-            let obj = this.engine.scene.getObjectInstance(base_type);
+            let obj = this.engine.scene.getObject<InstancedObject>(base_type);
             if(!obj) {
                 const {asset,type,item} = this.base.manifest(this.tribe);
                 const model = await this.assets.getAsset(asset,item,type);
@@ -370,7 +389,7 @@ export default class TileController implements SystemEventListener {
             // Genearte top level assets
             if(this.top){
                 const top_type = this.top.getType(this.tribe);
-                let obj = this.engine.scene.getObjectInstance(top_type);
+                let obj = this.engine.scene.getObject<InstancedObject>(top_type);
                 if(!obj){
                     const {asset,item,type} = this.top.manifest(this.tribe);
                     const model = await this.assets.getAsset(asset,item,type);

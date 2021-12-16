@@ -45,7 +45,11 @@ const mimeTypes = {
     "mp3": "audio/mp3"
 }
 
-
+/**
+ * @todo add better error handling
+ * @body should add some better error handling to this class
+ * 
+ */
 export default class AssetLoader  {
     static INSTANCE: AssetLoader | null = null;
     public assets: Map<string, GLTF | THREE.Group> = new Map();
@@ -161,20 +165,22 @@ export default class AssetLoader  {
             }
 
         } catch (error) {
-            console.error(error);
+            console.error("INSTALL ERROR |", error);
         }
     }
     private async *cache(assets: ManifestItem[], file: JsZip): AsyncGenerator<CachedAsset, null, any>{
         let i = 0;
         while (i < assets.length) {
-            const fileName = assets[i].file;
-            const ext = fileName.split(".").pop();
+            const filePath = assets[i].file;
+            const ext = filePath.split(".").pop();
            
-            if(!ext) throw new Error(`File: ${fileName} is missing a file extention`);
+            if(!ext) throw new Error(`File: ${filePath} is missing a file extention`);
+
+            if(!file.files[filePath]) throw new Error(`Failed to find file for NAME: ${assets[i].name} | PATH: ${filePath} | RESOURCE: ${assets[i]?.resource}`);
 
             const asset_blob = new Blob(
                 [
-                    await file.files[fileName].async("uint8array")
+                    await file.files[filePath].async("uint8array")
                 ],
                 {
                     type: (mimeTypes as any)[ext]

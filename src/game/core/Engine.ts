@@ -13,6 +13,7 @@ import { isMobile } from '../../utils/mobile';
 import TouchTap from './TouchTap';
 
 import type InstancedObject from '../world/rendered/InstancedObject';
+import type CityTile from '../world/rendered/CityTile';
 
 export default class Engine implements SystemEventListener {
     private controls: CameraControls;
@@ -141,6 +142,10 @@ export default class Engine implements SystemEventListener {
             this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT, data: { type: data.type, owner: data.owner, id: data.id } });
             return;
         }
+
+        if(!(object as CityTile)?.isGameObject) return;
+
+        this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT, data: { type: "tile", owner: (object as CityTile).tile_owner, id: object.uuid } });
     }
     private selection_mobile = (event: any) => {
         this.selection_handler(

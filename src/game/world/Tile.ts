@@ -117,7 +117,7 @@ export class Tile implements ITile {
         
             default:{
                 return {
-                    asset: this.type === "CITY" ?  key : this.type,
+                    asset: this.type,
                     item: 0,
                     type: "gltf"
                 }
@@ -132,6 +132,44 @@ export class Tile implements ITile {
     }
     
 }
+
+/*
+ * The level of a city could be build using groups with min of 2 and max of 3 on the sides and 1 center (capital icon on this piller)
+   the data reperention the level is a array with a number between 0 and 7 and when generated using a random number generator.
+   null in this array will repersent a non rendered place
+   Array Example SINGLE BLOCK LEVEL
+
+   City size 3x3
+   [
+    [ null, null, 1 ], <-- two of the inside block are not rendered with only the out side being render
+    [ null, null, 3 ], <-- Same as above
+    [ 4   ,   4 , 8 ]  <-- This is the front side of the city, so all 3 are rendered
+   ]
+
+   City size 4x4
+  THREE JS GROUP -> [
+                        [ null, null, null, 4  <- id/index of the model to be rendered here ],
+                        [ null, null, null, 4],
+                        [ null, null, null, 6],
+                        [   6 ,   5 ,   6 , 2]
+                    ]
+
+   FULL CTIY 
+   STARTING CITY DATA
+   [
+       [                           <-- THREE JS GROUP, LEVEL 0 GENERANTED FRIST
+           [ null, null, 1  ],
+           [ null, null, 7  ],
+           [   4 ,   5,   8 ]
+       ],
+       [
+           [null,null,null],
+           [null,null,null],
+           [null,null,  9 ]
+       ]
+   ]
+
+ */
 
 export class City extends Tile {
     static cityJsonConstructor(json: CityJson): City {

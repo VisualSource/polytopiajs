@@ -1,6 +1,16 @@
 [
     {
         "type": "model",
+        "name": "FRUIT_IMPERIUS",
+        "file": "assets/FRUIT_IMPERIUS.glb"
+    },
+    {
+        "type": "model",
+        "name": "FRUIT_BARDUR",
+        "file": "assets/FRUIT_BARDUR.glb"
+    },
+    {
+        "type": "model",
         "name": "MOUNTAIN",
         "file": "assets/MOUNTAIN.glb"
     },

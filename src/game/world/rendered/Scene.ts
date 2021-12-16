@@ -1,5 +1,6 @@
-import { nanoid } from 'nanoid';
 import { Scene, Group } from 'three';
+import type { Position, UUID } from '../../core/types';
+import CityTile from './CityTile';
 import InstancedObject from './InstancedObject';
 export default class WorldScene extends Scene {
     public levelname: string = "overworld";
@@ -32,21 +33,23 @@ export default class WorldScene extends Scene {
         root.name = name;
         
         this.add(root);
-
         return root;
     }
-    public getObjectInstance(key: string): InstancedObject | null {
+    public getObject<T = InstancedObject>(key: string): T | null {
         const scene = this.getActiveLevel();
         const obj = scene.getObjectByName(key);
-        if(obj) return obj as InstancedObject;
+        if(obj) return obj as any as T;
         return null;
     }
+    public createCityInstance(key: string, position: Position, tile_owner: UUID, geometry: THREE.BufferGeometry | undefined = undefined, material: THREE.Material | THREE.Material[] | undefined = undefined): CityTile {
+        const city = new CityTile(key,tile_owner,position,geometry,material);
+        this.getActiveLevel().add(city);
+        return city;
+    }
     public createObjectInstance(key: string, geometry: THREE.BufferGeometry | undefined = undefined, material: THREE.Material | THREE.Material[] | undefined = undefined): InstancedObject {
-        
         const obj = new InstancedObject(key,geometry,material,[]);
         this.getActiveLevel().add(obj);
         return obj;
        
     }
-
 }
