@@ -102,25 +102,28 @@ export default class World {
         this.level = level;
         return level;
     }
-    public async saveWorld(): Promise<WorldJson> {
+    public levelToJson(){
         let world: TileControllerJson[] = [];
-        let units: UnitJson[] = [];
-
         for(const level of this.level){
             world.push(level.toJSON());
         }
-
+        return world;
+    }
+    public unitsToJson(){
+        let units: UnitJson[] = [];
         this.units.forEach((value)=>{
             units.push(value.toJSON());
         });
+        return units;
 
-
+    }
+    public async saveWorld(): Promise<WorldJson> {
         return {
             size: this.level.size,
             leveldata: {
-                "overworld": world,
+                "overworld": this.levelToJson(),
             },
-            units
+            units: this.unitsToJson()
         }
     }
         
