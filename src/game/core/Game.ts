@@ -1,10 +1,12 @@
-import EventEmitter, { SystemEventListener } from './EventEmitter';
+import EventEmitter from './EventEmitter';
 import AssetLoader from '../loaders/AssetLoader';
 import Engine from './Engine';
 import World from '../world/World';
 import PlayerController from '../managers/PlayerController';
 import {init} from './debug';
 import { SystemEvents } from '../events/systemEvents';
+
+import type { SystemEventListener } from './EventEmitter';
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
     public events: EventEmitter = new EventEmitter();
@@ -17,7 +19,7 @@ export default class Game implements SystemEventListener {
         if(Game.INSTANCE) return Game.INSTANCE;
         Game.INSTANCE = this;
 
-        init(this);
+        if(import.meta.env.DEV) init(this);
 
         //@ts-ignore
         window.POLYTOPIA_GAME = this;

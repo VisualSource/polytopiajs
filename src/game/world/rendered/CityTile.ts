@@ -1,6 +1,5 @@
 import { Mesh } from "three";
 import InstancedObject from "./InstancedObject";
-import random from "random";
 import type { Position, UUID } from "../../core/types";
 
 

@@ -57,10 +57,8 @@ interface VariantGLTFReference extends GLTFReference {
  * If you want to export the extension with the original names
  * you are recommended to write GLTFExporter plugin to restore the names.
  *
- * @param variantNames {Array<string>}
- * @return {Array<string>}
  */
- const ensureUniqueNames = (variantNames: string[]) => {
+ const ensureUniqueNames = (variantNames: string[]): string[] => {
   const uniqueNames = [];
   const knownNames = new Set();
 
@@ -87,7 +85,7 @@ interface VariantGLTFReference extends GLTFReference {
  * @param variantNames {Array<string>} Required to be unique names
  * @return {Object}
  */
-const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
+const mappingsArrayToTable = (extensionDef: any, variantNames: string[]): Object => {
   const table: any = {};
   for (const mapping of extensionDef.mappings) {
     for (const variant of mapping.variants) {
@@ -100,11 +98,7 @@ const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
   return table;
 };
   
-/**
- * @param object {THREE.Mesh}
- * @return {boolean}
- */
- const compatibleObject = (object: THREE.Mesh) => {
+const compatibleObject = (object: THREE.Mesh): boolean => {
   return object.material !== undefined && // easier than (!object.isMesh && !object.isLine && !object.isPoints)
     object.userData && // just in case
     object.userData.variantMaterials;
@@ -185,16 +179,9 @@ const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
   
       gltf.userData.variants = variants;
   
-      // @TODO: Adding new unofficial property .functions.
-      //        It can be problematic especially with TypeScript?
       (gltf as VariantGLTF).functions = (gltf as VariantGLTF).functions || {};
   
-      /**
-       * @param object {THREE.Mesh}
-       * @param variantName {string|null}
-       * @return {Promise}
-       */
-      const switchMaterial = async (object: THREE.Mesh, variantName: string | null, onUpdate: (object: THREE.Mesh, oldMaterial: THREE.Material | THREE.Material[], gltfMaterialIndex: any) => void | null ) => {
+      const switchMaterial = async (object: THREE.Mesh, variantName: string | null, onUpdate: (object: THREE.Mesh, oldMaterial: THREE.Material | THREE.Material[], gltfMaterialIndex: any) => void | null ): Promise<void> => {
         if (!object.userData.originalMaterial) {
           object.userData.originalMaterial = object.material;
         }
@@ -230,11 +217,7 @@ const mappingsArrayToTable = (extensionDef: any, variantNames: string[]) => {
         }
       };
   
-      /**
-       * @param object {THREE.Mesh}
-       * @return {Promise}
-       */
-      const ensureLoadVariants = (object: THREE.Mesh) => {
+      const ensureLoadVariants = (object: THREE.Mesh): Promise<void> => {
         const currentMaterial = object.material;
         const variantMaterials = object.userData.variantMaterials;
         const pending = [];

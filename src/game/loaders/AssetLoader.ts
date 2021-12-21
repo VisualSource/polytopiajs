@@ -3,10 +3,12 @@ import JsZip from 'jszip';
 
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
-import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LoadingManager } from 'three';
 
-import KHR_Variants, { VariantGLTF } from './KHR_Variants';
+import KHR_Variants from './KHR_Variants';
+import type { VariantGLTF } from './KHR_Variants';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 
 type CachedAsset = { blob: Blob, name: string, date: string, resourceItem: string | null };
 type VarientComponent = { child: number, name: string };
@@ -32,7 +34,6 @@ interface ManifestItem {
 }
 
 /**
- *  @type {*} 
  *  @see https://www.iana.org/assignments/media-types/media-types.xhtml#model
 */
 const mimeTypes = {
@@ -59,9 +60,6 @@ export default class AssetLoader  {
         if(AssetLoader.INSTANCE) return AssetLoader.INSTANCE;
         AssetLoader.INSTANCE = this;
         if(init) this.init();
-
-        //@ts-ignore
-       // if(import.meta.env.MODE === "development") window.assetLoader = AssetLoader.INSTANCE;
     }
 
     public async getAsset(asset: string, item: Variant = 0, type: ModelType = "gltf"){
@@ -302,7 +300,7 @@ export default class AssetLoader  {
         }
 
     }
-    public async checkForUpdate() : Promise<void> {
+    /*public async checkForUpdate() : Promise<void> {
         const version = localStorage.getItem("pak_installed");
 
         const pak = await (await fetch(import.meta.env.SNOWPACK_PUBLIC_PAK_VERSION)).json();
@@ -311,7 +309,7 @@ export default class AssetLoader  {
             localforage.removeItem("pak");
             await this.install("/raw.zip",pak.version);
         }
-    }
+    }*/
     public async reinstall(): Promise<void> {
         localStorage.removeItem("pak_installed");
         localforage.removeItem("pack");

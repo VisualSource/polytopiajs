@@ -1,18 +1,18 @@
+/// <reference types="vite/client" />
 interface ImportMeta {
-    env: {
-        BUILD_VERSION: string;
-        MODE: "dvelopment" | "production" | "test",
-        NODE_ENV: "dvelopment" | "production" | "test",
-        SNOWPACK_PUBLIC_AUTH0_DOMAIN: string;
-        SNOWPACK_PUBLIC_AUTH0_CLIENT_ID: string;
-        SNOWPACK_PUBLIC_AUTH0_AUDIENCE: string;
-        SNOWPACK_PUBLIC_PAK_VERSION: string;
+    readonly env: {
+        readonly BUILD_VERSION: string;
+        readonly MODE: "dvelopment" | "production" | "test",
+        readonly BASE_URL: string;
+        readonly PROD: boolean;
+        readonly DEV: boolean;
+        readonly PACKAGE_VERSION: string;
+
     }
 }
 
 interface Window {
     opera: string;
-    __SNOWPACK_ENV__: any
     webkitAudioContext: AudioContext;
     webkitOfflineAudioContext: OfflineAudioContext; 
 }

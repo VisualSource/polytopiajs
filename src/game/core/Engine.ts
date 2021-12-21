@@ -4,7 +4,7 @@ import CameraControls from 'camera-controls';
 import { WebGLRenderer, OrthographicCamera, Fog,
     MathUtils, MOUSE, Quaternion, Vector2 , Vector3, Vector4, Spherical, Matrix4, Raycaster, Box3, Sphere, TextureLoader,
     Group, HemisphereLight, DirectionalLight } from 'three';
-import EventEmitter, { SystemEventListener } from '../core/EventEmitter';
+import EventEmitter from '../core/EventEmitter';
 import {ObjectEvents,SystemEvents} from '../events/systemEvents';
 
 import WorldScene from '../world/rendered/Scene';
@@ -12,6 +12,7 @@ import WorldScene from '../world/rendered/Scene';
 import { isMobile } from '../../utils/mobile';
 import TouchTap from './TouchTap';
 
+import type { SystemEventListener } from '../core/EventEmitter';
 import type InstancedObject from '../world/rendered/InstancedObject';
 import type CityTile from '../world/rendered/CityTile';
 

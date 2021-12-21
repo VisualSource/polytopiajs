@@ -1,9 +1,12 @@
 import WorldGenerator from "./generator/WorldGenerator";
-import TileController, { TileControllerJson } from './TileController';
+import TileController from './TileController';
 import UnitController from "./UnitController";
 import SelectorTile from "./rendered/SelectorTile";
-import { Unit, UnitJson } from "./Unit";
+import { Unit } from "./Unit";
 import NArray from "../../utils/NArray";
+
+import type { UnitJson } from "./Unit";
+import type { TileControllerJson } from './TileController';
 import type { VariantGLTF } from "../loaders/KHR_Variants";
 import type { Tribe } from "../core/types";
 import type Engine from "../core/Engine";
@@ -28,7 +31,7 @@ export default class World {
     constructor(private engine: Engine, private assets: AssetLoader, public players: PlayerController){
 
         fetch("/world.json").then(value=>value.json()).then(world=>{
-            this.loadWorld(world).then(level=>{
+            this.loadWorld(world).then(()=>{
                 this.unit_controller.createUnit("bardur","warrior",{row: 5, col: 2});
             });
         });

@@ -1,4 +1,5 @@
-import { EventDispatcher, EventListener, Event } from 'three';
+import { EventDispatcher } from 'three';
+import type {EventListener, Event} from 'three';
 
 /**
  *

@@ -92,7 +92,7 @@ export default class UnitController implements SystemEventListener {
     }
     public async init(): Promise<void> {
         try {
-            const data = await this.assets.getVarient("SELECTOR") as VariantGLTF;
+            const data = this.assets.getVarient("SELECTOR") as VariantGLTF;
     
             const mesh = data.scene.children[0].clone() as THREE.Mesh;
 

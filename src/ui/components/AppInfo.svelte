@@ -24,7 +24,7 @@
 
 <footer>
         <div>
-            PolytopiaJS Build: <span class="build">{import.meta.env.BUILD_VERSION}</span> 
+            PolytopiaJS Build: <span class="build">{import.meta.env.PACKAGE_VERSION}</span> 
         </div>
         <div>
             Lang: <span class="lang">{navigator.language}</span> 
@@ -39,4 +39,4 @@
             Vender: <span class="vendor">{navigator.vendor ?? "Unknown"}</span> 
         </div>
 </footer>
-
+<!--/*import.meta.env.BUILD_VERSION*/-->

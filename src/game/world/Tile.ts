@@ -4,7 +4,6 @@ import type {TileBase, Tribe, UUID} from '../core/types';
 import type AssetLoader from "../loaders/AssetLoader";
 import type Engine from "../core/Engine";
 import type CityTile from "./rendered/CityTile";
-import random from "random";
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -284,8 +283,6 @@ export class City extends Tile {
                 const model = await assets.getAsset("CITY",data.type,"gltf");
                 item = tile.createObjectInstance(`CITY_PART_${data.type}`,model.geometry,model.material);
             }
-
-            console.log(data);
 
             item.createInstance({
                 id: data.id,

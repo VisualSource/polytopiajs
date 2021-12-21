@@ -3,9 +3,6 @@
  * it keeps me (Visualsource) from mixing up whats a row and whats a column
  * it also has a cool custom iterator which makes things cool and easy to work with.
  *
- * @export
- * @class NArray
- * @template T
  */
 export default class NArray<T> {
     /*
@@ -28,7 +25,7 @@ export default class NArray<T> {
         if(!this._data[row]) return;
         return this._data[row][col]
     }
-    private *[Symbol.iterator](){
+    public *[Symbol.iterator](){
         for(const row of this._data){
             for(const col of row){
                 yield col;

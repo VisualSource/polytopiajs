@@ -1,7 +1,8 @@
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
-import { Tile, BuildTile, TileJson, City, CityJson } from "./Tile";
+import { Tile, BuildTile, City } from "./Tile";
 import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
+import type { TileJson, CityJson } from './Tile';
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type { WorldTile } from "./generator/WorldGenerator";
@@ -20,14 +21,6 @@ enum Selected {
     TILE,
     UNIT
 }
-
-interface ITileControllerProps {
-    engine: Engine;
-    assets: AssetLoader;
-    world: World
-    tile_data: WorldTile;
-}
-
 export interface TileControllerJson {
     tribe: Tribe;
     position: Position;
@@ -230,12 +223,9 @@ export default class TileController implements SystemEventListener {
     }
     /**
      * @constructor
-     *
-     * @param {TileControllerJson} json
-     * @return {*} 
      * @memberof TileController
      */
-    public initFromJson(json: TileControllerJson){
+    public initFromJson(json: TileControllerJson): this {
         this.position = json.position;
         this.tribe = json.tribe;
         if(json.base.type === "CITY") {

@@ -4,7 +4,7 @@
     "exclude": ["node_modules"],
     "compilerOptions": {
       "sourceMap": true,
-      "types": ["mocha", "snowpack-env"],
+      "types": ["mocha"],
       /* Visit https://aka.ms/tsconfig.json to read more about this file */
       "module": "ESNext",
       "jsx": "preserve",            
@@ -21,4 +21,3 @@
       "forceConsistentCasingInFileNames": true  
     }
   }
-  

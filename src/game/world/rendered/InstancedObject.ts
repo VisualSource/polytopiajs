@@ -1,6 +1,7 @@
 //import { InstancedUniformsMesh } from 'three-instanced-uniforms-mesh';
 import { DynamicDrawUsage, Object3D, InstancedMesh } from "three";
-import EventEmittter, { SystemEventListener } from '../../core/EventEmitter';
+import EventEmittter from '../../core/EventEmitter';
+import type { SystemEventListener } from '../../core/EventEmitter';
 import type { UUID } from "../../core/types";
 //import { SystemEvents } from '../../events/systemEvents';
 
