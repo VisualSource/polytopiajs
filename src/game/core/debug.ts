@@ -4,6 +4,7 @@ import type Game from './Game';
 export function init(game: Game){
     const actions = {
         ResetUnits: false,
+        ReloadAssets: false,
         activeplayer: "imperius"
     }
 
@@ -14,6 +15,11 @@ export function init(game: Game){
         game.world.units.forEach(unit=>{
             unit.reset();
         });
+    });
+    gui.add(actions,"ReloadAssets").onChange( async ()=>{
+        await game.assets.reinstall();
+        window.location.reload();
+        actions.ReloadAssets = false;
     });
     
 }

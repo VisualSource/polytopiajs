@@ -54,8 +54,7 @@ export default class Engine implements SystemEventListener {
             1, 
             1000 
         );
-        this.scene.add(this.camera);
-
+        
         // Effect composer setup
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(new RenderPass(this.scene,this.camera));

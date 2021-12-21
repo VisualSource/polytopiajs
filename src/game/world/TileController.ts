@@ -349,9 +349,10 @@ export default class TileController implements SystemEventListener {
     public async render(){
         try {
             if((this.base as City)?.isCity) {
+
+                const base = this.base as City;
                 
-                const key = `CITY_${this.base.id}`;
-                let city = this.engine.scene.getObject<CityTile>(key);
+                let city = this.engine.scene.getObject<CityTile>(base.key);
 
                 if(!city) {
                     const model_type = {
@@ -359,7 +360,8 @@ export default class TileController implements SystemEventListener {
                         name: `LAND_${ this.owning_tribe === "xin-xi" ? "IMPERIUS" : this.owning_tribe?.toUpperCase() }`
                     }
                     const model = await this.assets.getAsset("LAND",model_type,"gltf");
-                    city = this.engine.scene.createCityInstance(key, this.position, this.uuid ,model.geometry,model.material);
+                    city = this.engine.scene.createCityInstance(base.key, this.position, this.uuid ,model.geometry,model.material);
+                    await base.render(this.assets, this.engine, this.owning_tribe as Tribe, this.uuid);
                 }
 
                 return;
@@ -393,7 +395,7 @@ export default class TileController implements SystemEventListener {
                 if(!obj){
                     const {asset,item,type} = this.top.manifest(this.tribe);
                     const model = await this.assets.getAsset(asset,item,type);
-                    obj = this.engine.scene.createObjectInstance(base_type,model.geometry,model.material);
+                    obj = this.engine.scene.createObjectInstance(top_type,model.geometry,model.material);
                 }
 
                 obj.createInstance({
@@ -412,7 +414,7 @@ export default class TileController implements SystemEventListener {
             
         } catch (error: any) {
             console.warn(
-                `Failed to render object | ${this.uuid} |`,
+                `Render | Failed to render object | ${this.uuid} |`,
                 `Why: ${error.message}`
             );
         }

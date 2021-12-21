@@ -16,3 +16,7 @@ if (import.meta.hot) {
     app.$destroy();
   });
 }
+
+
+//https://github.com/NazimHAli/svelte-template
+//https://stackoverflow.com/questions/68654761/how-to-add-a-public-directory-in-vitejs-configuration-file

@@ -30,10 +30,9 @@ interface IEditableWorldObjectData {
  but maybe i can add switch between the default InstanceMesh and Unifrom one.
 */
 export default class InstancedObject extends InstancedMesh implements SystemEventListener{
-    static readonly WORLD_TILE_OFFSET: number = 4;
     public events: EventEmittter = new EventEmittter();
     private dummy: Object3D = new Object3D();
-    constructor(public name: string, geometry: THREE.BufferGeometry | undefined, material: THREE.Material | THREE.Material[] | undefined, public data: WorldObjectData[] ){
+    constructor(public name: string, geometry: THREE.BufferGeometry | undefined, material: THREE.Material | THREE.Material[] | undefined, public data: WorldObjectData[], private readonly WORLD_TILE_OFFSET: number = 4 ){
         super(geometry,material,15**2);
         this.instanceMatrix.setUsage(DynamicDrawUsage);
         this.update();
@@ -49,9 +48,9 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.data[index].y = y;
         this.data[index].z = z;
         this.dummy.position.set(
-            x * InstancedObject.WORLD_TILE_OFFSET,
-            y * InstancedObject.WORLD_TILE_OFFSET,
-            z * InstancedObject.WORLD_TILE_OFFSET
+            x * this.WORLD_TILE_OFFSET,
+            y * this.WORLD_TILE_OFFSET,
+            z * this.WORLD_TILE_OFFSET
         );
         this.dummy.updateMatrix();
         this.setMatrixAt(index,this.dummy.matrix);

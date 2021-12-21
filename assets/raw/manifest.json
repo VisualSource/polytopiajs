@@ -1,6 +1,11 @@
 [
     {
         "type": "model",
+        "name": "CITY",
+        "file": "assets/CITY.glb"
+    },
+    {
+        "type": "model",
         "name": "FRUIT_IMPERIUS",
         "file": "assets/FRUIT_IMPERIUS.glb"
     },

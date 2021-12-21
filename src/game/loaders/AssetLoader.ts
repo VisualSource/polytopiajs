@@ -312,4 +312,9 @@ export default class AssetLoader  {
             await this.install("/raw.zip",pak.version);
         }
     }
+    public async reinstall(): Promise<void> {
+        localStorage.removeItem("pak_installed");
+        localforage.removeItem("pack");
+        await this.install();
+    }
 } 

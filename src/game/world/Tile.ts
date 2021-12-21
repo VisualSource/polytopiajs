@@ -1,6 +1,10 @@
 import { nanoid } from "nanoid";
 import type { Manifest } from "../loaders/AssetLoader";
 import type {TileBase, Tribe, UUID} from '../core/types';
+import type AssetLoader from "../loaders/AssetLoader";
+import type Engine from "../core/Engine";
+import type CityTile from "./rendered/CityTile";
+import random from "random";
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -171,6 +175,54 @@ export class Tile implements ITile {
 
  */
 
+
+class CityLevelData {
+    private _data: ({ type: number | null, id: UUID })[][][] = [
+        [
+            [ {type: null, id: nanoid(8) }, { type: null, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
+            [ {type: null, id: nanoid(8) }, { type: null, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
+            [ {type: 1,    id: nanoid(8) }, { type: 1,    id:nanoid(8) }, { type: 1, id: nanoid(8) } ],
+        ],
+        [
+            [ {type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
+            [ {type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
+            [ {type: 1,    id: nanoid(8) }, { type: 1,    id:nanoid(8) }, { type: 0, id: nanoid(8) } ],
+        ]
+    ];
+
+    public generateLevel(): void {
+
+    }
+    public toJSON() {
+
+    }
+
+    public *[Symbol.iterator](){
+        let level = 0;
+        let row = 0;
+        let item = 0;
+        while(level < this._data.length) {
+            while(row < this._data[level].length) {
+                while(item < this._data[level][row].length){
+                    yield {
+                        level, // level should be the y of the object
+                        x: -row,
+                        z: -item,
+                        type: this._data[level][row][item].type,
+                        id: this._data[level][row][item].id
+                    };
+                    item++;
+                }
+                item = 0;
+                row++;
+            }
+            item = 0;
+            row = 0;
+            level++;
+        }   
+    }
+}
+
 export class City extends Tile {
     static cityJsonConstructor(json: CityJson): City {
         return new City().cityJsonConstructor(json);
@@ -184,6 +236,10 @@ export class City extends Tile {
     public current_units: number = 0;
     public city_wall: boolean = false;
     public city_level: number = 1;
+    public level_data: CityLevelData = new CityLevelData();
+    public get key(): string {
+        return `${this.type}_${this.id}`;
+    }
     public cityJsonConstructor(json: CityJson): this {
         this.capital = json.capital;
         this.current_units = json.current_units;
@@ -210,6 +266,41 @@ export class City extends Tile {
     public addUnit(){}
     public removeUnit(){}
     public levelCity(){}
+    public async render(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {
+        const tile = engine.scene.getObject<CityTile>(this.key);
+
+        if(!tile) {
+            console.warn("Render | Failed to render city |", this.id, "| Why: Root object does not exist.");
+            return;
+        };
+
+       // debugger;
+
+        for(const data of this.level_data) {
+         
+            if(data.type === null) continue;
+            let item = tile.getObjectInstance(`CITY_PART_${data.type}`);
+            if(!item) {
+                const model = await assets.getAsset("CITY",data.type,"gltf");
+                item = tile.createObjectInstance(`CITY_PART_${data.type}`,model.geometry,model.material);
+            }
+
+            console.log(data);
+
+            item.createInstance({
+                id: data.id,
+                index: 0,
+                owner: owner,
+                rotation: 0,
+                shown: true,
+                type: "tile",
+                x: data.x,
+                y: data.level,
+                z: data.z
+            });
+        }
+
+    }
 }
 /**
  *
