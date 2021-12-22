@@ -176,48 +176,71 @@ export class Tile implements ITile {
 
 
 class CityLevelData {
-    private _data: ({ type: number | null, id: UUID })[][][] = [
+    private _size: number = 2;
+    private sizeing: { [key: number]: { OFFSET: number, SPACING: number } } = {
+        2: {
+            OFFSET: 0.35,
+            SPACING: 0.9
+        },
+        3: {
+            OFFSET: 0.7,
+            SPACING: 0.8
+        },
+        4: {
+            OFFSET: 1.1,
+            SPACING: 0.7
+        }
+    };
+    private _data: (number | null)[][][] = [
         [
-            [ {type: null, id: nanoid(8) }, { type: null, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
-            [ {type: null, id: nanoid(8) }, { type: null, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
-            [ {type: 1,    id: nanoid(8) }, { type: 1,    id:nanoid(8) }, { type: 1, id: nanoid(8) } ],
+            [ 1,  1 ],
+            [ 1,  1 ],
         ],
         [
-            [ {type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
-            [ {type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) }, { type: 1, id: nanoid(8) } ],
-            [ {type: 1,    id: nanoid(8) }, { type: 1,    id:nanoid(8) }, { type: 0, id: nanoid(8) } ],
-        ]
+            [ null, null ],
+            [ null,  0   ],
+        ],
     ];
-
+    public updateLevel(){
+        
+    }
     public generateLevel(): void {
-
+        const level = [];
     }
     public toJSON() {
 
     }
 
     public *[Symbol.iterator](){
+        const SPACING = this.sizeing[this._size].SPACING; // 3=> 0.8, 4 => 0.7
+        const OFFSET = this.sizeing[this._size].OFFSET;  // 3 => 0.7, 4 => 1.1
         let level = 0;
         let row = 0;
         let item = 0;
+        let x = 0;
+        let z = 0;
+        let y = 0;
         while(level < this._data.length) {
             while(row < this._data[level].length) {
                 while(item < this._data[level][row].length){
                     yield {
-                        level, // level should be the y of the object
-                        x: -row,
-                        z: -item,
-                        type: this._data[level][row][item].type,
-                        id: this._data[level][row][item].id
+                        level: y, // level should be the y of the object
+                        x: x + OFFSET,
+                        z: z + OFFSET,
+                        type: this._data[level][row][item]
                     };
                     item++;
+                    x -= SPACING;
                 }
                 item = 0;
+                x = 0;
                 row++;
+                z -= SPACING;
             }
-            item = 0;
             row = 0;
+            z = 0
             level++;
+            y += 0.7;
         }   
     }
 }
@@ -284,8 +307,10 @@ export class City extends Tile {
                 item = tile.createObjectInstance(`CITY_PART_${data.type}`,model.geometry,model.material);
             }
 
+            console.log(data);
+
             item.createInstance({
-                id: data.id,
+                id: "",
                 index: 0,
                 owner: owner,
                 rotation: 0,
