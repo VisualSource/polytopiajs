@@ -9,6 +9,13 @@ export default class CityTile extends Mesh {
         super(geometry,material);
         this.position.set(position.row * 4, 0, position.col * 4);
     }
+    public clean(){
+        for(const child of this.children){
+            if(!(child as InstancedObject)?.isInstancedMesh) continue;
+            
+            (child as InstancedObject).removeAll();
+        }
+    }
     public getObjectInstance(key: string): InstancedObject | undefined {
         const obj = this.getObjectByName(key);
         if(!obj) return;

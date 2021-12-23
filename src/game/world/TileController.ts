@@ -404,8 +404,7 @@ export default class TileController implements SystemEventListener {
             
         } catch (error: any) {
             console.warn(
-                `Render | Failed to render object | ${this.uuid} |`,
-                `Why: ${error.message}`
+                `Render | Failed to render object | ${this.uuid} | Why: ${error.message}`
             );
         }
     }

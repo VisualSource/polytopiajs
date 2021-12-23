@@ -4,6 +4,7 @@ import type {TileBase, Tribe, UUID} from '../core/types';
 import type AssetLoader from "../loaders/AssetLoader";
 import type Engine from "../core/Engine";
 import type CityTile from "./rendered/CityTile";
+import random from "random";
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -29,6 +30,7 @@ export interface CityJson {
     current_units: number;
     city_wall: boolean;
     city_level: number;
+    level_data: (number | null)[][][];
     metadata: {
         [key: string]: any;
     };
@@ -176,21 +178,6 @@ export class Tile implements ITile {
 
 
 class CityLevelData {
-    private _size: number = 2;
-    private sizeing: { [key: number]: { OFFSET: number, SPACING: number } } = {
-        2: {
-            OFFSET: 0.35,
-            SPACING: 0.9
-        },
-        3: {
-            OFFSET: 0.7,
-            SPACING: 0.8
-        },
-        4: {
-            OFFSET: 1.1,
-            SPACING: 0.7
-        }
-    };
     private _data: (number | null)[][][] = [
         [
             [ 1,  1 ],
@@ -201,19 +188,67 @@ class CityLevelData {
             [ null,  0   ],
         ],
     ];
-    public updateLevel(){
-        
+    constructor(private city: City){}
+    private getSizeing(){
+        switch (this.city.city_level) {
+            case 0:
+            case 1: // 2x2
+                return {
+                    OFFSET: 0.35,
+                    SPACING: 0.9,
+                    SIZE: 2
+                };
+            case 2:
+            case 3:
+            case 4: // 3x3
+                return {
+                    OFFSET: 0.7,
+                    SPACING: 0.8,
+                    SIZE: 3
+                }
+            default: //4x4
+                return {
+                    OFFSET: 1.1,
+                    SPACING: 0.7,
+                    SIZE: 4
+                }
+        }
+    }
+    public set load(city: (number | null)[][][]){
+        this._data = city;
+    }
+    public toJSON(): (number | null)[][][] {
+        return this._data;
+    }
+    /**
+     * when city changes for example from 2x2 to 3x3 update past level to reflect the change
+     *  
+     */
+    public refactor(): void {
+        const {SIZE} = this.getSizeing();
+        if(this._data[0][0].length === SIZE) return; 
+
+        for(let i = 0; i < this._data.length; i++) {
+            this._data[i] = Array.from({ length: SIZE }, (el,index) => Array.from({ length: SIZE }, (e,id)=>{
+                try {
+                    return this._data[i][index - 1][id - 1] ?? null;
+                } catch (error) {
+                    return 1;
+                }
+            }));
+        }
+
     }
     public generateLevel(): void {
-        const level = [];
-    }
-    public toJSON() {
+        this.refactor();
+
+        const {SIZE} = this.getSizeing();
+
+        this._data.push(Array.from({ length: SIZE }, ()=> Array.from({ length: SIZE}, (a,b)=>1) ));
 
     }
-
     public *[Symbol.iterator](){
-        const SPACING = this.sizeing[this._size].SPACING; // 3=> 0.8, 4 => 0.7
-        const OFFSET = this.sizeing[this._size].OFFSET;  // 3 => 0.7, 4 => 1.1
+        const { SPACING, OFFSET } = this.getSizeing();
         let level = 0;
         let row = 0;
         let item = 0;
@@ -258,7 +293,11 @@ export class City extends Tile {
     public current_units: number = 0;
     public city_wall: boolean = false;
     public city_level: number = 1;
-    public level_data: CityLevelData = new CityLevelData();
+    public level_data: CityLevelData;
+    constructor(){
+        super();
+        this.level_data = new CityLevelData(this);
+    }
     public get key(): string {
         return `${this.type}_${this.id}`;
     }
@@ -268,6 +307,7 @@ export class City extends Tile {
         this.city_wall = json.city_wall;
         this.city_level = json.city_level;
         this.metadata = json.metadata;
+        this.level_data.load = json.level_data;
         return this;
     }
     public cityDefaultConstructor(data: { capital: boolean }): this {
@@ -281,45 +321,60 @@ export class City extends Tile {
             city_wall: this.city_wall,
             current_units: this.current_units,
             type: "CITY",
-            metadata: this.metadata
+            metadata: this.metadata,
+            level_data: this.level_data.toJSON()
         };
     }
-    public addCityWall(){}
-    public addUnit(){}
-    public removeUnit(){}
-    public levelCity(){}
-    public async render(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {
+    public async levelUpCity(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {
         const tile = engine.scene.getObject<CityTile>(this.key);
 
         if(!tile) {
-            console.warn("Render | Failed to render city |", this.id, "| Why: Root object does not exist.");
+            console.warn("Render | Failed to regenerate city | Why: city object does not exist.");
             return;
-        };
+        }
 
-       // debugger;
+        tile.clean();
 
-        for(const data of this.level_data) {
-         
-            if(data.type === null) continue;
-            let item = tile.getObjectInstance(`CITY_PART_${data.type}`);
-            if(!item) {
-                const model = await assets.getAsset("CITY",data.type,"gltf");
-                item = tile.createObjectInstance(`CITY_PART_${data.type}`,model.geometry,model.material);
+        this.city_level++;
+
+        this.level_data.generateLevel();
+
+        await this.render(assets,engine,tribe,owner);
+
+    }
+    
+    public async render(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {
+        try {
+            const tile = engine.scene.getObject<CityTile>(this.key);
+
+            if(!tile) {
+                console.warn("Render | Failed to render city |", this.id, "| Why: Root object does not exist.");
+                return;
+            };
+
+            for(const data of this.level_data) {
+            
+                if(data.type === null) continue;
+                let item = tile.getObjectInstance(`CITY_PART_${data.type}`);
+                if(!item) {
+                    const model = await assets.getAsset("CITY",data.type,"gltf");
+                    item = tile.createObjectInstance(`CITY_PART_${data.type}`,model.geometry,model.material);
+                }
+
+                item.createInstance({
+                    id: "",
+                    index: 0,
+                    owner: owner,
+                    rotation: 0,
+                    shown: true,
+                    type: "tile",
+                    x: data.x,
+                    y: data.level,
+                    z: data.z
+                });
             }
-
-            console.log(data);
-
-            item.createInstance({
-                id: "",
-                index: 0,
-                owner: owner,
-                rotation: 0,
-                shown: true,
-                type: "tile",
-                x: data.x,
-                y: data.level,
-                z: data.z
-            });
+        } catch (error: any) {
+            console.warn(`%cRender City | ${this.id} | Why: ${error.message}`, [ "color: #eee", "background-color: red" ]  );
         }
 
     }
