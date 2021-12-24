@@ -12,6 +12,7 @@ import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
 import { chebyshev_distance } from "../../utils/math";
 import type PlayerController from "../managers/PlayerController";
+import { RenderOrder } from "../core/renderOrder";
 
 export default class UnitController implements SystemEventListener {
     private readonly ACCELERATOR: number = 4.5;
@@ -106,7 +107,9 @@ export default class UnitController implements SystemEventListener {
             attack_mat.color = new Color("red")
 
             this.mesh_movement = new InstancedObject("SELECTOR_MOVEMENT",mesh.geometry,movement_mat,[]);
+            this.mesh_movement.renderOrder = RenderOrder.SELECTOR;
             this.mesh_attack = new InstancedObject("SELECTOR_ATTACK",mesh.geometry, attack_mat,[]);
+            this.mesh_attack.renderOrder = RenderOrder.SELECTOR;
             this.engine.scene.add(this.mesh_movement,this.mesh_attack);
         } catch (error) {
             console.error(error);

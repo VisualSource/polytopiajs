@@ -1,25 +1,32 @@
-import {GUI} from 'dat.gui';
+import {GUI} from 'lil-gui';
 import type Game from './Game';
+import type { Tribe } from './types';
 
 export function init(game: Game){
     const actions = {
-        ResetUnits: false,
-        ReloadAssets: false,
-        activeplayer: "imperius"
+        "Reset Units": function() {
+            game.world.units.forEach(unit=>{
+                unit.reset();
+            });
+        },
+        "Reload Assets": function () {
+            game.assets.reinstall().then(()=>{
+                window.location.reload();
+            });
+        },
+        "Active Player": "imperius"
     }
 
-    const gui = new GUI({name:"DEBUG"});
+    const gui = new GUI({ title: "Controls"  });
     
-    gui.add(actions,"ResetUnits").onChange(value=>{
-        actions.ResetUnits = false;
+    gui.add(actions,"Reset Units");
+    gui.add(actions,"Reload Assets");
+    gui.add(actions,"Active Player",["imperius","bardur"]).onChange((value: Tribe)=>{
+        game.world.players.activePlayer = value;
         game.world.units.forEach(unit=>{
             unit.reset();
         });
     });
-    gui.add(actions,"ReloadAssets").onChange( async ()=>{
-        await game.assets.reinstall();
-        window.location.reload();
-        actions.ReloadAssets = false;
-    });
+  
     
 }

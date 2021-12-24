@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { RenderOrder } from "../core/renderOrder";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type {Position, Tribe, UUID, Skill} from "../core/types";
@@ -134,6 +135,7 @@ export class Unit {
             if(!model) {
                 const asset = await this.asset.getAsset(this.model_id,0,"gltf");
                 model = this.engine.scene.createObjectInstance(this.model_id,asset.geometry,asset.material);
+                model.renderOrder = RenderOrder.UNIT;
             }
 
             model.createInstance({

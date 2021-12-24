@@ -3,6 +3,7 @@ import type { SystemEventListener } from '../../core/EventEmitter';
 import type { VariantGLTF } from '../../loaders/KHR_Variants';
 import { ObjectEvents, SystemEvents, UnitEvent } from '../../events/systemEvents';
 import type Engine from '../../core/Engine';
+import { RenderOrder } from '../../core/renderOrder';
 
 /**
  * @listens INTERACTION
@@ -20,6 +21,7 @@ export default class SelectorTile implements SystemEventListener {
         asset.functions.copyVariantMaterials(this.mesh,asset.scene.children[0] as THREE.Mesh);
         this.mesh.visible = false;
         this.mesh.name = "Selector";
+        this.mesh.renderOrder = RenderOrder.SELECTOR;
         this.events.on(SystemEvents.INTERACTION,(event)=>{
             switch (event.id) {
                 case ObjectEvents.DESELECTION: {

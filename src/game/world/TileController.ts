@@ -11,6 +11,7 @@ import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type World from "./World";
 import type InstancedObject from "./rendered/InstancedObject";
 import type CityTile from "./rendered/CityTile";
+import { RenderOrder } from "../core/renderOrder";
 
 /**
  * The selected object on this tile.
@@ -364,6 +365,7 @@ export default class TileController implements SystemEventListener {
                 const {asset,type,item} = this.base.manifest(this.tribe);
                 const model = await this.assets.getAsset(asset,item,type);
                 obj = this.engine.scene.createObjectInstance(base_type,model.geometry,model.material);
+                obj.renderOrder = RenderOrder.BASE;
             }
 
             obj.createInstance({
@@ -386,6 +388,8 @@ export default class TileController implements SystemEventListener {
                     const {asset,item,type} = this.top.manifest(this.tribe);
                     const model = await this.assets.getAsset(asset,item,type);
                     obj = this.engine.scene.createObjectInstance(top_type,model.geometry,model.material);
+                    obj.renderOrder = RenderOrder.TOP;
+                    
                 }
 
                 obj.createInstance({
