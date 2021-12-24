@@ -5,6 +5,7 @@ import type AssetLoader from "../loaders/AssetLoader";
 import type Engine from "../core/Engine";
 import type CityTile from "./rendered/CityTile";
 import random from "random";
+import { object_without_properties } from "svelte/internal";
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -178,17 +179,18 @@ export class Tile implements ITile {
 
 
 class CityLevelData {
-    private _data: (number | null)[][][] = [
-        [
-            [ 1,  1 ],
-            [ 1,  1 ],
-        ],
-        [
-            [ null, null ],
-            [ null,  0   ],
-        ],
-    ];
+    private _data: (number | null)[][][];
     constructor(private city: City){}
+    public init(){
+        this._data = [
+            Array.from({ length: 2 }, ()=> Array.from({length: 2}, ()=> random.int(1,5))),
+            Array.from({ length: 2}, (le,li)=> Array.from({length: 2},(re,ri)=> {
+                const modelId = () => random.float(0,1) > 0.5 ? null : random.int(1,5);
+                if(li === 1 && ri === 1) return this.city.capital ? 0 : modelId();
+                return modelId();
+            }) )
+        ]
+    }
     private getSizeing(){
         switch (this.city.city_level) {
             case 0:
@@ -229,13 +231,19 @@ class CityLevelData {
         if(this._data[0][0].length === SIZE) return; 
 
         for(let i = 0; i < this._data.length; i++) {
-            this._data[i] = Array.from({ length: SIZE }, (el,index) => Array.from({ length: SIZE }, (e,id)=>{
+
+            this._data[i] = Array.from({ length: SIZE }, ()=> Array.from({ length: SIZE }, () => null ) );
+           /* 
+            This merges the old array into the new array. Moves the old array into the bottom right corner.
+            which is the size that is render towards the camera. This is how it apperies to act the game but, 
+            can determin if this is the readly method.
+           this._data[i] = Array.from({ length: SIZE }, (el,index) => Array.from({ length: SIZE }, (e,id)=>{
                 try {
                     return this._data[i][index - 1][id - 1] ?? null;
                 } catch (error) {
                     return 1;
                 }
-            }));
+            }));*/
         }
 
     }
@@ -244,10 +252,39 @@ class CityLevelData {
 
         const {SIZE} = this.getSizeing();
 
-        this._data.push(Array.from({ length: SIZE }, ()=> Array.from({ length: SIZE}, (a,b)=>1) ));
+        this._data.push(Array.from({ length: SIZE }, ()=> Array.from({ length: SIZE}, (a,b)=> null) ));
+
+
+        for(let level = 0; level < this._data.length; level++) {
+            for(let layer = 0; layer < this._data[level].length; layer++){
+                for(let col = 0; col < this._data[level][layer].length; col++ ){
+                    if((level === this._data.length - 1) && ( col === SIZE - 1 ) && (layer === SIZE - 1) ) {
+                         // Captial marking 
+                        const get_bottom = (base: number): number => {
+                            if(this._data[base - 1] && (this._data[base - 1][layer][col] === null)) {
+                                return get_bottom(base - 1);
+                            }
+                            return base;
+                        }
+
+                        this._data[get_bottom(level)][layer][col] = 0;
+
+                        continue;
+                    }
+
+                    if(this._data[level - 1] && (this._data[level - 1][layer][col] === null)){
+                        this._data[level][layer][col] = null;
+                        continue;
+                    }
+                    
+                    this._data[level][layer][col] = random.float(0,1) > 0.1 ? random.int(1,5) : null;
+                }
+            }
+        }
 
     }
     public *[Symbol.iterator](){
+        if(!this._data) throw new Error(`City level data was not init | ${this.city.id}`);
         const { SPACING, OFFSET } = this.getSizeing();
         let level = 0;
         let row = 0;
@@ -312,6 +349,7 @@ export class City extends Tile {
     }
     public cityDefaultConstructor(data: { capital: boolean }): this {
         this.capital = data.capital;
+        this.level_data.init();
         return this;
     }
     public toJSON(): CityJson {
