@@ -1,6 +1,11 @@
 [
     {
         "type": "model",
+        "name": "BARDUR_CITY",
+        "file": "assets/BARDUR_CITY.glb"
+    },
+    {
+        "type": "model",
         "name": "CITY",
         "file": "assets/CITY.glb"
     },

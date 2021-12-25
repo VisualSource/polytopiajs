@@ -395,7 +395,7 @@ export class City extends Tile {
                 if(data.type === null) continue;
                 let item = tile.getObjectInstance(`CITY_PART_${data.type}`);
                 if(!item) {
-                    const model = await assets.getAsset("CITY",data.type,"gltf");
+                    const model = await assets.getAsset(`${tribe.toUpperCase()}_CITY`,data.type,"gltf");
                     item = tile.createObjectInstance(`CITY_PART_${data.type}`,model.geometry,model.material);
                 }
 
