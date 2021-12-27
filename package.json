@@ -50,7 +50,7 @@
     "regexparam": "^2.0.0",
     "svelte": "^3.44.3",
     "sveltestrap": "^5.6.3",
-    "three": "^0.135.0",
+    "three": "^0.136.0",
     "three-instanced-uniforms-mesh": "^0.44.0",
     "three-nebula": "^10.0.3",
     "troika-three-text": "^0.44.0",
