@@ -2116,7 +2116,7 @@
             "col": 2
         },
         "tribe": "imperius",
-        "type": "warrior",
+        "type": "WARRIOR",
         "health": 10,
         "is_veteran": false
     }]

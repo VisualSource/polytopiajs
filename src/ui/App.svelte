@@ -1,5 +1,4 @@
 <script lang="ts">
-    import AppInfo from './components/AppInfo.svelte';
     import GameView from './components/GameView.svelte';
 
     import {onMount} from 'svelte';
@@ -16,11 +15,11 @@
 
   <div class="App">
     <GameView/>
-    <AppInfo/>
   </div>
 
 
 <style lang="sass">
   .App
     height: 100vh
+    width: 100vw
 </style>

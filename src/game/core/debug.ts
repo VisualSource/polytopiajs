@@ -1,4 +1,5 @@
 import {GUI} from 'lil-gui';
+import { isMobile } from '../../utils/mobile';
 import type Game from './Game';
 import type { Tribe } from './types';
 
@@ -16,7 +17,20 @@ export function init(game: Game){
         },
         "Active Player": "imperius"
     }
+    const client_info: { [key: string]: any } = {
+        "Game Build": import.meta.env.PACKAGE_VERSION,
+        "Lang": navigator.language,
+        "Network Status": navigator.onLine ? "Online" : "Offline",
+        "Vender": navigator.vendor,
+        "Mobile": isMobile() ? "Yes" : "No",
+    }
 
+    let i = 0;
+    for(const a of navigator.userAgent.split(" ")) {
+        client_info[`UserAgent_${i}`] = a.replace("(","").replace(";","").replace(")","");
+        i++;
+    }
+   
     const gui = new GUI({ title: "Controls"  });
     
     gui.add(actions,"Reset Units");
@@ -27,6 +41,9 @@ export function init(game: Game){
             unit.reset();
         });
     });
-  
-    
+    const client = gui.addFolder("Client");
+    client.close();
+    for(const info in client_info) {
+        client.add(client_info,info).disable();
+    }  
 }

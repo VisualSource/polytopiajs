@@ -5,19 +5,20 @@ import type AssetLoader from "../loaders/AssetLoader";
 import type {Position, Tribe, UUID, Skill} from "../core/types";
 import type PlayerController from "../managers/PlayerController";
 
+
+export type UnitType = "WARRIOR";
 interface IUnit {
-    type: string;
+    type: UnitType;
     tribe: Tribe;
     position: Position;
 }
 export interface UnitJson {
     position: Position;
     tribe: Tribe,
-    type: string;
+    type: UnitType;
     health: number;
     is_veteran: boolean;
 } 
-
 export class Unit {
     static createFromJson(engine: Engine, asset: AssetLoader, players: PlayerController, json: UnitJson): Unit {
         return new Unit(engine,asset,players).initFromJson(json);
@@ -25,10 +26,28 @@ export class Unit {
     static createNew(engine: Engine, asset: AssetLoader,players: PlayerController, data: IUnit): Unit {
         return new Unit(engine,asset,players).initDefault(data);
     }
+    static readonly UNIT_MODEL_ID: { [tribe: string]: number } = {
+        "imperius": 0,
+        "bardur": 1, 
+        "xin-xi": 2, 
+        "oumaji": 3, 
+        "kickoo": 4, 
+        "zebasi": 5
+    };
+    static readonly UNIT_DATA: { [type: string]: { defence: number, attack: number, maxHealth: number, movement: number, range: number, skills: Skill[] } } = {
+        "WARRIOR": {
+            defence: 2,
+            attack: 2,
+            maxHealth: 10,
+            movement: 1,
+            range: 1,
+            skills: ["DASH"]
+        }
+    };
     public readonly uuid: UUID = nanoid(8);
     public position: Position;
     public tribe: Tribe;
-    public type: string;
+    public type: UnitType;
     public movement: number = 1;
     public range: number = 1;
     public isVeteran: boolean = false;
@@ -39,14 +58,29 @@ export class Unit {
     public hasMoved: boolean = false;
     public hasAttacked: boolean = false;
     public maxHealth: number = 10;
-    private model_id: string;
-    constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}    
+    constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}   
+    private get model_id(): string {
+        return `${this.type}_${this.tribe}`;
+    } 
+    private get model_index(): number {
+        return Unit.UNIT_MODEL_ID[this.tribe];
+    }
     public initDefault(data: IUnit): this {
         this.position = data.position;
         this.type = data.type;
         this.tribe = data.tribe;
+
+        const {range,maxHealth,movement,skills,defence,attack} = Unit.UNIT_DATA[this.type];
+        this.movement = movement;
+        this.range = range;
+        this.skills = skills;
+        this.attack = attack;
+        this.defence = defence;
+        this.health = maxHealth;
+        this.maxHealth = maxHealth;
+
+
          // use the commented part when we have models to use for the diffenent tribes and unit types.
-        this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
         return this;
     }
     public initFromJson(json: UnitJson): this {
@@ -55,7 +89,13 @@ export class Unit {
         this.tribe = json.tribe;
         this.isVeteran = json.is_veteran;
         this.health = json.health;
-        this.model_id = "UNIT"; /*`${data.tribe}_${this.type}`*/;
+        const {range,movement,skills,defence,attack} = Unit.UNIT_DATA[this.type];
+        this.movement = movement;
+        this.range = range;
+        this.skills = skills;
+        this.defence = defence;
+        this.attack = attack;
+
         return this;
     }
     public toJSON(): UnitJson {
@@ -121,7 +161,6 @@ export class Unit {
         if(!data) throw new Error(`Failed to get instanced data for unit (${this.uuid})`);
 
         this.tribe = tribe;
-        this.model_id = "UNIT";/*`${tribe}_${this.type}`*/
 
         unit.removeInstanceById(this.uuid);
 
@@ -133,7 +172,7 @@ export class Unit {
             
             let model = this.engine.scene.getObject(this.model_id);
             if(!model) {
-                const asset = await this.asset.getAsset(this.model_id,0,"gltf");
+                const asset = await this.asset.getAsset(this.type,this.model_index,"gltf");
                 model = this.engine.scene.createObjectInstance(this.model_id,asset.geometry,asset.material);
                 model.renderOrder = RenderOrder.UNIT;
             }

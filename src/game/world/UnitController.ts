@@ -1,18 +1,19 @@
+import InstancedObject from "./rendered/InstancedObject";
+import { Color } from "three";
+import {SystemEvents, UnitEvent, ObjectEvents} from '../events/systemEvents';
+import { nanoid } from "nanoid";
+import EventEmitter from "../core/EventEmitter";
+import { Unit } from "./Unit";
+import { chebyshev_distance } from "../../utils/math";
+import { RenderOrder } from "../core/renderOrder";
+import type { UnitType } from "./Unit";
 import type Engine from "../core/Engine";
 import type { Position, Tribe, UUID } from "../core/types";
 import type AssetLoader from "../loaders/AssetLoader";
 import type World from "./World";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
-import InstancedObject from "./rendered/InstancedObject";
-import { Color } from "three";
-import {SystemEvents, UnitEvent, ObjectEvents} from '../events/systemEvents';
-import { nanoid } from "nanoid";
 import type { SystemEventListener } from "../core/EventEmitter";
-import EventEmitter from "../core/EventEmitter";
-import { Unit } from "./Unit";
-import { chebyshev_distance } from "../../utils/math";
 import type PlayerController from "../managers/PlayerController";
-import { RenderOrder } from "../core/renderOrder";
 
 export default class UnitController implements SystemEventListener {
     private readonly ACCELERATOR: number = 4.5;
@@ -122,7 +123,7 @@ export default class UnitController implements SystemEventListener {
         unit.destory();
         this.world.units.delete(id);
     }
-    public async createUnit(tribe: Tribe, type: string, position: Position){
+    public async createUnit(tribe: Tribe, type: UnitType, position: Position){
         const unit = Unit.createNew(this.engine,this.assets,this.world.players, { type, tribe, position });
         this.world.units.set(unit.uuid,unit);
         const tile = this.world.level.get(position.row,position.col).setUnit(unit.uuid);

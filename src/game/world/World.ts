@@ -32,7 +32,7 @@ export default class World {
 
         fetch("/world.json").then(value=>value.json()).then(world=>{
             this.loadWorld(world).then(()=>{
-                this.unit_controller.createUnit("bardur","warrior",{row: 5, col: 2});
+                this.unit_controller.createUnit("bardur","WARRIOR",{row: 5, col: 2});
             });
         });
 

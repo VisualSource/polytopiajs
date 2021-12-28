@@ -1,13 +1,13 @@
 [
     {
         "type": "model",
-        "name": "BARDUR_CITY",
-        "file": "assets/BARDUR_CITY.glb"
+        "name": "IMPERIUS_CITY",
+        "file": "assets/IMPERIUS_CITY.glb"
     },
     {
         "type": "model",
-        "name": "CITY",
-        "file": "assets/CITY.glb"
+        "name": "BARDUR_CITY",
+        "file": "assets/BARDUR_CITY.glb"
     },
     {
         "type": "model",
@@ -61,8 +61,8 @@
     },
     {
         "type":"model",
-        "name": "UNIT",
-        "file": "assets/UNIT.glb"
+        "name": "WARRIOR",
+        "file": "assets/WARRIOR.glb"
     },
     {
         "type":"model",
