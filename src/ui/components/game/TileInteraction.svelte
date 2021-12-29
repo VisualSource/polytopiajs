@@ -1,10 +1,26 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { fade, fly } from 'svelte/transition';
-    import EventEmitter from '../../../game/core/EventEmitter';
     import { Button, Icon } from 'sveltestrap';
+    import EventEmitter from '../../../game/core/EventEmitter';
     import { SystemEvents, ObjectEvents } from '../../../game/events/systemEvents';
 
+    //https://www.leshylabs.com/apps/sstool/
+    //https://dev.to/martyhimmel/animating-sprite-sheets-with-javascript-ag3
     let show = true;
+    let canvas: HTMLCanvasElement;
+
+    onMount(()=>{
+        let img = new Image();
+        img.src = "http://localhost:3000/temp/ground.png";
+        let img2 = new Image();
+        img2.src = "http://localhost:3000/temp/village.png";
+        let ctx = (canvas as HTMLCanvasElement).getContext("2d");
+        ctx?.drawImage(img,0,-35,243,274,0,0,243 / 5,274 / 5);
+        ctx?.drawImage(img2,-5,-10,256,177,0,0,256 / 6,177 / 6);
+    })
+
+
     const events = new EventEmitter();
 
     const interaction = (event: any) => {
@@ -40,7 +56,6 @@
         user-select: none
         color: var(--bs-light)
         width: 25%
-        height: 140px
         border-top-left-radius: 6px 
         border-top-right-radius: 6px
         > main 
@@ -55,7 +70,13 @@
             > div.preview 
                 display: flex
                 > div.preview-img 
+                    display: flex
+                    overflow: visible
                     margin-right: 10px
+                    overflow: visible
+              
+                    > canvas
+                        display: block             
                 > div.title-desc 
                     @include variables.flex-column()
                     > h6 
@@ -72,7 +93,7 @@
         user-select: none
         &:active
             transform: translate(1px,1px)
-
+      
     @media screen and (max-width: 765px) 
         #tile-actions 
             bottom: 0
@@ -80,11 +101,11 @@
 </style>
 
 {#if show} 
-    <div id="tile-actions" class="bg-dark" in:fly="{{ y: 100, duration: 200 }}" out:fade>
+    <div id="tile-actions" class="bg-dark" in:fly="{{ y: 200, duration: 200 }}" out:fade>
         <header>
             <div class="preview">
                 <div class="preview-img">
-                    <img src="" alt="tile preview"/>
+                  <canvas bind:this={canvas} width="60" height="60"></canvas>
                 </div>
                 <div class="title-desc">
                     <h6>
