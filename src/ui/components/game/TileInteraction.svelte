@@ -1,32 +1,68 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { fade, fly } from 'svelte/transition';
     import { Button, Icon } from 'sveltestrap';
-    import EventEmitter from '../../../game/core/EventEmitter';
     import { SystemEvents, ObjectEvents } from '../../../game/events/systemEvents';
+    import Game from '../../../game/core/Game';
+    import tilejson from '../../data/tiles.json';
+    import tileimage from '../../data/tiles.png';
 
     //https://www.leshylabs.com/apps/sstool/
     //https://dev.to/martyhimmel/animating-sprite-sheets-with-javascript-ag3
-    let show = true;
+    let show = false;
     let canvas: HTMLCanvasElement;
+    let rendered_last: string[] = [];
+    let name = "TILE NAME";
+    const img = new Image();
+    const game = new Game();
 
-    onMount(()=>{
-        let img = new Image();
-        img.src = "http://localhost:3000/temp/ground.png";
-        let img2 = new Image();
-        img2.src = "http://localhost:3000/temp/village.png";
-        let ctx = (canvas as HTMLCanvasElement).getContext("2d");
-        ctx?.drawImage(img,0,-35,243,274,0,0,243 / 5,274 / 5);
-        ctx?.drawImage(img2,-5,-10,256,177,0,0,256 / 6,177 / 6);
-    })
+    const compare_list = (a: string[], b: string[]): boolean => {
+        if(!b) return false;
+        if(a.length !== b.length) return false;
+        let i = 0;
+        while(i < a.length) {
+            if(a[i] !== b[i]) return false;
+            i++;
+        }
+        return true;
+    }
 
+    const render_img = async (request: any) => {
 
-    const events = new EventEmitter();
+        const tile = game.world.level.get(request.data.world.row,request.data.world.col).getPreivew;
+        // check if the rendered last array is the same as the new tile array.
+        if(compare_list(rendered_last,tile)) return;
 
+        name = game.world.level.get(request.data.world.row,request.data.world.col).uiName ?? "TILE NAME";
+    
+        if(img.src !== tileimage) {
+            await new Promise<void>((ok,err)=>{
+                img.onload = () => ok();
+                img.src = tileimage;
+            });
+        } 
+        if(!canvas) return;
+        
+        const ctx = canvas.getContext("2d");
+
+        ctx?.clearRect(0,0,canvas.width,canvas.height);
+
+        for(const imgData of tile) {
+            //@ts-ignore
+            const imgFrame = tilejson.frames[imgData];
+            
+            if(!imgFrame) continue;
+            const {frame} = imgFrame;
+
+            ctx?.drawImage(img,frame.x,frame.y,frame.w,frame.h,0,0,frame.w / 4, frame.h / 4);
+        }
+
+        rendered_last = tile;
+    }
     const interaction = (event: any) => {
         switch (event.id) {
             case ObjectEvents.SELECTION:
                 show = true;
+                render_img(event);
                 break;
             case ObjectEvents.DESELECTION: 
             default:
@@ -36,11 +72,10 @@
     }
     const onClose = () => {
         show = false;
-        events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: {} });
-
+        game.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: {} });
     }
 
-    events.on(SystemEvents.INTERACTION, interaction);
+    game.events.on(SystemEvents.INTERACTION, interaction);
 
 </script>
 
@@ -109,7 +144,7 @@
                 </div>
                 <div class="title-desc">
                     <h6>
-                        <strong>TILE NAME</strong>
+                        <strong>{name}</strong>
                     </h6>
                     <span>TILE DESCRIPTION</span>
                 </div>

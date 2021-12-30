@@ -59,8 +59,8 @@ export class Unit {
     public hasAttacked: boolean = false;
     public maxHealth: number = 10;
     constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}   
-    private get model_id(): string {
-        return `${this.type}_${this.tribe}`;
+    public get model_id(): string {
+        return `${this.type}_${this.tribe.toUpperCase()}`;
     } 
     private get model_index(): number {
         return Unit.UNIT_MODEL_ID[this.tribe];

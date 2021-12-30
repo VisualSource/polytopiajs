@@ -6,9 +6,9 @@ import { RenderOrder } from "../../core/renderOrder";
 
 export default class CityTile extends Mesh {
     public isGameObject: boolean = true;
-    constructor(public name: string, public tile_owner: UUID,  position: Position, geometry?: THREE.BufferGeometry | undefined, material?: THREE.Material | THREE.Material[] | undefined){
+    constructor(public name: string, public tile_owner: UUID, public world_position: Position, geometry?: THREE.BufferGeometry | undefined, material?: THREE.Material | THREE.Material[] | undefined){
         super(geometry,material);
-        this.position.set(position.row * 4, 0, position.col * 4);
+        this.position.set(world_position.row * 4, 0, world_position.col * 4);
         this.renderOrder = RenderOrder.BASE;
     }
     public clean(){

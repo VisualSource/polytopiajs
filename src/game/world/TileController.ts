@@ -31,9 +31,6 @@ export interface TileControllerJson {
     owning_tribe: Tribe | null;
 }
 /**
- * @todo
- */
-/**
  * @listens INTERACTION
  * @emits UNIT 
  * @emits INTERACTION
@@ -180,6 +177,26 @@ export default class TileController implements SystemEventListener {
        // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
        // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
     }
+    public get getPreivew(): string[] {
+        if(this.unit) {
+            const id = this.world.units.get(this.unit)?.model_id;
+            if(id) return [id];
+            return []
+        }
+        const data = [this.base.getType(this.tribe)];
+        if(this.top) data.push(this.top.getType(this.tribe));
+        return data;
+    }
+    public get uiName(): string | undefined {
+        if(this.unit) {
+            return this.world.units.get(this.unit)?.type
+        }
+        if(this.top) {
+            return this.top.type;
+        }
+        return `${this.base.type}`;
+
+    }    
     public terrainBouns(): number {
         switch (this.base.type) {
             case "LAND":

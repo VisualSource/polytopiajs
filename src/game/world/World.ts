@@ -8,7 +8,7 @@ import NArray from "../../utils/NArray";
 import type { UnitJson } from "./Unit";
 import type { TileControllerJson } from './TileController';
 import type { VariantGLTF } from "../loaders/KHR_Variants";
-import type { Tribe } from "../core/types";
+import type { Tribe, UUID } from "../core/types";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type PlayerController from "../managers/PlayerController";
