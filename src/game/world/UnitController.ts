@@ -6,9 +6,8 @@ import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
 import { chebyshev_distance } from "../../utils/math";
 import { RenderOrder } from "../core/renderOrder";
-import type { UnitType } from "./Unit";
 import type Engine from "../core/Engine";
-import type { Position, Tribe, UUID } from "../core/types";
+import type { Position, Tribe, UUID, UnitType } from "../core/types";
 import type AssetLoader from "../loaders/AssetLoader";
 import type World from "./World";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
@@ -138,6 +137,16 @@ export default class UnitController implements SystemEventListener {
         this.world.level.get(unit.position.row,unit.position.col).setUnit(null);
         unit.setPostion(tile.uuid,pos);
         unit.hasMoved = true;
+    }
+    public healUnit(id: UUID): void {
+        const unit = this.world.units.get(id);
+        if(!unit || !(unit.health > unit.maxHealth) ) return;
+
+        let healRate = 2;
+        if(this.world.level.get(unit.position.row,unit.position.col).owning_tribe === unit.tribe) {
+            healRate = 4;
+        }
+        unit.heal(healRate);
     }
     /**
      *

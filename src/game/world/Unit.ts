@@ -2,11 +2,9 @@ import { nanoid } from "nanoid";
 import { RenderOrder } from "../core/renderOrder";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
-import type {Position, Tribe, UUID, Skill} from "../core/types";
+import type {Position, Tribe, UUID, Skill, UnitType } from "../core/types";
 import type PlayerController from "../managers/PlayerController";
 
-
-export type UnitType = "WARRIOR";
 interface IUnit {
     type: UnitType;
     tribe: Tribe;
@@ -112,6 +110,10 @@ export class Unit {
             return ["LAND","FOREST","MOUNTAIN"];
         }
         return ["LAND","FOREST"];
+    }
+    public heal(amount: number): void {
+        this.health += amount;
+        if(this.health > this.maxHealth) this.health = this.maxHealth;
     }
     public setPostion(next_tile_owner: UUID, postion: Position){
         const model = this.engine.scene.getObject(this.model_id);

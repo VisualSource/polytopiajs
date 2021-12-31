@@ -1617,6 +1617,7 @@
                 "capital": true,
                 "current_units": 1,
                 "city_wall": false,
+                "city_name": "Orkurgrugu",
                 "city_level": 1,
                 "level_data": [
                     [

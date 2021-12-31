@@ -1,7 +1,9 @@
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
 import { Tile, BuildTile, City } from "./Tile";
-import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
+import { ObjectEvents, SystemEvents, UnitEvent, ActionEvent } from "../events/systemEvents";
+import { capitalize } from '../../utils/strings';
+import { RenderOrder } from "../core/renderOrder";
 import type { TileJson, CityJson } from './Tile';
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
@@ -11,7 +13,6 @@ import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type World from "./World";
 import type InstancedObject from "./rendered/InstancedObject";
 import type CityTile from "./rendered/CityTile";
-import { RenderOrder } from "../core/renderOrder";
 
 /**
  * The selected object on this tile.
@@ -173,12 +174,38 @@ export default class TileController implements SystemEventListener {
                     break;
             }
         });
+        this.events.on(SystemEvents.ACTION,(event)=>{
+            if(event.data.tile !== this.uuid) return;
+            switch (event.id) {
+                case ActionEvent.SPAWN:
+                    this.world.unit_controller.createUnit(this.owning_tribe as Tribe, event.data.type, this.position);
+                    break;
+                case ActionEvent.CREATE: 
+                    break;
+                case ActionEvent.DESTORY:
+                    this.removeBuilding();
+                    break;
+                case ActionEvent.DISBAND: 
+                    if(this.unit) this.world.unit_controller.destoryUnit(this.unit);
+                    break;
+                case ActionEvent.GATHER:
+                    this.removeBuilding();
+                    break;
+                case ActionEvent.HEAL: 
+                    break;
+                case ActionEvent.RECOVER:
+                     
+                    break;
+                default:
+                    break;
+            }
+        });
        // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
        // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
        // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
     }
     public get getPreivew(): string[] {
-        if(this.unit) {
+        if(this.unit && this.selected === Selected.UNIT) {
             const id = this.world.units.get(this.unit)?.model_id;
             if(id) return [id];
             return []
@@ -187,15 +214,27 @@ export default class TileController implements SystemEventListener {
         if(this.top) data.push(this.top.getType(this.tribe));
         return data;
     }
-    public get uiName(): string | undefined {
-        if(this.unit) {
-            return this.world.units.get(this.unit)?.type
+    public uiText() {
+        const title = (): string => {
+            if(this.unit && this.selected === Selected.UNIT) {
+                const unit = this.world.units.get(this.unit);
+                if(!unit) return "Undefined";
+                return `${capitalize(unit.tribe)} ${capitalize(unit.type)}`;
+            }
+            if(this.top && ["RUIN","VILLAGE"].includes(this.top.type)) return capitalize(this.top.type);
+            if((this.base as City)?.isCity) return (this.base as City).uiName;
+            return `${capitalize(this.base.type)}${this.top ? `, ${this.top.type.toLowerCase()}` : ""}${this.road ? ", roads" : ""} `;
         }
-        if(this.top) {
-            return this.top.type;
-        }
-        return `${this.base.type}`;
+        const description = (): string => {
+            if((this.base as City)?.isCity) return this.world.players.activePlayer === this.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
 
+            return "";
+        }
+
+        return {
+            title: title(),
+            desc: description()
+        }
     }    
     public terrainBouns(): number {
         switch (this.base.type) {
@@ -232,7 +271,7 @@ export default class TileController implements SystemEventListener {
         if(tile_data.base === "CITY") {
             this.owning_tribe = this.tribe;
             this.road = true;
-            this.base = City.cityDefaultConstructor(tile_data.metadata as any);
+            this.base = City.cityDefaultConstructor({ tribe: this.tribe, ...tile_data.metadata } as any);
         } else {
             this.base = Tile.defaultConstructor(tile_data.base as TileBase, tile_data.metadata);
             if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
@@ -318,8 +357,8 @@ export default class TileController implements SystemEventListener {
             type
         }});
     }
-    public addBuilding(){}
-    public removeBuilding(){
+    private addBuilding(){}
+    private removeBuilding(){
         if(!this.top) return;
         try {
             const top_type = this.top.getType(this.tribe);

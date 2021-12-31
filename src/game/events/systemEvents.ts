@@ -5,7 +5,8 @@ export enum SystemEvents {
     OBJECT = "OBJECT",
     INTERACTION = "INTERACTION",
     UNIT = "UNIT",
-    SOUND = "SOUND"
+    SOUND = "SOUND",
+    ACTION = "ACTION"
 };
 
 export enum SoundEvent {
@@ -40,4 +41,14 @@ export enum AssetLoaderEvents {
     CHECKING_FOR_UPDATE,
     ASSETS_INIT_START,
     ASSETS_INIT_END
+}
+
+export enum ActionEvent {
+    RECOVER, // heal self unit.
+    HEAL, // heal other unit
+    SPAWN, // create unit
+    CREATE, // create building
+    DISBAND, // destory unit
+    DESTORY, // destory building,
+    GATHER
 }

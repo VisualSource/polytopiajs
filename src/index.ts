@@ -9,19 +9,18 @@ let app = new App({
   target: document.body,
 });
 
-if('Notification' in window) {
+/*if('Notification' in window) {
   Notification.requestPermission().then((value)=>{
     console.log(value);
   },(resason)=>{
     console.log(resason);
   });
-}
+}*/
 
-if(import.meta.env.PROD) {
-  if("serviceWorker" in navigator) {
+/*if(import.meta.env.PROD && "serviceWorker" in navigator) {
       //https://developers.google.com/web/ilt/pwa/introduction-to-push-notifications
-    window.addEventListener("load",()=>{
-      navigator.serviceWorker.register("/service-worker.js");
-    });
-  }
-}
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/service-worker.js");
+  });
+}*/
+

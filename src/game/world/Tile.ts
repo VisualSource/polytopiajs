@@ -1,11 +1,12 @@
 import { nanoid } from "nanoid";
+import random from "random";
+import { capitalize } from "../../utils/strings";
+
 import type { Manifest } from "../loaders/AssetLoader";
 import type {TileBase, Tribe, UUID} from '../core/types';
 import type AssetLoader from "../loaders/AssetLoader";
 import type Engine from "../core/Engine";
 import type CityTile from "./rendered/CityTile";
-import random from "random";
-import { object_without_properties } from "svelte/internal";
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -32,6 +33,7 @@ export interface CityJson {
     city_wall: boolean;
     city_level: number;
     level_data: (number | null)[][][];
+    city_name: string;
     metadata: {
         [key: string]: any;
     };
@@ -138,45 +140,6 @@ export class Tile implements ITile {
     }
     
 }
-
-/*
- * The level of a city could be build using groups with min of 2 and max of 3 on the sides and 1 center (capital icon on this piller)
-   the data reperention the level is a array with a number between 0 and 7 and when generated using a random number generator.
-   null in this array will repersent a non rendered place
-   Array Example SINGLE BLOCK LEVEL
-
-   City size 3x3
-   [
-    [ null, null, 1 ], <-- two of the inside block are not rendered with only the out side being render
-    [ null, null, 3 ], <-- Same as above
-    [ 4   ,   4 , 8 ]  <-- This is the front side of the city, so all 3 are rendered
-   ]
-
-   City size 4x4
-  THREE JS GROUP -> [
-                        [ null, null, null, 4  <- id/index of the model to be rendered here ],
-                        [ null, null, null, 4],
-                        [ null, null, null, 6],
-                        [   6 ,   5 ,   6 , 2]
-                    ]
-
-   FULL CTIY 
-   STARTING CITY DATA
-   [
-       [                           <-- THREE JS GROUP, LEVEL 0 GENERANTED FRIST
-           [ null, null, 1  ],
-           [ null, null, 7  ],
-           [   4 ,   5,   8 ]
-       ],
-       [
-           [null,null,null],
-           [null,null,null],
-           [null,null,  9 ]
-       ]
-   ]
-
- */
-
 
 class CityLevelData {
     private _data: (number | null)[][][];
@@ -317,11 +280,15 @@ class CityLevelData {
     }
 }
 
+const CITY_SYLLABLES: {[tribe: string]: string[] } = {
+    "bardur": ["ark","bu","fla","gru","gu","lak","lin","ork","rø","tof","ur"]
+}
+
 export class City extends Tile {
     static cityJsonConstructor(json: CityJson): City {
         return new City().cityJsonConstructor(json);
     }
-    static cityDefaultConstructor(data: { capital: boolean }): City {
+    static cityDefaultConstructor(data: { capital: boolean, tribe: Tribe }): City {
         return new City().cityDefaultConstructor(data);
     }
     public readonly isCity: boolean = true;
@@ -331,9 +298,13 @@ export class City extends Tile {
     public city_wall: boolean = false;
     public city_level: number = 1;
     public level_data: CityLevelData;
+    public city_name: string = "";
     constructor(){
         super();
         this.level_data = new CityLevelData(this);
+    }
+    public get uiName(): string {
+        return `The city of ${this.city_name} lvl ${this.city_level}`;
     }
     public get key(): string {
         return `${this.type}_${this.id}`;
@@ -345,11 +316,20 @@ export class City extends Tile {
         this.city_level = json.city_level;
         this.metadata = json.metadata;
         this.level_data.load = json.level_data;
+        this.city_name = json.city_name;
         return this;
     }
-    public cityDefaultConstructor(data: { capital: boolean }): this {
+    public cityDefaultConstructor(data: { capital: boolean, tribe: Tribe }): this {
         this.capital = data.capital;
         this.level_data.init();
+
+        const syllable = CITY_SYLLABLES[data.tribe];
+        const len = random.int(4,6);
+        for(let i = 0; i < len; i++){
+            this.city_name += syllable[random.int(0, syllable.length - 1)];
+        }
+        this.city_name = capitalize(this.city_name);
+
         return this;
     }
     public toJSON(): CityJson {
@@ -357,10 +337,11 @@ export class City extends Tile {
             capital: this.capital,
             city_level: this.city_level,
             city_wall: this.city_wall,
+            city_name: this.city_name,
             current_units: this.current_units,
             type: "CITY",
             metadata: this.metadata,
-            level_data: this.level_data.toJSON()
+            level_data: this.level_data.toJSON(),
         };
     }
     public async levelUpCity(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {

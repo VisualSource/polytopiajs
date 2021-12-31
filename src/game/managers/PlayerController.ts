@@ -26,6 +26,9 @@ export default class PlayerController {
         }
         return this;
     }
+    public activePlayerHas(tech: Tech): boolean {
+        return this.playerHasTech(this.activePlayer,tech);
+    }
     public playerHasTech(tribe: Tribe, tech: Tech): boolean {
         const player = this.players.get(tribe);
         if(!player) return false;

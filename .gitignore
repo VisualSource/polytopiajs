@@ -2,6 +2,7 @@
 /.env.development
 /.env.production
 /assets/test
+/assets/images
 /public/test_1.zip
 /public/test_2.zip
 /public/test_3.zip

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fade, fly } from 'svelte/transition';
     import { Button, Icon } from 'sveltestrap';
-    import { SystemEvents, ObjectEvents } from '../../../game/events/systemEvents';
+    import { SystemEvents, ObjectEvents, ActionEvent } from '../../../game/events/systemEvents';
     import Game from '../../../game/core/Game';
     import tilejson from '../../data/tiles.json';
     import tileimage from '../../data/tiles.png';
@@ -9,9 +9,12 @@
     //https://www.leshylabs.com/apps/sstool/
     //https://dev.to/martyhimmel/animating-sprite-sheets-with-javascript-ag3
     let show = false;
-    let canvas: HTMLCanvasElement;
-    let rendered_last: string[] = [];
     let name = "TILE NAME";
+    let description = "";
+    let actions: { id: ActionEvent, data: { [key: string]: any } }[] = [];
+
+    let rendered_last: string[] = [];
+    let canvas: HTMLCanvasElement;
     const img = new Image();
     const game = new Game();
 
@@ -26,14 +29,16 @@
         return true;
     }
 
-    const render_img = async (request: any) => {
+    const render_ui = async (request: any): Promise<void> => {
 
         const tile = game.world.level.get(request.data.world.row,request.data.world.col).getPreivew;
         // check if the rendered last array is the same as the new tile array.
         if(compare_list(rendered_last,tile)) return;
 
-        name = game.world.level.get(request.data.world.row,request.data.world.col).uiName ?? "TILE NAME";
-    
+        const { title, desc } = game.world.level.get(request.data.world.row,request.data.world.col).uiText();
+        name = title;
+        description = desc;
+
         if(img.src !== tileimage) {
             await new Promise<void>((ok,err)=>{
                 img.onload = () => ok();
@@ -58,21 +63,57 @@
 
         rendered_last = tile;
     }
+    const render_actions = async (event: any) : Promise<void> => {
+        const tile = game.world.level.get(event.data.world.row,event.data.world.col);
+
+        if(tile.unit !== null) {
+            const unit = game.world.units.get(tile.unit);
+            if(!unit || game.world.players.activePlayer !== unit.tribe) return;
+            
+            if(unit.health < unit.maxHealth) {
+                actions.push({ id: ActionEvent.RECOVER, data: { unit: tile.unit, tile: tile.uuid } });
+            }
+
+            if(game.world.players.activePlayerHas("free_spirit")) {
+                actions.push({ id: ActionEvent.DISBAND, data: { unit: tile.unit, tile: tile.uuid } });
+            }
+
+            if(unit.type === "MIND_BENDER") {
+                actions.push({ id: ActionEvent.HEAL, data: { unit: tile.unit, tile: tile.uuid } });
+            }
+
+            return;
+        }
+        //@ts-ignore
+        if(tile.base?.isCity) {
+            if(tile.owning_tribe !== game.world.players.activePlayer) return;
+            actions.push({ id: ActionEvent.SPAWN, data: { tile: tile.uuid, type: "WARRIOR" } });
+
+            return;
+        }
+
+    }
     const interaction = (event: any) => {
         switch (event.id) {
             case ObjectEvents.SELECTION:
                 show = true;
-                render_img(event);
+                render_ui(event);
+                render_actions(event);
                 break;
             case ObjectEvents.DESELECTION: 
             default:
                 show = false;
+                actions = [];
                 break;
         }
     }
     const onClose = () => {
         show = false;
         game.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: {} });
+    }
+
+    const actionEvent = (data: { id: any, data: any }) => {
+        game.events.emit<SystemEvents,ActionEvent>({ type: SystemEvents.ACTION, ...data });
     }
 
     game.events.on(SystemEvents.INTERACTION, interaction);
@@ -146,7 +187,7 @@
                     <h6>
                         <strong>{name}</strong>
                     </h6>
-                    <span>TILE DESCRIPTION</span>
+                    <span>{description}</span>
                 </div>
             </div>
             <div>
@@ -155,10 +196,13 @@
                 </Button>
             </div>
         </header>
-        <main class="border-top border-light">
-            <div class="rounded-circle border border-3 bg-primary tile-action">A</div>
-            <div class="rounded-circle border border-3 bg-primary tile-action">B</div>
-        </main>
+        {#if actions.length > 0 }
+            <main class="border-top border-light">
+                {#each actions as action}
+                    <div class="rounded-circle border border-3 bg-primary tile-action" on:click={()=>actionEvent(action)}>{action.id}</div>
+                {/each}
+            </main>
+        {/if}
     </div>
 {/if}
 
