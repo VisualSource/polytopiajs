@@ -4,7 +4,7 @@
     import { SystemEvents, ObjectEvents, ActionEvent } from '../../../game/events/systemEvents';
     import Game from '../../../game/core/Game';
     import tilejson from '../../data/tiles.json';
-    import tileimage from '../../data/tiles.png';
+    import tileimage from '../../data/tiles.webp';
 
     //https://www.leshylabs.com/apps/sstool/
     //https://dev.to/martyhimmel/animating-sprite-sheets-with-javascript-ag3

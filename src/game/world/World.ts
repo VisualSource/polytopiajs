@@ -30,11 +30,13 @@ export default class World {
     public unit_controller: UnitController;
     constructor(private engine: Engine, private assets: AssetLoader, public players: PlayerController){
 
-        fetch("/world.json").then(value=>value.json()).then(world=>{
+        this.createWorld(["imperius","bardur"],11);
+
+       /* fetch("/world.json").then(value=>value.json()).then(world=>{
             this.loadWorld(world).then(()=>{
                 this.unit_controller.createUnit("bardur","WARRIOR",{row: 5, col: 2});
             });
-        });
+        });*/
 
         // this is here for testing, in production this is not a great place to do this.
        /* this.createWorld(["imperius","bardur"],11).then(a=>{

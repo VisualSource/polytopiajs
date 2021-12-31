@@ -281,7 +281,8 @@ class CityLevelData {
 }
 
 const CITY_SYLLABLES: {[tribe: string]: string[] } = {
-    "bardur": ["ark","bu","fla","gru","gu","lak","lin","ork","rø","tof","ur"]
+    "bardur": ["ark","bu","fla","gru","gu","lak","lin","ork","rø","tof","ur"],
+    "imperius": ["ca","do", "ica", "ip", "lo", "lus", "ma", "mo", "mus", "nu", "pi", "re", "res", "ro", "sum", "te"]
 }
 
 export class City extends Tile {
@@ -320,6 +321,7 @@ export class City extends Tile {
         return this;
     }
     public cityDefaultConstructor(data: { capital: boolean, tribe: Tribe }): this {
+        console.log(data);
         this.capital = data.capital;
         this.level_data.init();
 
