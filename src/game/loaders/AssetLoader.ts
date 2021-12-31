@@ -133,11 +133,11 @@ export default class AssetLoader  {
             });
         });
     }
-    public async install(src: string = "/raw.zip", version: number | undefined = undefined): Promise<void> {
+    public async install(src: string = "raw.zip", version: number | undefined = undefined): Promise<void> {
         try {
             const zip = new JsZip();
 
-            const request = await fetch(src);
+            const request = await fetch(`${import.meta.env.BASE_URL}${src}`);
             const blob = await request.blob();
 
             const file = await zip.loadAsync(blob);
