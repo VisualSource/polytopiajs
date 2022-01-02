@@ -23,6 +23,7 @@ export interface WorldJson {
 }
 
 export default class World {
+    public lookup: Map<UUID,{ row: number, col: number }> = new Map();
     // this problily will need to be a map for when working with different dimensions and the like.
     public level: NArray<TileController>;
     public units: Map<string,Unit> = new Map();
@@ -67,8 +68,12 @@ export default class World {
         this.engine.scene.activeLevelReady();
 
         for(const tile of leveldata){
-            level.set(tile.row,tile.col,TileController.createNew(this.engine,this.assets,this,tile));
-            await level.get(tile.row,tile.col).render();
+            const controller = TileController.createNew(this.engine,this.assets,this,tile);
+
+            level.set(tile.row,tile.col,controller);
+            this.lookup.set(controller.uuid,{ row: tile.row, col: tile.col })
+
+            await controller.render();
         }   
 
         this.level = level;
@@ -92,8 +97,10 @@ export default class World {
         this.engine.scene.activeLevelReady();
 
         for(const tile of worlddata.leveldata["overworld"]) {
-            level.set(tile.position.row,tile.position.col,TileController.createFromJson(this.engine,this.assets,this,tile));
-            await level.get(tile.position.row,tile.position.col).render();
+            const controller = TileController.createFromJson(this.engine,this.assets,this,tile)
+            level.set(tile.position.row,tile.position.col,controller);
+            this.lookup.set(controller.uuid,tile.position);
+            await controller.render();
         }
 
         for(const unit of worlddata.units) {

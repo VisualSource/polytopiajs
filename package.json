@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "vite --host",
-    "build": "vite build",
+    "build": "npm run spritesheet && vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "mockdb": "json-server db.json",
     "spritesheet": "node ./scripts/spritesheet.js"
   },
   "author": "VisualSource",

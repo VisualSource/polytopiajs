@@ -1,12 +1,12 @@
 <script lang="ts">
     import { fade, fly } from 'svelte/transition';
-    import { Button, Icon } from 'sveltestrap';
+    import { Button } from 'sveltestrap';
     import { SystemEvents, ObjectEvents, ActionEvent } from '../../../game/events/systemEvents';
     import Game from '../../../game/core/Game';
     import tilejson from '../../data/tiles.json';
     import tileimage from '../../data/tiles.webp';
+    import ArrowDown from 'bootstrap-icons/icons/chevron-down.svg';
 
-    //https://www.leshylabs.com/apps/sstool/
     //https://dev.to/martyhimmel/animating-sprite-sheets-with-javascript-ag3
     let show = false;
     let name = "TILE NAME";
@@ -18,7 +18,7 @@
     const img = new Image();
     const game = new Game();
 
-    const compare_list = (a: string[], b: string[]): boolean => {
+    const compare_list = (a: any[], b: any[]): boolean => {
         if(!b) return false;
         if(a.length !== b.length) return false;
         let i = 0;
@@ -31,11 +31,10 @@
 
     const render_ui = async (request: any): Promise<void> => {
 
-        const tile = game.world.level.get(request.data.world.row,request.data.world.col).getPreivew;
+        const {icon, title, desc} = game.world.level.get(request.data.world.row,request.data.world.col).ui();
         // check if the rendered last array is the same as the new tile array.
-        if(compare_list(rendered_last,tile)) return;
+        if(compare_list(rendered_last,icon) && title === name && desc === description) return;
 
-        const { title, desc } = game.world.level.get(request.data.world.row,request.data.world.col).uiText();
         name = title;
         description = desc;
 
@@ -51,7 +50,7 @@
 
         ctx?.clearRect(0,0,canvas.width,canvas.height);
 
-        for(const imgData of tile) {
+        for(const imgData of icon) {
             //@ts-ignore
             const imgFrame = tilejson.frames[imgData];
             
@@ -61,11 +60,15 @@
             ctx?.drawImage(img,frame.x,frame.y,frame.w,frame.h,0,0,frame.w / 4, frame.h / 4);
         }
 
-        rendered_last = tile;
+        rendered_last = icon;
     }
     const render_actions = async (event: any) : Promise<void> => {
         const tile = game.world.level.get(event.data.world.row,event.data.world.col);
-
+        /**
+         * @todo optimize 
+         * @body optimize this function to prevent unneed re 
+         * 
+        */
         if(tile.unit !== null) {
             const unit = game.world.units.get(tile.unit);
             if(!unit || game.world.players.activePlayer !== unit.tribe) return;
@@ -90,6 +93,11 @@
             actions.push({ id: ActionEvent.SPAWN, data: { tile: tile.uuid, type: "WARRIOR" } });
 
             return;
+        }
+
+        if(tile?.top && ["GAME","FRUIT"].includes(tile.top.type)) {
+            //if(tile.owning_tribe !== game.world.players.activePlayer) return;
+            actions.push({ id: ActionEvent.GATHER, data: { tile: tile.uuid } });
         }
 
     }
@@ -192,7 +200,7 @@
             </div>
             <div>
                 <Button on:click={onClose} class="rounded-circle bg-light">
-                    <Icon id="action" class="text-dark" name="chevron-compact-down"/>
+                   <img src={ArrowDown} alt="close"/>
                 </Button>
             </div>
         </header>

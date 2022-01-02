@@ -1,6 +1,6 @@
 import InstancedObject from "./rendered/InstancedObject";
 import { Color } from "three";
-import {SystemEvents, UnitEvent, ObjectEvents} from '../events/systemEvents';
+import {SystemEvents, UnitEvent, ObjectEvents, ActionEvent} from '../events/systemEvents';
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
@@ -122,8 +122,8 @@ export default class UnitController implements SystemEventListener {
         unit.destory();
         this.world.units.delete(id);
     }
-    public async createUnit(tribe: Tribe, type: UnitType, position: Position){
-        const unit = Unit.createNew(this.engine,this.assets,this.world.players, { type, tribe, position });
+    public async createUnit(tribe: Tribe, type: UnitType, position: Position, orgin: UUID){
+        const unit = Unit.createNew(this.engine,this.assets,this.world.players, { type, tribe, position, orgin });
         this.world.units.set(unit.uuid,unit);
         const tile = this.world.level.get(position.row,position.col).setUnit(unit.uuid);
         await unit.render(tile.uuid);
@@ -147,6 +147,38 @@ export default class UnitController implements SystemEventListener {
             healRate = 4;
         }
         unit.heal(healRate);
+    }
+    public generateBootArea(center: Position, range: number, unit_uuid: UUID, bootID: ActionEvent) {
+        const self = this.world.units.get(unit_uuid);
+        if(!self) return;
+
+        // hide tiles
+        // remove past tile data
+
+        for(let i = -range; i <= range; i++) {
+            for(let j = -range; j <= range; j++) {
+                let row = center.row + i;
+                let col = center.col + j;
+                const data = this.world.level.isValid(row,col);
+
+                if(!data || (i === 0 && j === 0) || !data.unit ) continue;
+
+                const friend = this.world.units.get(data.unit);
+                if(!friend || (friend.tribe !== self.tribe) ) continue;
+
+                // generate mesh.
+
+                this.world.level.get(row,col).override = {
+                    type: SystemEvents.ACTION,
+                    id: bootID,
+                    data: {
+                        tile: this.world.level.get(row,col).uuid
+                    }
+                };
+
+            }
+        }
+
     }
     /**
      *
@@ -230,29 +262,29 @@ export default class UnitController implements SystemEventListener {
                 if(!data || (i === 0 && j === 0) || !data.unit ) continue;
 
                 const enemy = this.world.units.get(data.unit);
-                if(!enemy) continue;
+                if(!enemy || (enemy.tribe === self.tribe) ) continue;
 
-                if(enemy.tribe !== self.tribe) {
-                    this.mesh_attack.createInstance({
-                        index: 0,
-                        id: nanoid(10),
-                        owner: data.uuid,
-                        rotation: 0,
-                        shown: true,
-                        type: "tile",
-                        x: row,
-                        z: col,
-                        y: 0
-                    });
-                    this.world.level.get(row,col).override = {
-                        type: SystemEvents.UNIT,
-                        id: UnitEvent.ATTACK,
-                        data: {
-                            attacker: self.uuid,
-                            defender: enemy.uuid
-                        }
-                    };
-                }
+                
+                this.mesh_attack.createInstance({
+                    index: 0,
+                    id: nanoid(10),
+                    owner: data.uuid,
+                    rotation: 0,
+                    shown: true,
+                    type: "tile",
+                    x: row,
+                    z: col,
+                    y: 0
+                });
+                this.world.level.get(row,col).override = {
+                    type: SystemEvents.UNIT,
+                    id: UnitEvent.ATTACK,
+                    data: {
+                        attacker: self.uuid,
+                        defender: enemy.uuid
+                    }
+                };
+                
             }
         }
 

@@ -310,6 +310,13 @@ export class City extends Tile {
     public get key(): string {
         return `${this.type}_${this.id}`;
     }
+    public canSpawnUnit(): boolean {
+        if(!(this.current_units <= (this.city_level + 2))) return false;
+        
+        this.current_units++;
+
+        return true;
+    }
     public cityJsonConstructor(json: CityJson): this {
         this.capital = json.capital;
         this.current_units = json.current_units;

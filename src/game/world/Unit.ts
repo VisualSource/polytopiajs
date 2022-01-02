@@ -9,6 +9,7 @@ interface IUnit {
     type: UnitType;
     tribe: Tribe;
     position: Position;
+    orgin: UUID;
 }
 export interface UnitJson {
     position: Position;
@@ -43,6 +44,7 @@ export class Unit {
         }
     };
     public readonly uuid: UUID = nanoid(8);
+    public orgin: UUID;
     public position: Position;
     public tribe: Tribe;
     public type: UnitType;
@@ -67,6 +69,7 @@ export class Unit {
         this.position = data.position;
         this.type = data.type;
         this.tribe = data.tribe;
+        this.orgin = data.orgin;
 
         const {range,maxHealth,movement,skills,defence,attack} = Unit.UNIT_DATA[this.type];
         this.movement = movement;

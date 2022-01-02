@@ -12,8 +12,11 @@ import mergeImages from 'merge-images';
 const { Canvas, Image } = canvas;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const spritesheet_json_name = "tiles.json";
+const spritesheet_name = "tiles.webp";
 const width = 214;
 const height = 250;
+const MAX_WIDTH = 1926; /* 9 images pre row */
 
 const tempPath = join(__dirname,"../assets/images/temp");
 const rawPath = join(__dirname,"../assets/images/raw");
@@ -24,9 +27,7 @@ const timer = ms => new Promise( res => setTimeout(res, ms));
 const resize_imgs = async () => {
     try {
         console.log("Resize | Staring resize");
-
         const files = await readdir(rawPath);
-
         for(let i = 0; i < files.length; i++){
             await resizer(join(rawPath,files[i]),{ 
                 all: { 
@@ -40,7 +41,6 @@ const resize_imgs = async () => {
             });
             console.log("Resize |", `Name: ${files[i]}, File: ${i+1}/${files.length}`);
         }
-
         console.log("Resize | Finished");
     } catch (error) {
         console.error("Resize |", error.message);
@@ -50,7 +50,6 @@ const resize_imgs = async () => {
 const package_to_json = async () => {
     try{
         console.log("Generation | Start");
-
         const images_raw = await readdir(complied, {withFileTypes: true, encoding: "utf-8" });
         let images_json = {};
         let src_images = [];
@@ -69,29 +68,23 @@ const package_to_json = async () => {
                 }
             };
         }
-
-
         let curlX = 0;
         let curlY = 0;
         let heightHeight = 0;
         let i = 0;
         for(const key of Object.keys(images_json)) {
-            if(curlX + images_json[key].frame.w > 1926 /* 9 images pre row */) {
+            if(curlX + images_json[key].frame.w > MAX_WIDTH) {
                 curlX = 0;
                 curlY += heightHeight;
                 heightHeight = images_json[key].frame.h;
             }
-
             images_json[key].frame.x = curlX;
             images_json[key].frame.y = curlY;
             src_images[i].x = curlX;
             src_images[i].y = curlY;
-
             curlX += images_json[key].frame.w;
-
             i++;
         }
-
         const spritesheet_uri = await mergeImages(src_images,{
             Canvas,
             Image,
@@ -99,12 +92,11 @@ const package_to_json = async () => {
             height: curlY,
             width: curlX
         });
-
         const img_raw = spritesheet_uri.split(";base64,").pop();
         console.log("Generation | Writen Spritesheet.png");
         await writeFile(join(tempPath,"spritesheet.png"),img_raw,{encoding: "base64" });
-        console.log("Generation | Write tiles.json");
-        await writeFile(join(outputPath,"tiles.json"), JSON.stringify({ frames: images_json }));
+        console.log("Generation | Writing",spritesheet_json_name);
+        await writeFile(join(outputPath,spritesheet_json_name), JSON.stringify({ frames: images_json }));
         console.log("Generation | Finished");
     }catch(error) {
         console.error("Generation |",error.message);
@@ -112,10 +104,8 @@ const package_to_json = async () => {
 }
 
 const compress = async () => {
-
     try {
-        const cwebp = spawn("cwebp", [join(tempPath,"spritesheet.png"), "-o", join(outputPath,"tiles.webp")] );
-
+        const cwebp = spawn("cwebp", [join(tempPath,"spritesheet.png"), "-o", join(outputPath,spritesheet_name)] );
         await new Promise((ok,err)=>{
             cwebp.stdout.on("data",(data)=>{
                 console.log("Compress |",data.toString());
@@ -135,9 +125,7 @@ const compress = async () => {
     } catch (error) {
         console.error("Compress |", error.message);
     }
-    
 }
-
 const clean_up = async () => {
     console.log("Clean up | Starting");
     try {
@@ -150,7 +138,6 @@ const clean_up = async () => {
             }
         }
         const tempFiles = await readdir(tempPath);
-
         for(const temp of tempFiles) {
             try {
                 await unlink(join(tempPath,temp));
@@ -161,10 +148,8 @@ const clean_up = async () => {
     } catch (error) {
         console.error("Clean up", error.message);
     }
-
     console.log("Clean up | Done");
 }
-
 async function main(){
     await resize_imgs();
     await timer(500);

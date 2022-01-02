@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
 import { Tile, BuildTile, City } from "./Tile";
-import { ObjectEvents, SystemEvents, UnitEvent, ActionEvent } from "../events/systemEvents";
+import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
 import { capitalize } from '../../utils/strings';
 import { RenderOrder } from "../core/renderOrder";
 import type { TileJson, CityJson } from './Tile';
@@ -9,7 +9,7 @@ import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type { WorldTile } from "./generator/WorldGenerator";
 import type { SystemEventListener } from "../core/EventEmitter";
-import type {Position, TileBase, Tribe, UUID} from '../core/types';
+import type {Position, Tech, TileBase, Tribe, UUID} from '../core/types';
 import type World from "./World";
 import type InstancedObject from "./rendered/InstancedObject";
 import type CityTile from "./rendered/CityTile";
@@ -30,6 +30,12 @@ export interface TileControllerJson {
     base: TileJson | CityJson;
     road: boolean;
     owning_tribe: Tribe | null;
+}
+
+const REQUIRED_TECH: { [key: string]: Tech } = {
+    "GAME": "hunting",
+    "FRUIT": "organization",
+    "FISH": "fishing"
 }
 /**
  * @listens INTERACTION
@@ -174,51 +180,16 @@ export default class TileController implements SystemEventListener {
                     break;
             }
         });
-        this.events.on(SystemEvents.ACTION,(event)=>{
-            if(event.data.tile !== this.uuid) return;
-            switch (event.id) {
-                case ActionEvent.SPAWN:
-                    this.world.unit_controller.createUnit(this.owning_tribe as Tribe, event.data.type, this.position);
-                    break;
-                case ActionEvent.CREATE: 
-                    break;
-                case ActionEvent.DESTORY:
-                    this.removeBuilding();
-                    break;
-                case ActionEvent.DISBAND: 
-                    if(this.unit) this.world.unit_controller.destoryUnit(this.unit);
-                    break;
-                case ActionEvent.GATHER:
-                    this.removeBuilding();
-                    break;
-                case ActionEvent.HEAL: 
-                    break;
-                case ActionEvent.RECOVER:
-                     
-                    break;
-                default:
-                    break;
-            }
-        });
-       // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT },this.selectionHandle);
-       // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.resetHandle);
-       // this.events.onId<SystemEvents,ObjectEvents>({ name: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION }, this.deselectionHandle);
     }
-    public get getPreivew(): string[] {
-        if(this.unit && this.selected === Selected.UNIT) {
-            const id = this.world.units.get(this.unit)?.model_id;
-            if(id) return [id];
-            return []
-        }
-        const data = [this.base.getType(this.tribe)];
-        if(this.top) data.push(this.top.getType(this.tribe));
-        return data;
-    }
-    public uiText() {
+    public ui() {
+        const icon: string[] = [];
         const title = (): string => {
             if(this.unit && this.selected === Selected.UNIT) {
                 const unit = this.world.units.get(this.unit);
                 if(!unit) return "Undefined";
+
+                icon.push(unit.model_id);
+
                 return `${capitalize(unit.tribe)} ${capitalize(unit.type)}`;
             }
             if(this.top && ["RUIN","VILLAGE"].includes(this.top.type)) return capitalize(this.top.type);
@@ -226,14 +197,26 @@ export default class TileController implements SystemEventListener {
             return `${capitalize(this.base.type)}${this.top ? `, ${this.top.type.toLowerCase()}` : ""}${this.road ? ", roads" : ""} `;
         }
         const description = (): string => {
+            icon.push(this.base.getType(this.tribe));
             if((this.base as City)?.isCity) return this.world.players.activePlayer === this.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
-
+            if(this.top) {
+                icon.push(this.top.getType(this.tribe));
+                if(this.top.type === "RUIN") return "Move a unit here and examine these ancient ruins.";
+                if(this.top.type === "VILLAGE") return "Move a unit here to capture this city!";
+                if(["GAME","FRUIT","FISH"].includes(this.top.type)) {
+                    const tech_need = REQUIRED_TECH[this.top.type];
+                    if(this.owning_tribe !== this.world.players.activePlayer) return "This resource is outside of your empire";
+                    return this.world.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
+                }
+            }
+            if(this.base.type === "MOUNTAIN" && !this.world.players.activePlayerHas("climbing")) return "You need to research Climbing to be able to move here.";
             return "";
         }
 
         return {
             title: title(),
-            desc: description()
+            desc: description(),
+            icon
         }
     }    
     public terrainBouns(): number {
@@ -351,14 +334,14 @@ export default class TileController implements SystemEventListener {
         this.deselectionHandle();
         this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { tile_deselection: true } });
     }
-    public selectionEvent(type: "unit" | "tile"){
+    public selectionEvent(type: "unit" | "tile"): void {
         this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.SELECTION, data: {
             world: this.position,
             type
         }});
     }
-    private addBuilding(){}
-    private removeBuilding(){
+    public addBuilding(): void {}
+    public removeBuilding(): void {
         if(!this.top) return;
         try {
             const top_type = this.top.getType(this.tribe);
