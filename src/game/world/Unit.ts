@@ -11,6 +11,10 @@ interface IUnit {
     position: Position;
     orgin: UUID;
 }
+
+export enum UnitNames {
+    WARRIOR = "WARRIOR"
+}
 export interface UnitJson {
     position: Position;
     tribe: Tribe,

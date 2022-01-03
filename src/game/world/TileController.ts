@@ -32,11 +32,6 @@ export interface TileControllerJson {
     owning_tribe: Tribe | null;
 }
 
-const REQUIRED_TECH: { [key: string]: Tech } = {
-    "GAME": "hunting",
-    "FRUIT": "organization",
-    "FISH": "fishing"
-}
 /**
  * @listens INTERACTION
  * @emits UNIT 
@@ -84,7 +79,7 @@ export default class TileController implements SystemEventListener {
      * @type {Selected}
      * @memberof TileController
      */
-    private selected: Selected = Selected.TILE; 
+    public selected: Selected = Selected.TILE; 
     /**
      * Whether the tile is selected or not
      *
@@ -180,45 +175,13 @@ export default class TileController implements SystemEventListener {
                     break;
             }
         });
+    }  
+    public getTopModalName(): string | undefined {
+        return this.top?.getType(this.tribe);
     }
-    public ui() {
-        const icon: string[] = [];
-        const title = (): string => {
-            if(this.unit && this.selected === Selected.UNIT) {
-                const unit = this.world.units.get(this.unit);
-                if(!unit) return "Undefined";
-
-                icon.push(unit.model_id);
-
-                return `${capitalize(unit.tribe)} ${capitalize(unit.type)}`;
-            }
-            if(this.top && ["RUIN","VILLAGE"].includes(this.top.type)) return capitalize(this.top.type);
-            if((this.base as City)?.isCity) return (this.base as City).uiName;
-            return `${capitalize(this.base.type)}${this.top ? `, ${this.top.type.toLowerCase()}` : ""}${this.road ? ", roads" : ""} `;
-        }
-        const description = (): string => {
-            icon.push(this.base.getType(this.tribe));
-            if((this.base as City)?.isCity) return this.world.players.activePlayer === this.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
-            if(this.top) {
-                icon.push(this.top.getType(this.tribe));
-                if(this.top.type === "RUIN") return "Move a unit here and examine these ancient ruins.";
-                if(this.top.type === "VILLAGE") return "Move a unit here to capture this city!";
-                if(["GAME","FRUIT","FISH"].includes(this.top.type)) {
-                    const tech_need = REQUIRED_TECH[this.top.type];
-                    if(this.owning_tribe !== this.world.players.activePlayer) return "This resource is outside of your empire";
-                    return this.world.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
-                }
-            }
-            if(this.base.type === "MOUNTAIN" && !this.world.players.activePlayerHas("climbing")) return "You need to research Climbing to be able to move here.";
-            return "";
-        }
-
-        return {
-            title: title(),
-            desc: description(),
-            icon
-        }
-    }    
+    public getBaseModalName(): string {
+        return this.base.getType(this.tribe);
+    }
     public terrainBouns(): number {
         switch (this.base.type) {
             case "LAND":
@@ -398,7 +361,7 @@ export default class TileController implements SystemEventListener {
             }
 
             // Generate base level asset
-            const base_type = this.base.getType(this.tribe);
+            const base_type = this.getBaseModalName();
             let obj = this.engine.scene.getObject<InstancedObject>(base_type);
             if(!obj) {
                 const {asset,type,item} = this.base.manifest(this.tribe);
@@ -421,7 +384,8 @@ export default class TileController implements SystemEventListener {
 
             // Genearte top level assets
             if(this.top){
-                const top_type = this.top.getType(this.tribe);
+                const top_type = this.getTopModalName();
+                if(!top_type) throw new Error("Failed to get top modal name.");
                 let obj = this.engine.scene.getObject<InstancedObject>(top_type);
                 if(!obj){
                     const {asset,item,type} = this.top.manifest(this.tribe);

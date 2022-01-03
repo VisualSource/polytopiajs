@@ -13,6 +13,7 @@ export default class PlayerController {
     constructor(){}
     set activePlayer(value: Tribe){
         this._active_player = value;
+        // should throw a event here if need
     }
     get activePlayer(): Tribe {
         return this._active_player;

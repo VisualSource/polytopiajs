@@ -6,6 +6,7 @@ import PlayerController from '../managers/PlayerController';
 import {init} from './debug';
 import { SystemEvents } from '../events/systemEvents';
 import ActionsManager from '../managers/ActionsManager';
+import UI from './UI';
 
 import type { SystemEventListener } from './EventEmitter';
 
@@ -15,6 +16,7 @@ export default class Game implements SystemEventListener {
     public assets: AssetLoader;
     public engine: Engine;
     public world: World;
+    public ui: UI;
     private players: PlayerController;
     private actions: ActionsManager;
     
@@ -23,9 +25,6 @@ export default class Game implements SystemEventListener {
         Game.INSTANCE = this;
 
         if(import.meta.env.DEV) init(this);
-
-        //@ts-ignore
-        window.POLYTOPIA_GAME = this;
     }
 
     public async init(){
@@ -49,6 +48,7 @@ export default class Game implements SystemEventListener {
         console.info("Init Engine | Starting threejs env",canvas);
         this.players = PlayerController.init(["bardur","imperius"]);
         this.world = new World(this.engine,this.assets,this.players);
+        this.ui = new UI(this.world);
         this.actions = new ActionsManager(this.world);
         return true;
     }
