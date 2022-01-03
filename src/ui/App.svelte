@@ -1,22 +1,11 @@
 <script lang="ts">
-    import GameView from './components/GameView.svelte';
+    import Router from 'svelte-spa-router';
+    import routes from './routes';
+</script>
 
-    import {onMount} from 'svelte';
-
-
-    let count: number = 0;
-    onMount(() => {
-      const interval = setInterval(() => count++, 1000);
-      return () => {
-        clearInterval(interval);
-      };
-    });
-  </script>
-
-  <div class="App">
-    <GameView/>
-  </div>
-
+<div class="App">
+  <Router {routes} />
+</div>
 
 <style lang="sass">
   .App

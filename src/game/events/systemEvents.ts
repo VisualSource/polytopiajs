@@ -6,7 +6,8 @@ export enum SystemEvents {
     INTERACTION = "INTERACTION",
     UNIT = "UNIT",
     SOUND = "SOUND",
-    ACTION = "ACTION"
+    ACTION = "ACTION",
+    UI = "UI"
 };
 
 export enum SoundEvent {
@@ -41,6 +42,14 @@ export enum AssetLoaderEvents {
     CHECKING_FOR_UPDATE,
     ASSETS_INIT_START,
     ASSETS_INIT_END
+}
+
+export enum UIEvent {
+    SCORE_CHANGE,
+    STARS_CHANGE,
+    STAR_GAIN_CHANGE,
+    TURN_CHANGE,
+    ALL
 }
 
 export enum ActionEvent {

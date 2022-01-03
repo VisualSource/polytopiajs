@@ -1,7 +1,6 @@
 <script lang="ts">
     import { fade, fly } from 'svelte/transition';
     import { Button } from 'sveltestrap';
-    import ArrowDown from 'bootstrap-icons/icons/chevron-down.svg';
     import TileUI from '../../controllers/TileUI';
 
     const { show, name, description, onClose, canvas, actions, onAction } = new TileUI();
@@ -22,6 +21,7 @@
         width: 25%
         border-top-left-radius: 6px 
         border-top-right-radius: 6px
+        z-index: variables.$z_tiles
         > main 
             @include variables.flex-row-center()
             height: 80px
@@ -80,7 +80,9 @@
             </div>
             <div>
                 <Button on:click={onClose} class="rounded-circle bg-light">
-                   <img src={ArrowDown} alt="close"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/>
+                        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/>
+                    </svg>
                 </Button>
             </div>
         </header>
