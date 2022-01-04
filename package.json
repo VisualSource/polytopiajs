@@ -53,7 +53,7 @@
     "random": "^3.0.6",
     "svelte": "^3.44.3",
     "svelte-spa-router": "^3.2.0",
-    "sveltestrap": "^5.6.3",
+    "sveltestrap": "^5.7.0",
     "three": "^0.135.0",
     "three-instanced-uniforms-mesh": "^0.44.0",
     "three-nebula": "^10.0.3",
