@@ -1,5 +1,7 @@
 $z_loading: 10
 $z_menu: 8
+$z_techtree: 4
+$z_scores: 5
 $z_tiles: 2
 $z_base: 1
     
@@ -18,11 +20,11 @@ $z_base: 1
     justify-content: center
     align-content: center 
     align-items: center
-@mixin overlay-menu() 
+@mixin overlay-menu($z) 
     position: absolute
     left: 0
     top: 0 
     height: 100%
     width: 100%
-    z-index: $z_menu
+    z-index: $z
      

@@ -16,7 +16,7 @@
         left: 0
         margin: 0 auto
         user-select: none
-        z-index: variables.$z_base
+        z-index: variables.$z_scores
         width: max-content
         > div 
             @include variables.flex-column-center()

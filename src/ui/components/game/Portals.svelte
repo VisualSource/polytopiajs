@@ -1,7 +1,7 @@
 <style lang="sass">
     @use "../../_variables"
     #portals 
-       @include variables.overlay-menu()
+       @include variables.overlay-menu(variables.$z_menu)
        background: url("/background/portals_dt.jpg") var(--bs-dark) no-repeat
        background-size: cover
        > div.container-md

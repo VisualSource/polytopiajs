@@ -57,6 +57,7 @@ export default class Player {
     public score: number = 0;
     public stars: number = 4;
     public star_gain: number = 2;
+    public citys: number = 2;
     constructor(public tribe: Tribe, public uuid: UUID | null){
         switch (tribe) {
             case "bardur":

@@ -15,7 +15,7 @@ export default class PlayerController {
     private _turn: number = 0;
     private events: EventEmitter = new EventEmitter();
     constructor(){}
-    private getActivePlayer(): Player {
+    public getActivePlayer(): Player {
         const p = this.players.get(this.activePlayer);
         if(!p) throw new Error("");
         return p;

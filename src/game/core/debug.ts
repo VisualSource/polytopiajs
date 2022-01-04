@@ -34,6 +34,7 @@ export function init(game: Game){
     }
    
     const gui = new GUI({ title: "Controls"  });
+    gui.domElement.style.zIndex = "2";
     
     gui.add(actions,"Reset Units");
     gui.add(actions,"Reload Assets");
