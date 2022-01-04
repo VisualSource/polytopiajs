@@ -57,7 +57,7 @@
     "three": "^0.135.0",
     "three-instanced-uniforms-mesh": "^0.44.0",
     "three-nebula": "^10.0.3",
-    "troika-three-text": "^0.44.0",
+    "troika-three-text": "^0.45.0",
     "workbox-cacheable-response": "^6.4.2",
     "workbox-core": "^6.4.2",
     "workbox-expiration": "^6.4.2",
