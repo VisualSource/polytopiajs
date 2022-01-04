@@ -55,7 +55,7 @@
     "svelte-spa-router": "^3.2.0",
     "sveltestrap": "^5.7.0",
     "three": "^0.135.0",
-    "three-instanced-uniforms-mesh": "^0.44.0",
+    "three-instanced-uniforms-mesh": "^0.45.0",
     "three-nebula": "^10.0.3",
     "troika-three-text": "^0.45.0",
     "workbox-cacheable-response": "^6.4.2",
