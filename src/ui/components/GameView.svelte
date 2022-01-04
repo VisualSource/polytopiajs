@@ -7,7 +7,7 @@
     import UserStats from './game/UserStats.svelte';
     import Controls from './game/Controls.svelte';
     import Settings from './game/Settings.svelte';
-    import TechTree from './game/TechTree.svelte';
+    import TechTree from './game/techtree/TechTree.svelte';
     import GlobalStats from './game/GlobalStats.svelte';
     import Portals from './game/Portals.svelte';
 
