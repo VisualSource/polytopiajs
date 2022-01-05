@@ -1,7 +1,7 @@
 import Player from "./Player";
 import type { Tech, Tribe } from "../core/types";
 import EventEmitter from "../core/EventEmitter";
-import { SystemEvents, UIEvent } from "../events/systemEvents";
+import { GameEvent, SystemEvents, UIEvent } from "../events/systemEvents";
 
 export default class PlayerController {
     static loadFromJson(): PlayerController {
@@ -10,14 +10,16 @@ export default class PlayerController {
     static init(tribes: Tribe[]): PlayerController {
         return new PlayerController().defaultConstructor(tribes);
     }
+    public tribes: Tribe[] = [];
     public players: Map<Tribe,Player> = new Map();
     private _active_player: Tribe = "imperius";
     private _turn: number = 0;
+    private activeIndex = 0;
     private events: EventEmitter = new EventEmitter();
     constructor(){}
     public getActivePlayer(): Player {
         const p = this.players.get(this.activePlayer);
-        if(!p) throw new Error("");
+        if(!p) throw new Error("Filed to get active player data");
         return p;
     }
     get activePlayerStarGain(): number {
@@ -44,6 +46,10 @@ export default class PlayerController {
         p.score += value;
         this.events.emit<SystemEvents, UIEvent>({ type: SystemEvents.UI, id: UIEvent.SCORE_CHANGE, data: { score: p.score } });
     }
+    set activePlayerCitys(value: number){
+        const p = this.getActivePlayer();
+        p.citys = value;
+    }
     public updateTurn(): void {
         this._turn++;
         this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.TURN_CHANGE, data: {turn: this._turn } });
@@ -65,6 +71,7 @@ export default class PlayerController {
         return this;
     }
     public defaultConstructor(tribes: Tribe[]): this {
+        this.tribes = tribes;
         for(const tribe of tribes){
             this.players.set(tribe,new Player(tribe,null));
         }
@@ -78,6 +85,13 @@ export default class PlayerController {
         const player = this.players.get(tribe);
         if(!player) return false;
         return (player.tech as any)[tech] ?? false;
+    }
+    public changeTurn(){
+        this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: {} });
+        this.activeIndex++;
+        if(this.activeIndex > this.players.size) this.activeIndex = 0;
+        this.activePlayer = this.tribes[this.activeIndex];
+
     }
     public toJson(){
         let players: any[] = [];

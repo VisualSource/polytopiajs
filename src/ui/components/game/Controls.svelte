@@ -1,7 +1,7 @@
 <script lang="ts">
     import ControlsUI from '../../controllers/ControlsUI';
     import {replace} from 'svelte-spa-router';
-    const { turnText, turnColor } = new ControlsUI();
+    const { turnText, turnColor, nextTurn } = new ControlsUI();
 </script>
 
 <style lang="sass">
@@ -80,7 +80,7 @@
         <span>Portal</span>
     </div>
     <div class="ctrl-btn">
-        <div role="button" class={"rounded-circle border border-2 btn-size " + $turnColor}>
+        <div role="button" class={"rounded-circle border border-2 btn-size " + $turnColor} on:click={nextTurn}>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
                 <path d="M0 0h24v24H0V0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
             </svg>

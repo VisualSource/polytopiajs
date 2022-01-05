@@ -91,13 +91,20 @@ export default class UI {
         if((this.ctr.base as City)?.isCity) return this.world.players.activePlayer === this.ctr.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
 
         if(this.ctr.top) {
-           
-            if(this.ctr.top.type === "RUIN") return "Move a unit here and examine these ancient ruins.";
-            if(this.ctr.top.type === "VILLAGE") return "Move a unit here to capture this city!";
-            if(["GAME","FRUIT","FISH"].includes(this.ctr.top.type)) {
-                const tech_need = REQUIRED_TECH[this.ctr.top.type];
-                if(this.ctr.owning_tribe !== this.world.players.activePlayer) return "This resource is outside of your empire";
-                return this.world.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
+            switch (this.ctr.top.type) {
+                case "RUIN":
+                    return "Move a unit here and examine these ancient ruins.";
+                case "VILLAGE":
+                    return "Move a unit here to capture this city!";
+                case "GAME":
+                case "FRUIT":
+                case "FISH": {
+                    const tech_need = REQUIRED_TECH[this.ctr.top.type];
+                    if(this.ctr.owning_tribe !== this.world.players.activePlayer) return "This resource is outside of your empire";
+                    return this.world.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
+                }
+                default:
+                    break;
             }
         }
 

@@ -17,7 +17,7 @@ export function init(game: Game){
                 window.location.reload();
             });
         },
-        "Active Player": "imperius"
+        "Active Player": "bardur"
     }
     const client_info: { [key: string]: any } = {
         "Game Build": import.meta.env.PACKAGE_VERSION,

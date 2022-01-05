@@ -7,8 +7,13 @@ export enum SystemEvents {
     UNIT = "UNIT",
     SOUND = "SOUND",
     ACTION = "ACTION",
-    UI = "UI"
+    UI = "UI",
+    GAME_EVENT = "GAME_EVENT"
 };
+
+export enum GameEvent {
+    TURN_CHANGE
+}
 
 export enum SoundEvent {
     PLAY,
