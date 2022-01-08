@@ -80,11 +80,9 @@ export default class WorldGenerator {
                 }
             }
         }
-        console.log(capital_cells);
         for(let i = 0; i < capital_cells.length; i++) { 
             const row = (capital_cells[i] / worldsize | 0);
             const col = (capital_cells[i] % worldsize);
-            console.log(row,col,tribes[i]);
             map.set(row,col,{
                 base: "CITY",
                 buldings: [],

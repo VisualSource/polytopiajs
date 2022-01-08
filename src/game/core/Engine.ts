@@ -205,6 +205,12 @@ export default class Engine implements SystemEventListener {
         this.hoverUpdate();
     }
     public moveCameraTo(row: number, col: number) {
-        this.controls.moveTo(row * 4, 0, col * 4, true);
+        const pos = { row: row * 4, col: col * 4 };
+        const out = new Vector3();
+        this.controls.getPosition(out);
+
+        console.log(out,pos);
+
+        this.controls.truck(out.x - pos.row,out.z - pos.col);
     }
 }

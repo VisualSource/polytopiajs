@@ -393,10 +393,14 @@ export class City extends Tile {
         tile.clean();
 
         this.city_level++;
-
         this.level_data.generateLevel();
 
         await this.render(assets,engine,tribe,owner);
+
+        /**
+         * @todo Change player stats
+         * @body when leveling up increase stars and upgrade menu
+         */
 
     }
     
