@@ -3,10 +3,11 @@ import random from "random";
 import { capitalize } from "../../utils/strings";
 
 import type { Manifest } from "../loaders/AssetLoader";
-import type {TileBase, Tribe, UUID} from '../core/types';
+import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type AssetLoader from "../loaders/AssetLoader";
 import type Engine from "../core/Engine";
 import type CityTile from "./rendered/CityTile";
+import type World from "./World";
 interface ITile {
     getType: (tribe: Tribe) => string;
     manifest: (tribe: Tribe) => Manifest;
@@ -300,9 +301,38 @@ export class City extends Tile {
     public city_level: number = 1;
     public level_data: CityLevelData;
     public city_name: string = "";
+    public population: number = 0;
     constructor(){
         super();
         this.level_data = new CityLevelData(this);
+    }
+    public async add_population(value: number, { assets, engine, tribe, owner  }: {assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID }): Promise<void> {
+        this.population += value;
+        if(this.population >= this.max_population) {
+            this.population = Math.abs(this.population - this.max_population);
+            await this.levelUpCity(assets,engine,tribe,owner);
+        }
+    }
+    public claimLand(world: World, id: UUID, tribe: Tribe, range: number = 1): void {
+        const center = world.lookup.get(id);
+    
+        if(!center) return;
+
+        for(let i = -range; i <= range; i++) {
+            for(let j = -range; j <= range; j++) {
+                let row = center.row + i;
+                let col = center.col + j;
+                const data = world.level.isValid(row,col);
+
+                if(!data || (i === 0 && j === 0) || data.owning_city) continue;
+                
+                data.owning_tribe = tribe;
+                data.owning_city = id;
+            }
+        }
+    }
+    public get max_population(): number {
+        return this.city_level + 1;
     }
     public get uiName(): string {
         return `The city of ${this.city_name} lvl ${this.city_level}`;
@@ -328,7 +358,6 @@ export class City extends Tile {
         return this;
     }
     public cityDefaultConstructor(data: { capital: boolean, tribe: Tribe }): this {
-        console.log(data);
         this.capital = data.capital;
         this.level_data.init();
 

@@ -58,6 +58,7 @@ export default class Player {
     public stars: number = 4;
     public star_gain: number = 2;
     public citys: number = 2;
+    public capital_uuid: UUID;
     constructor(public tribe: Tribe, public uuid: UUID | null){
         switch (tribe) {
             case "bardur":
@@ -84,6 +85,11 @@ export default class Player {
     }
     public toJSON(){
         return {
+            capital_uuid: this.capital_uuid,
+            score: this.score,
+            citys: this.citys,
+            star_gain: this.star_gain,
+            stars: this.stars,
             tribe: this.tribe,
             uuid: this.uuid,
             tech: this.tech

@@ -9,7 +9,7 @@ export default class ControlsUI {
 
     }
     public nextTurn = () => {
-        this.game.world.players.changeTurn();
+        this.game.players.changeTurn();
     }
     public setActions(){
         this.turnText.set("End Turn");

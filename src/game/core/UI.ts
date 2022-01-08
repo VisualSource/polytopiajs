@@ -65,7 +65,7 @@ export default class UI {
 
         let actions = [];
         
-        if(this.ctr?.top && ["GAME","FRUIT"].includes(this.ctr.top.type) ){
+        if(this.ctr?.top && ["GAME","FRUIT"].includes(this.ctr.top.type) && this.ctr.owning_city){
             actions.push({ id: ActionEvent.GATHER, data: { tile: this.ctr.uuid } });
         }
 
@@ -100,11 +100,11 @@ export default class UI {
                 case "FRUIT":
                 case "FISH": {
                     const tech_need = REQUIRED_TECH[this.ctr.top.type];
-                    if(this.ctr.owning_tribe !== this.world.players.activePlayer) return "This resource is outside of your empire";
+                    if(!this.ctr.owning_city) return "This resource is outside of your empire";
                     return this.world.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
                 }
                 default:
-                    break;
+                    break;  
             }
         }
 

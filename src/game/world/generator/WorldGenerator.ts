@@ -39,6 +39,8 @@ export default class WorldGenerator {
                 });
             }
         }
+
+        // CAPITAL GENEARTION
  
         let capital_cells: any[] = [];
         let capital_map: { [cell: number]: number } = {};
@@ -78,9 +80,11 @@ export default class WorldGenerator {
                 }
             }
         }
+        console.log(capital_cells);
         for(let i = 0; i < capital_cells.length; i++) { 
             const row = (capital_cells[i] / worldsize | 0);
             const col = (capital_cells[i] % worldsize);
+            console.log(row,col,tribes[i]);
             map.set(row,col,{
                 base: "CITY",
                 buldings: [],
@@ -93,11 +97,8 @@ export default class WorldGenerator {
             });
         }
         
-        //
-        //
         // Capital Generation setup END
-        //
-        //
+      
         let done_tiles: any[] = [];
         let active_tiles: any[] = [];  // done tiles that generate terrain around them
 
@@ -133,18 +134,20 @@ export default class WorldGenerator {
     
            // generate forest, mountains, and extra water according to terrain underneath
         for(let cell = 0; cell < worldsize**2; cell++) {
-            if(map.get((cell / worldsize | 0),cell % worldsize)) {
+            const tile = map.get((cell / worldsize | 0),cell % worldsize);
+            // OG: map[cell]['type'] === 'ground' && map[cell]['above'] === null
+            // Did not check if base was Land or not
+            if(tile && tile.base === "LAND") { // 
                 const row = (cell / worldsize | 0);
                 const col = cell % worldsize;
-                let tribe = map.get(row,col).tribe;
                 let rand = random.float(0,1);
-                if(rand < (terrain_props.forest.default * (terrain_props.forest as any)[tribe])){
+                if(rand < (terrain_props.forest.default * (terrain_props.forest as any)[tile.tribe])){
                     map.get(row,col).base = "FOREST";
-                } else if (rand > (1 - terrain_props.mountain.default *  (terrain_props.mountain as any)[tribe])) {
+                } else if (rand > (1 - terrain_props.mountain.default *  (terrain_props.mountain as any)[tile.tribe])) {
                     map.get(row,col).base = "MOUNTAIN";
                 }
                 rand = random.float(0,1);
-                if(rand < (terrain_props.water as any)[tribe]){
+                if(rand < (terrain_props.water as any)[tile.tribe]){
                     map.get(row,col).base = "OCEAN";
                 }
             }

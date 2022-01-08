@@ -17,7 +17,7 @@
                 width: 5px
 </style>
 
-<div id="turn-change" in:fade="{{duration: 200}}" out:fade="{{duration: 200}}">
+<div id="turn-change" in:fade="{{duration: 10}}" out:fade="{{duration: 10}}">
     <div class="container-md">
         <h3>-Next up-</h3>
         <h3>NAME</h3>

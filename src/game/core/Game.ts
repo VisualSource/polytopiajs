@@ -7,24 +7,29 @@ import {init} from './debug';
 import { SystemEvents } from '../events/systemEvents';
 import ActionsManager from '../managers/ActionsManager';
 import UI from './UI';
+import Settings from './Settings';
 
 import type { SystemEventListener } from './EventEmitter';
+import type { Tribe } from './types';
 
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
     public events: EventEmitter = new EventEmitter();
+    public settings: Settings = new Settings();
     public assets: AssetLoader;
     public engine: Engine;
     public world: World;
     public ui: UI;
-    private players: PlayerController;
+    public players: PlayerController;
     private actions: ActionsManager;
     
     constructor() {
         if(Game.INSTANCE) return Game.INSTANCE;
         Game.INSTANCE = this;
 
-        if(import.meta.env.DEV) init(this);
+        this.settings.load();
+
+        if(import.meta.env.DEV) init(this);;
     }
 
     public async init(){
@@ -43,13 +48,17 @@ export default class Game implements SystemEventListener {
         return this;
     }
     public async initEngine(canvas: HTMLCanvasElement): Promise<boolean> {
+        const tribes: Tribe[] = ["bardur","imperius"]; // THIS IS A TEMP VALUE.
         this.engine = new Engine(canvas);
-        this.engine.init();
-        console.info("Init Engine | Starting threejs env",canvas);
-        this.players = PlayerController.init(["bardur","imperius"]);
-        this.world = new World(this.engine,this.assets,this.players);
-        this.ui = new UI(this.world);
-        this.actions = new ActionsManager(this.world);
+        this.engine.init(); // START THREEJS, Controls, load assets, etc
+        console.info("Init Engine | Starting threejs BUILD", import.meta.env.PACKAGE_VERSION);
+
+        this.players = PlayerController.init(tribes); // Set the current players of the game
+        this.world = new World(this.engine,this.assets,this.players); // init world
+        const { capitals } = await this.world.createWorld(tribes,11); // generate world
+        this.players.setCapitals(capitals); // set the uuid of capitals to players 
+        this.ui = new UI(this.world); // init ui stats funcs
+        this.actions = new ActionsManager(this.world,this.players, this.settings); // init game events handler
         return true;
     }
     public async destory(){

@@ -2,6 +2,7 @@
     import Router, { replace } from 'svelte-spa-router';
     import {onMount, onDestroy} from 'svelte';
     import Game from '../../game/core/Game';
+    import { timer } from '../../utils/time';
 
     import TileInteraction from './game/TileInteraction.svelte';
     import UserStats from './game/UserStats.svelte';
@@ -11,11 +12,9 @@
     import GlobalStats from './game/GlobalStats.svelte';
     import Portals from './game/Portals.svelte';
     import TurnChange from './game/TurnChange.svelte';
-    import { GameEvent, SystemEvents } from '../../game/events/systemEvents';
     import GameLoading from './game/GameLoading.svelte';
 
     let canvas: HTMLCanvasElement;
-    const timer = (ms: number) => new Promise( res => setTimeout(res, ms));
     const routes = { 
         "/settings": Settings,
         "/tech-tree": TechTree,
@@ -28,10 +27,7 @@
     onMount(()=>{
         replace("/loading");
         Game.INSTANCE?.init().then(self=>{
-            self.initEngine(canvas).then(()=>timer(10000)).then(()=>replace("/change"));
-            self.events.on(SystemEvents.GAME_EVENT,(event)=>{
-                if(event.id === GameEvent.TURN_CHANGE) replace("/change");
-            });
+            self.initEngine(canvas).then(()=>timer(10000)).then(()=>replace(self.settings.confirm_turn ? "/change" : "/"))
         });
     });
     onDestroy(()=>Game.INSTANCE?.destory());

@@ -43,116 +43,27 @@ export interface TileControllerJson {
 export default class TileController implements SystemEventListener {
     /**
      * @constructor
-     *
-     * @static
-     * @param {Engine} engine
-     * @param {AssetLoader} assets
-     * @param {World} world
-     * @param {TileControllerJson} json
-     * @return {TileController}  {TileController}
-     * @memberof TileController
      */
     static createFromJson(engine: Engine, assets: AssetLoader, world: World, json: TileControllerJson): TileController {
         return new TileController(engine,assets,world).initFromJson(json);
     }
     /**
-     * @constructor
-     *
-     * @static
-     * @param {Engine} engine
-     * @param {AssetLoader} assets
-     * @param {World} world
-     * @param {WorldTile} tile_data
-     * @return {TileController}  {TileController}
-     * @memberof TileController
+     *@constructor
      */
     static createNew(engine: Engine, assets: AssetLoader, world: World, tile_data: WorldTile): TileController {
         return new TileController(engine,assets,world).init(tile_data);
     }
-    /**
-     * keeps track of want the current selected thing is on this tile.
-     * Unit => 0
-     * Tile => 1
-     * Deselection => 2
-     *
-     * @private
-     * @type {Selected}
-     * @memberof TileController
-     */
     public selected: Selected = Selected.TILE; 
-    /**
-     * Whether the tile is selected or not
-     *
-     * @private
-     * @type {boolean}
-     * @memberof TileController
-     */
-    private isSelected: boolean = false;
-    /**
-     * Static id of the tile
-     *
-     * @type {UUID}
-     * @memberof TileController
-     */
     public readonly uuid: UUID = nanoid();
-    /**
-     * if the tile has a road placed on this tile
-     *
-     * @type {boolean}
-     * @memberof TileController
-     */
     public road: boolean = false;
-    /**
-     * the extra stuff on top of a tile 
-     * Example metal in a mountian or fruit
-     *
-     * @type {(BuildTile | null)}
-     * @memberof TileController
-     */
     public top: BuildTile | null = null;
-    /**
-     * The base props of this tile
-     *
-     * @type {Tile}
-     * @memberof TileController
-     */
     public base: Tile | City;
-    /**
-     * A UUID ref to a unit
-     *
-     * @type {(UUID | null)}
-     * @memberof TileController
-     */
     public unit: UUID | null = null;
     public events: EventEmitter = new EventEmitter();
     public position: Position;
-    /**
-     * The tribe that this tile should be rendered as 
-     *
-     * @private
-     * @type {Tribe}
-     * @memberof TileController
-     */
-    private tribe: Tribe;
-    /**
-     * The tribe that this tile is owned by
-     *
-     * @type {(Tribe | null)}
-     * @memberof TileController
-     */
     public owning_tribe: Tribe | null = null;
-    /**
-     * A event that overrides the default selection events in the `selectionHandle` function.
-     *
-     * @type {({
-     *         type: string;
-     *         id: number;
-     *         data: {
-     *             [prop: string]: any;
-     *         }
-     *     } | null)}
-     * @memberof TileController
-     */
+    public owning_city: UUID | null = null;
+    // A event to throw when tile is selected instead of the default behavior
     public override: {
         type: string;
         id: number;
@@ -160,17 +71,17 @@ export default class TileController implements SystemEventListener {
             [prop: string]: any;
         }
     } | null = null;
+    private tribe: Tribe;
+    private isSelected: boolean = false;
     constructor(private engine: Engine, private assets: AssetLoader, private world: World){
         this.events.on(SystemEvents.INTERACTION,(event)=>{
             switch (event.id) {
                 case ObjectEvents.TILE_SELECT:
-                    this.selectionHandle(event);
-                    break;
+                    return this.selectionHandle(event);
                 case ObjectEvents.RESET:
-                    this.resetHandle(event);
-                    break;
+                    return this.resetHandle(event);
                 case ObjectEvents.DESELECTION:
-                    this.deselectionHandle();
+                    return this.deselectionHandle();
                 default:
                     break;
             }
@@ -303,7 +214,7 @@ export default class TileController implements SystemEventListener {
             type
         }});
     }
-    public addBuilding(): void {}
+    public async addBuilding(): Promise<void> {}
     public removeBuilding(): void {
         if(!this.top) return;
         try {
@@ -315,11 +226,6 @@ export default class TileController implements SystemEventListener {
             console.warn(error);
         }
     }
-    /**
-     * destorys the renderable component of this tile it does not destory any of the data in this class
-     *
-     * @memberof TileController
-     */
     public destory(){
         try {
             const base_type = this.base.getType(this.tribe);
@@ -334,11 +240,6 @@ export default class TileController implements SystemEventListener {
             console.warn(error);
         }
     }
-    /**
-     * Generate tiles and add them to threejs scene
-     *
-     * @memberof TileController
-     */
     public async render(){
         try {
             if((this.base as City)?.isCity) {

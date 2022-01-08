@@ -12,6 +12,7 @@ import type { Tribe, UUID } from "../core/types";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type PlayerController from "../managers/PlayerController";
+import type { City } from "./Tile";
 
 
 export interface WorldJson {
@@ -30,9 +31,6 @@ export default class World {
     public selector: SelectorTile;
     public unit_controller: UnitController;
     constructor(private engine: Engine, private assets: AssetLoader, public players: PlayerController){
-
-        this.createWorld(["imperius","bardur"],11);
-
        /* fetch("/world.json").then(value=>value.json()).then(world=>{
             this.loadWorld(world).then(()=>{
                 this.unit_controller.createUnit("bardur","WARRIOR",{row: 5, col: 2});
@@ -48,7 +46,7 @@ export default class World {
             });
        });*/
     }
-    public async createWorld(tribes: Tribe[], size: number): Promise<NArray<TileController>> {
+    public async createWorld(tribes: Tribe[], size: number): Promise<{ level: NArray<TileController>, capitals: { tribe: Tribe, uuid: UUID }[] }> {
        
         // Add ui and selector objects
         try {
@@ -62,7 +60,7 @@ export default class World {
         }
 
         const leveldata = WorldGenerator.gen(tribes,size);
-        
+        const capitals: { tribe: Tribe, uuid: UUID }[] = [];
         const level: NArray<TileController> = new NArray(size);
 
         this.engine.scene.activeLevelReady();
@@ -70,15 +68,29 @@ export default class World {
         for(const tile of leveldata){
             const controller = TileController.createNew(this.engine,this.assets,this,tile);
 
+            if(tile.base === "CITY"){
+                capitals.push({ tribe: tile.tribe, uuid: controller.uuid });
+            }
             level.set(tile.row,tile.col,controller);
             this.lookup.set(controller.uuid,{ row: tile.row, col: tile.col })
 
             await controller.render();
         }   
-
         this.level = level;
 
-        return level;
+        for(const city of capitals){
+            const pos = this.lookup.get(city.uuid);
+            if(!pos) continue;
+            const tile = this.level.get(pos.row,pos.col);
+            if(!tile) continue;
+            (tile.base as City).claimLand(this,city.uuid,city.tribe);
+        }
+
+
+        return {
+            level,
+            capitals
+        };
     }
     public async loadWorld(worlddata: WorldJson){
 

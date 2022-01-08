@@ -1,5 +1,5 @@
 import Player from "./Player";
-import type { Tech, Tribe } from "../core/types";
+import type { Tech, Tribe, UUID } from "../core/types";
 import EventEmitter from "../core/EventEmitter";
 import { GameEvent, SystemEvents, UIEvent } from "../events/systemEvents";
 
@@ -17,6 +17,14 @@ export default class PlayerController {
     private activeIndex = 0;
     private events: EventEmitter = new EventEmitter();
     constructor(){}
+    public setCapitals(data: { tribe: Tribe, uuid: UUID }[]): void {
+        for(const { tribe, uuid } of data){
+            const team = this.players.get(tribe);
+            if(team){
+                team.capital_uuid = uuid;
+            }
+        }
+    }
     public getActivePlayer(): Player {
         const p = this.players.get(this.activePlayer);
         if(!p) throw new Error("Filed to get active player data");
@@ -87,11 +95,12 @@ export default class PlayerController {
         return (player.tech as any)[tech] ?? false;
     }
     public changeTurn(){
-        this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: {} });
+        this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: { last: this.activePlayer } });
         this.activeIndex++;
         if(this.activeIndex > this.players.size) this.activeIndex = 0;
         this.activePlayer = this.tribes[this.activeIndex];
-
+        this.updateTurn();
+        
     }
     public toJson(){
         let players: any[] = [];

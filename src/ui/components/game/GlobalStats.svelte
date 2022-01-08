@@ -7,7 +7,7 @@
 
 <script lang="ts">
     import {fade} from 'svelte/transition';
-    import BackButton from './BackButton.svelte';
+    import BackButton from './shared/BackButton.svelte';
 </script>
 
 <div id="global-stats" in:fade="{{duration: 200}}" out:fade="{{duration: 200}}">

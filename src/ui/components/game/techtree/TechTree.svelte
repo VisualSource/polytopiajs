@@ -33,7 +33,7 @@
 <script lang="ts">
     import {fade} from 'svelte/transition'
     import TechItem from './TechItem.svelte';
-    import BackButton from '../BackButton.svelte';
+    import BackButton from '../shared/BackButton.svelte';
     import Game from '../../../../game/core/Game';
 
     const game = new Game();
