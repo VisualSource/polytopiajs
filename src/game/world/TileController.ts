@@ -222,6 +222,7 @@ export default class TileController implements SystemEventListener {
             let obj = this.engine.scene.getObject<InstancedObject>(top_type);
             if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);
             obj.removeInstanceById(this.top.id);
+            this.top = null;
         } catch (error) {
             console.warn(error);
         }

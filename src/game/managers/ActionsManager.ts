@@ -7,10 +7,12 @@ import type { City } from "../world/Tile";
 import type World from "../world/World";
 import type PlayerController from "./PlayerController";
 import type Settings from '../core/Settings';
+import type AssetLoader from '../loaders/AssetLoader';
+import type Engine from '../core/Engine';
 
 export default class ActionsManager implements SystemEventListener {
     public events: EventEmitter = new EventEmitter();
-    constructor(private world: World, private players: PlayerController, private settings: Settings){
+    constructor(private world: World, private players: PlayerController, private settings: Settings, private assets: AssetLoader, private engine: Engine){
         this.events.on(SystemEvents.GAME_EVENT,(event)=>{
             if((event.id === GameEvent.TURN_CHANGE)){
                 replace("/loading");
@@ -41,13 +43,26 @@ export default class ActionsManager implements SystemEventListener {
                 case ActionEvent.DESTORY:
                     tile.removeBuilding();
                     break;
-                case ActionEvent.DISBAND: 
-                    
+                case ActionEvent.DISBAND: {
+                    if(!tile.unit) break;
+                    this.world.unit_controller.destoryUnit(tile.uuid);
                     break;
-                case ActionEvent.GATHER:
+                }
+                case ActionEvent.GATHER:{
+                    if(!tile.top) break;
                     // will need to get the closest city to add pop to
+                    const uuid = this.players.getActivePlayer().capital_uuid;
+                    const pos = this.world.lookup.get(uuid);
+                    if(!pos) break;
+
+                    const city = this.world.level.get(pos.row,pos.col);
+
+                    (city.base as City).add_population(1,{ engine: this.engine, assets: this.assets, tribe: city.owning_tribe as Tribe, owner: city.uuid });
+
+
                     tile.removeBuilding();
                     break;
+                }
                 case ActionEvent.HEAL: 
                     break;
                 case ActionEvent.RECOVER:

@@ -58,7 +58,7 @@ export default class Game implements SystemEventListener {
         const { capitals } = await this.world.createWorld(tribes,11); // generate world
         this.players.setCapitals(capitals); // set the uuid of capitals to players 
         this.ui = new UI(this.world); // init ui stats funcs
-        this.actions = new ActionsManager(this.world,this.players, this.settings); // init game events handler
+        this.actions = new ActionsManager(this.world,this.players, this.settings,this.assets,this.engine); // init game events handler
         return true;
     }
     public async destory(){
