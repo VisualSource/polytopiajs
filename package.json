@@ -31,7 +31,7 @@
     "@types/three": "^0.136.1",
     "canvas": "^2.8.0",
     "chai": "^4.3.4",
-    "image-size": "^1.0.0",
+    "image-size": "^1.0.1",
     "lil-gui": "^0.16.0",
     "merge-images": "^2.0.0",
     "mocha": "^9.1.3",
