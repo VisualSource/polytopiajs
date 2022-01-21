@@ -2,3 +2,6 @@ https://www.npmjs.com/package/three-spritetext
 https://github.com/protectwise/troika
 https://github.com/protectwise/troika/tree/master/packages/three-instanced-uniforms-mesh
 https://www.npmjs.com/package/three-mesh-bvh
+
+
+https://github.com/OmarShehata/webgl-outlines
