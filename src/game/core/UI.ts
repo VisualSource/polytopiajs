@@ -16,9 +16,15 @@ export default class UI {
     private ctr: TileController | null = null;
     private ctxU: Unit | null = null;
     constructor(private world: World){}
+    /**
+     * Checks if the current context has a unit attached to it
+     */
     private hasUnit(): boolean {
-        return Boolean(this.ctr?.unit && (this.ctr.selected === 1));
+        return !!this.ctr?.unit && (this.ctr.selected === 1);
     }
+    /**
+     *  Sets the current tile that the other func in this class draw from for there infomation
+     */
     public setContext(row: number, col: number): void {
         const ctr = this.world.level.get(row,col);
         if(!ctr) {
@@ -37,6 +43,10 @@ export default class UI {
         this.ctr = null;
         this.ctxU = null;
     }
+    /**
+     * Gets the usable actions that can be done on the current selected object depending on player, world, tech, and tile state
+     * 
+     */
     public getActions(): {id: ActionEvent, data: { [key: string]: any }}[] {
         if(!this.ctr) return [];
         
@@ -71,6 +81,10 @@ export default class UI {
 
         return actions;
     }
+    /**
+     * Generates the layers to create the icon
+     * 
+     */
     public getIcon(): string[] {
         if(!this.ctr) return [];
         if(this.hasUnit()) {
@@ -85,6 +99,10 @@ export default class UI {
 
         return icon;
     }
+    /**
+     * Get the description of the tile depending on the state of the player, world and tile
+     * 
+     */
     public getDescription(): string {
         if(!this.ctr) return "";
 
@@ -112,6 +130,10 @@ export default class UI {
 
         return "";
     }
+    /**
+     * Gets the title of the tile depending on the state of the player and tile
+     * 
+     */
     public getTitle(): string {
         if(!this.ctr) return "Tile";
         if(this.hasUnit()){

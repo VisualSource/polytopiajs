@@ -1,9 +1,12 @@
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import CameraControls from 'camera-controls';
 import { WebGLRenderer, OrthographicCamera, Fog,
     MathUtils, MOUSE, Quaternion, Vector2 , Vector3, Vector4, Spherical, Matrix4, Raycaster, Box3, Sphere, TextureLoader,
-    Group, HemisphereLight, DirectionalLight } from 'three';
+    Group, HemisphereLight, DirectionalLight, Color } from 'three';
+
 import EventEmitter from '../core/EventEmitter';
 import {ObjectEvents,SystemEvents} from '../events/systemEvents';
 
@@ -17,6 +20,7 @@ import type InstancedObject from '../world/rendered/InstancedObject';
 import type CityTile from '../world/rendered/CityTile';
 
 export default class Engine implements SystemEventListener {
+    private outlinePass: OutlinePass;
     private controls: CameraControls;
     private renderer: WebGLRenderer;
     private composer: EffectComposer;
@@ -35,7 +39,19 @@ export default class Engine implements SystemEventListener {
     constructor(public canvas: HTMLCanvasElement){
         // install the camera controls lib
         CameraControls.install( { 
-            THREE: { MOUSE, MathUtils, Quaternion, Spherical, Vector2, Vector3, Vector4, Matrix4, Raycaster, Box3, Sphere }
+            THREE: { 
+                MOUSE, 
+                MathUtils, 
+                Quaternion, 
+                Spherical, 
+                Vector2, 
+                Vector3, 
+                Vector4, 
+                Matrix4, 
+                Raycaster, 
+                Box3, 
+                Sphere 
+            }
         });
     }
     public init(){
@@ -64,6 +80,20 @@ export default class Engine implements SystemEventListener {
         this.renderer.setSize(window.innerWidth,window.innerHeight, true);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.camera.lookAt(this.scene.position);
+
+        // Effects
+        this.outlinePass = new OutlinePass(
+            new Vector2(window.innerWidth,window.innerHeight), this.scene, this.camera
+        );
+        this.outlinePass.visibleEdgeColor = new Color('#ffffff');
+        this.outlinePass.hiddenEdgeColor = new Color('#190a05');
+        this.outlinePass.edgeStrength = 3;
+        this.outlinePass.edgeGlow = 1;
+        this.outlinePass.edgeThickness = 1;
+        this.outlinePass.pulsePeriod = 0;
+        this.outlinePass.usePatternTexture = false;
+
+        this.composer.addPass(this.outlinePass);
 
         this.controls = new CameraControls(this.camera,this.renderer.domElement);
         this.controls.setPosition(0,0,5);
@@ -110,6 +140,9 @@ export default class Engine implements SystemEventListener {
         this.scene.add(lightGroup);
 
         this.renderer.setAnimationLoop(this.animationLoop);
+    }
+    public addOutline(object: THREE.Object3D) {
+        this.outlinePass.selectedObjects.push(object);
     }
     public destory(){
         document.removeEventListener("resize",this.resize);

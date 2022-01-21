@@ -186,6 +186,8 @@ export class Unit {
                 model.renderOrder = RenderOrder.UNIT;
             }
 
+            this.engine.addOutline(model);
+
             model.createInstance({
                 index: 0,
                 id: this.uuid,

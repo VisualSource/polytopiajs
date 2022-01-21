@@ -27,10 +27,10 @@ interface IEditableWorldObjectData {
 }
 /*
  Should make a version to use the 'InstancedUniformsMesh'
- but it does not support mutliple material which is needed for the water tiles 
+ but it does not support mutliple materials which is needed for the water tiles 
  but maybe i can add switch between the default InstanceMesh and Unifrom one.
 */
-export default class InstancedObject extends InstancedMesh implements SystemEventListener{
+export default class InstancedObject extends InstancedMesh implements SystemEventListener {
     public events: EventEmittter = new EventEmittter();
     private dummy: Object3D = new Object3D();
     constructor(public name: string, geometry: THREE.BufferGeometry | undefined, material: THREE.Material | THREE.Material[] | undefined, public data: WorldObjectData[], private readonly WORLD_TILE_OFFSET: number = 4 ){
@@ -60,7 +60,6 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         if(index > this.count || index < 0) throw new Error("Index out of bounds");
         return this.data[index];
     }
-   
     public getItemById(id: UUID): WorldObjectData | undefined {
         return this.data.find(value=>value.id === id);
     }
@@ -75,7 +74,7 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.update();
 
     }
-    public createInstance(data: WorldObjectData){ 
+    public createInstance(data: WorldObjectData): void { 
         this.data.push(data);
         this.update();
     }
@@ -98,18 +97,25 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
 
         return item;
     }
-    public removeAll() {
+    public setAllShow(show = false): void {
+        this.data.forEach(value=>{ value.shown = show });
+        this.update();
+    }
+    public removeAll(): void {
         this.data = [];
         this.count = 0;
         this.update();
     }
-    public update(){
+    public update(): void {
         this.count = this.data.length;
         for(let i = 0; i < this.data.length; i++){
             this.data[i].index = i;
-           // this.events.emit<SystemEvents,ObjectEvents>({type: SystemEvents.OBJECT, id: ObjectEvents.OBJECT_INDEX_CHANGE, data: { index: i }});
-            this.setPostion(i,this.data[i].x,this.data[i].y,this.data[i].z);
-            this.setRotation(i,this.data[i].rotation);
+            if(this.data[i].shown) {
+                this.setPostion(i,this.data[i].x,this.data[i].y,this.data[i].z);
+                this.setRotation(i,this.data[i].rotation);
+            } else {
+                this.count--;
+            }
         }
         this.instanceMatrix.needsUpdate = true;
     }

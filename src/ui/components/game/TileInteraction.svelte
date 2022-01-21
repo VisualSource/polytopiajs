@@ -64,7 +64,7 @@
             width: 100%
 </style>
 
-{#if $show } 
+{#if $show} 
     <div id="tile-actions" class="bg-dark" in:fly="{{ y: 200, duration: 200 }}" out:fade>
         <header>
             <div class="preview">
@@ -79,11 +79,11 @@
                 </div>
             </div>
             <div>
-                <Button on:click={onClose} class="rounded-circle bg-light">
+                <button on:click={onClose} class="btn rounded-circle bg-light">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/>
                         <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/>
                     </svg>
-                </Button>
+                </button>
             </div>
         </header>
         {#if $actions.length > 0 }
