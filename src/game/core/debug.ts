@@ -6,6 +6,7 @@ import type { Tribe } from './types';
 export function init(game: Game){
     //@ts-ignore
     window.POLYTOPIA_GAME = game;
+
     const actions = {
         "Reset Units": function() {
             game.world.units.forEach(unit=>{

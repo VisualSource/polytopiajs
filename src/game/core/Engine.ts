@@ -267,14 +267,13 @@ export default class Engine implements SystemEventListener {
 
         console.log(old_posa);
     }
-    set setCameraPos(data: any) {
+    set setCameraPos(data: { target: { x: number, y: number, z: number }, zoom: number }) {
         this.controls.setTarget(data.target.x,data.target.y,data.target.z,false);
         this.controls.zoomTo(data.zoom,false);
         this.controls.polarAngle = 0.8726646259971647;
         this.controls.azimuthAngle = 3.9269908169872414;
-       // this.controls.zoom(data.zoom,false);
     }
-    get getCameraPos(): any {
+    get getCameraPos(): { target: { x: number, y: number, z: number }, zoom: number } {
         const target = new Vector3();
         this.controls.getTarget(target);
         return {
