@@ -53,7 +53,7 @@ export default class Game implements SystemEventListener {
         this.engine.init(); // START THREEJS, Controls, load assets, etc
         console.info("Init Engine | Starting threejs BUILD", import.meta.env.PACKAGE_VERSION);
 
-        this.players = PlayerController.init(tribes); // Set the current players of the game
+        this.players = PlayerController.init(tribes,this.engine); // Set the current players of the game
         this.world = new World(this.engine,this.assets,this.players); // init world
         const { capitals } = await this.world.createWorld(tribes,11); // generate world
         this.players.setCapitals(capitals); // set the uuid of capitals to players 

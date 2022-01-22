@@ -18,7 +18,16 @@ interface Window {
 }
 
 declare module '*.svelte';
-declare module 'troika-three-text' {}
+declare module 'troika-three-text' {
+    class Text extends THREE.Object3D {
+        sync: () => void;
+        text: string;
+        fontSize: number;
+        position: THREE.Vector3;
+        color: any;
+        dispose: () => void
+    }
+}
 declare module 'three-instanced-uniforms-mesh' {
     declare class InstancedUniformsMesh extends THREE.InstancedMesh {
         public setUniformAt(uniformName, instanceIndex, value): void;

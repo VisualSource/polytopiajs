@@ -1,10 +1,12 @@
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import CameraControls from 'camera-controls';
 import { WebGLRenderer, OrthographicCamera, Fog,
-    MathUtils, MOUSE, Quaternion, Vector2 , Vector3, Vector4, Spherical, Matrix4, Raycaster, Box3, Sphere, TextureLoader,
+    MathUtils, MOUSE, Quaternion, Vector2 , Vector3, 
+    Vector4, Spherical, Matrix4, Raycaster, Box3, Sphere, TextureLoader,
     Group, HemisphereLight, DirectionalLight, Color } from 'three';
 
 import EventEmitter from '../core/EventEmitter';
@@ -20,6 +22,7 @@ import type InstancedObject from '../world/rendered/InstancedObject';
 import type CityTile from '../world/rendered/CityTile';
 
 export default class Engine implements SystemEventListener {
+    private fxaa: ShaderPass;
     private outlinePass: OutlinePass;
     private controls: CameraControls;
     private renderer: WebGLRenderer;
@@ -27,7 +30,6 @@ export default class Engine implements SystemEventListener {
     private camera: OrthographicCamera;
     private raycaster: Raycaster = new Raycaster();
     private textureLoader: TextureLoader = new TextureLoader();
-    private frustumSize: number = 1000;
     private touch: TouchTap | null = null;
     private hover: { INTERSECTION: any; pointer: Vector2; } = {
         INTERSECTION: null,
@@ -61,17 +63,15 @@ export default class Engine implements SystemEventListener {
         });
         this.scene = new WorldScene();
 
-        const aspect = window.innerWidth / window.innerHeight;
-
         this.camera = new OrthographicCamera( 
-            this.frustumSize * aspect / - 2, 
-            this.frustumSize * aspect / 2, 
-            this.frustumSize / 2, 
-            this.frustumSize / - 2, 
+            window.innerWidth / -200,
+            window.innerWidth / 200,
+            window.innerHeight / 200,
+            window.innerHeight / -200,
             1, 
             1000 
         );
-        
+
         // Effect composer setup
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(new RenderPass(this.scene,this.camera));
@@ -79,7 +79,7 @@ export default class Engine implements SystemEventListener {
         this.composer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth,window.innerHeight, true);
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.camera.lookAt(this.scene.position);
+        this.camera.position.set(0,0,100);
 
         // Effects
         this.outlinePass = new OutlinePass(
@@ -95,14 +95,21 @@ export default class Engine implements SystemEventListener {
 
         this.composer.addPass(this.outlinePass);
 
+        this.fxaa = new ShaderPass(FXAAShader);
+
+        const pixelRatio = this.renderer.getPixelRatio();
+
+        this.fxaa.material.uniforms['resolution'].value.x = 1 / (this.renderer.domElement.offsetWidth * pixelRatio);
+        this.fxaa.material.uniforms['resolution'].value.y = 1 / (this.renderer.domElement.offsetHeight * pixelRatio);
+        this.composer.addPass(this.fxaa);
+
         this.controls = new CameraControls(this.camera,this.renderer.domElement);
-        this.controls.setPosition(0,0,5);
-        this.controls.maxZoom = 30;
-        this.controls.minZoom = 10;
-        this.controls.zoom(10,false);
-        this.controls.azimuthAngle = 3.913;
-        this.controls.polarAngle = 0.825;
-       // this.controls.setBoundary(new Box3(new Vector3(-50,-50,-50),new Vector3(50,10,50)))
+        this.controls.polarAngle = 0.8726646259971647;
+        this.controls.azimuthAngle = 3.9269908169872414;
+        this.controls.maxZoom = 0.40;
+        this.controls.minZoom = 0.16;
+        this.controls.zoom(0.38,false);
+        this.controls.setBoundary(new Box3(new Vector3(-20,-20,-20),new Vector3(20,20,20)))
         this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
         this.controls.mouseButtons.right = CameraControls.ACTION.NONE;
         this.controls.mouseButtons.middle = CameraControls.ACTION.NONE;
@@ -199,12 +206,17 @@ export default class Engine implements SystemEventListener {
 		this.hover.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
     private resize = () => {
-        const aspect = window.innerWidth / window.innerHeight;
+        //const aspect = window.innerWidth / window.innerHeight;
 
-        this.camera.left = -this.frustumSize * aspect / 2;
+        this.camera.left = window.innerWidth / -200;
+        this.camera.right =  window.innerWidth / 200;
+        this.camera.top = window.innerHeight / 200;
+        this.camera.bottom = window.innerHeight / -200;
+
+        /*this.camera.left = -this.frustumSize * aspect / 2;
         this.camera.right = this.frustumSize * aspect / 2;
         this.camera.top = this.frustumSize / 2;
-        this.camera.bottom = -this.frustumSize / 2;
+        this.camera.bottom = -this.frustumSize / 2;*/
 
         this.composer.setSize(window.innerWidth,window.innerHeight);
         this.composer.setPixelRatio(window.devicePixelRatio);
@@ -212,6 +224,11 @@ export default class Engine implements SystemEventListener {
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
         this.camera.updateProjectionMatrix();
+
+        const pixelRatio = this.renderer.getPixelRatio();
+
+        this.fxaa.material.uniforms['resolution'].value.x = 1 / (this.renderer.domElement.offsetWidth * pixelRatio);
+        this.fxaa.material.uniforms['resolution'].value.y = 1 / (this.renderer.domElement.offsetHeight * pixelRatio);
     }
     private hoverUpdate() {
         if(this.is_mobile) return;
@@ -238,12 +255,32 @@ export default class Engine implements SystemEventListener {
         this.hoverUpdate();
     }
     public moveCameraTo(row: number, col: number) {
-        const pos = { row: row * 4, col: col * 4 };
-        const out = new Vector3();
-        this.controls.getPosition(out);
+        const old_pos = new Vector3();
+        this.controls.getPosition(old_pos);
 
-        console.log(out,pos);
+        console.log(old_pos);
 
-        this.controls.truck(out.x - pos.row,out.z - pos.col);
+        this.controls.moveTo(row * 4,67,col * 4);
+
+        const old_posa = new Vector3();
+        this.controls.getPosition(old_posa);
+
+        console.log(old_posa);
+    }
+    set setCameraPos(data: any) {
+        this.controls.setTarget(data.target.x,data.target.y,data.target.z,false);
+        this.controls.zoomTo(data.zoom,false);
+        this.controls.polarAngle = 0.8726646259971647;
+        this.controls.azimuthAngle = 3.9269908169872414;
+       // this.controls.zoom(data.zoom,false);
+    }
+    get getCameraPos(): any {
+        const target = new Vector3();
+        this.controls.getTarget(target);
+        return {
+            target,
+            //@ts-ignore
+            zoom: this.controls._zoom
+        };
     }
 }

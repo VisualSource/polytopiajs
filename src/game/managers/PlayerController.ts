@@ -2,13 +2,14 @@ import Player from "./Player";
 import type { Tech, Tribe, UUID } from "../core/types";
 import EventEmitter from "../core/EventEmitter";
 import { GameEvent, SystemEvents, UIEvent } from "../events/systemEvents";
+import type Engine from "../core/Engine";
 
 export default class PlayerController {
-    static loadFromJson(): PlayerController {
-        return new PlayerController().jsonConstructor();
+    static loadFromJson(engine: Engine): PlayerController {
+        return new PlayerController(engine).jsonConstructor();
     }
-    static init(tribes: Tribe[]): PlayerController {
-        return new PlayerController().defaultConstructor(tribes);
+    static init(tribes: Tribe[], engine: Engine): PlayerController {
+        return new PlayerController(engine).defaultConstructor(tribes);
     }
     public tribes: Tribe[] = [];
     public players: Map<Tribe,Player> = new Map();
@@ -16,7 +17,7 @@ export default class PlayerController {
     private _turn: number = 0;
     private activeIndex = 0;
     private events: EventEmitter = new EventEmitter();
-    constructor(){}
+    constructor(private engine: Engine){}
     public setCapitals(data: { tribe: Tribe, uuid: UUID }[]): void {
         for(const { tribe, uuid } of data){
             const team = this.players.get(tribe);
@@ -27,7 +28,7 @@ export default class PlayerController {
     }
     public getActivePlayer(): Player {
         const p = this.players.get(this.activePlayer);
-        if(!p) throw new Error("Filed to get active player data");
+        if(!p) throw new Error("Failed to get active player data");
         return p;
     }
     get activePlayerStarGain(): number {
@@ -65,6 +66,7 @@ export default class PlayerController {
     set activePlayer(value: Tribe){
         this._active_player = value;
         const p = this.getActivePlayer();
+        if(p.camera) this.engine.setCameraPos = p.camera;
         this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.ALL, data: {
             score: p.score,
             stars: p.stars,
@@ -95,9 +97,12 @@ export default class PlayerController {
         return (player.tech as any)[tech] ?? false;
     }
     public changeTurn(){
+        const current = this.players.get(this.activePlayer);
+        if(current) { current.camera = this.engine.getCameraPos; }
         this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: { last: this.activePlayer } });
+
         this.activeIndex++;
-        if(this.activeIndex > this.players.size) this.activeIndex = 0;
+        if(this.activeIndex >= this.players.size) this.activeIndex = 0;
         this.activePlayer = this.tribes[this.activeIndex];
         this.updateTurn();
         
