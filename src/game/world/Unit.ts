@@ -148,7 +148,7 @@ export class Unit {
     public destory(){
         const model = this.engine.scene.getObject(this.model_id);
         if(!model) throw new Error(`Failed to destory non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
-        model.removeInstanceById(this.uuid);
+        model.removeInstance(this.uuid);
     }
     public canMove(): boolean {
         return !this.hasAttacked && !this.hasMoved;
@@ -165,13 +165,13 @@ export class Unit {
         const unit = this.engine.scene.getObject(this.model_id);
         if(!unit) throw new Error(`Failed to get object for model with id of ${this.model_id}`);
 
-        const data = unit.getItemById(this.uuid);
+        const data = unit.getItem(this.uuid);
 
         if(!data) throw new Error(`Failed to get instanced data for unit (${this.uuid})`);
 
         this.tribe = tribe;
 
-        unit.removeInstanceById(this.uuid);
+        unit.removeInstance(this.uuid);
 
         await this.render(data.owner);
     }
@@ -186,10 +186,7 @@ export class Unit {
                 model.renderOrder = RenderOrder.UNIT;
             }
 
-            this.engine.addOutline(model);
-
             model.createInstance({
-                index: 0,
                 id: this.uuid,
                 owner: tile_owner,
                 rotation: 0,

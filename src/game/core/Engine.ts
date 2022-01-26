@@ -178,7 +178,11 @@ export default class Engine implements SystemEventListener {
         let {object, instanceId } = intersects[0];
 
         if((object as InstancedObject)?.isInstancedMesh){
-            const data = (object as InstancedObject).getItem(instanceId as number);
+            const data = (object as InstancedObject).getIndex(instanceId as number);
+            if(!data) {
+                console.error("Invaild instance id");
+                return;
+            }
             this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT, data: { type: data.type, owner: data.owner, id: data.id } });
             return;
         }
@@ -253,19 +257,6 @@ export default class Engine implements SystemEventListener {
         this.controls.update(time);
         this.composer.render(time);
         this.hoverUpdate();
-    }
-    public moveCameraTo(row: number, col: number) {
-        const old_pos = new Vector3();
-        this.controls.getPosition(old_pos);
-
-        console.log(old_pos);
-
-        this.controls.moveTo(row * 4,67,col * 4);
-
-        const old_posa = new Vector3();
-        this.controls.getPosition(old_posa);
-
-        console.log(old_posa);
     }
     set setCameraPos(data: { target: { x: number, y: number, z: number }, zoom: number }) {
         this.controls.setTarget(data.target.x,data.target.y,data.target.z,false);

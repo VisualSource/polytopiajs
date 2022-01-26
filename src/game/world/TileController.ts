@@ -55,6 +55,7 @@ export default class TileController implements SystemEventListener {
     }
     public selected: Selected = Selected.TILE; 
     public readonly uuid: UUID = nanoid();
+    public isVisable: boolean = false;
     public road: boolean = false;
     public top: BuildTile | null = null;
     public base: Tile | City;
@@ -221,7 +222,7 @@ export default class TileController implements SystemEventListener {
             const top_type = this.top.getType(this.tribe);
             let obj = this.engine.scene.getObject<InstancedObject>(top_type);
             if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);
-            obj.removeInstanceById(this.top.id);
+            obj.removeInstance(this.top.id);
             this.top = null;
         } catch (error) {
             console.warn(error);
@@ -233,12 +234,36 @@ export default class TileController implements SystemEventListener {
             let obj = this.engine.scene.getObject<InstancedObject>(base_type);
             if(!obj) throw new Error(`Failed to destory object | ${base_type}:${this.base.id} | Why: Object type does not exist`);
 
-            obj.removeInstanceById(this.base.id);
+            obj.removeInstance(this.base.id);
 
             this.removeBuilding();
 
         } catch (error) {
             console.warn(error);
+        }
+    }
+    public setVisablity(show: boolean) {
+        this.isVisable = show;
+        if((this.base as City)?.isCity) {
+            let obj = this.engine.scene.getObject<CityTile>((this.base as City).key);
+            if(obj) {   
+                obj.visible = show;
+            }
+            return;
+        }
+
+        const base_type = this.getBaseModalName();
+        let obj = this.engine.scene.getObject<InstancedObject>(base_type);
+        if(obj) {
+           obj.setVisibility(this.base.id,show);
+        }
+        if(this.top){
+            const top_type = this.getTopModalName();
+            if(!top_type) throw new Error("Failed to get top modal name.");
+            let obj = this.engine.scene.getObject<InstancedObject>(top_type);
+            if(obj) {
+              obj.setVisibility(this.top.id,show);
+            }
         }
     }
     public async render(){
@@ -256,9 +281,9 @@ export default class TileController implements SystemEventListener {
                     }
                     const model = await this.assets.getAsset("LAND",model_type,"gltf");
                     city = this.engine.scene.createCityInstance(base.key, this.position, this.uuid ,model.geometry,model.material);
+                    city.visible = true;
                     await base.render(this.assets, this.engine, this.owning_tribe as Tribe, this.uuid);
                 }
-
                 return;
             }
 
@@ -273,7 +298,6 @@ export default class TileController implements SystemEventListener {
             }
 
             obj.createInstance({
-                index: 0,
                 owner: this.uuid,
                 rotation: this.base.metadata?.rotation ?? 0,
                 shown: true,
@@ -298,7 +322,6 @@ export default class TileController implements SystemEventListener {
                 }
 
                 obj.createInstance({
-                    index: 0,
                     owner: this.uuid,
                     rotation: this.top.metadata?.rotation ?? 0,
                     shown: true,

@@ -12,7 +12,8 @@ export enum SystemEvents {
 };
 
 export enum GameEvent {
-    TURN_CHANGE
+    TURN_CHANGE,
+    FOG_CHANGE
 }
 
 export enum SoundEvent {

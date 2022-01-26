@@ -15,6 +15,13 @@ export default class NArray<T> {
     constructor(public readonly size: number){
         for(let i = 0; i < this.size; i++) this._data.push([]);
     }
+    public fill(value: T){
+        for(const row of this._data){
+            for(let i = 0; i < this.size; i++){
+                row.push(value);
+            } 
+        }
+    }
     public set(row: number, col: number, data: T): void {
         this._data[row][col] = data;
     }

@@ -220,9 +220,7 @@ export default class UnitController implements SystemEventListener {
 
                 if(!(dis <= 1) || (dis === 0) || data.unit || !unit.vaild_terrian.includes(data.base.type)) continue;
 
-                
                 this.mesh_movement.createInstance({
-                    index: 0,
                     id: nanoid(10),
                     owner: data.uuid,
                     rotation: 0,
@@ -266,7 +264,6 @@ export default class UnitController implements SystemEventListener {
 
                 
                 this.mesh_attack.createInstance({
-                    index: 0,
                     id: nanoid(10),
                     owner: data.uuid,
                     rotation: 0,

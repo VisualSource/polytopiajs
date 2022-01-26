@@ -3,6 +3,8 @@ import type { Tech, Tribe, UUID } from "../core/types";
 import EventEmitter from "../core/EventEmitter";
 import { GameEvent, SystemEvents, UIEvent } from "../events/systemEvents";
 import type Engine from "../core/Engine";
+import type World from "../world/World";
+import NArray from "../../utils/NArray";
 
 export default class PlayerController {
     static loadFromJson(engine: Engine): PlayerController {
@@ -18,11 +20,38 @@ export default class PlayerController {
     private activeIndex = 0;
     private events: EventEmitter = new EventEmitter();
     constructor(private engine: Engine){}
-    public setCapitals(data: { tribe: Tribe, uuid: UUID }[]): void {
+    public setCapitals(data: { tribe: Tribe, uuid: UUID }[], world: World): void {
         for(const { tribe, uuid } of data){
             const team = this.players.get(tribe);
+
+            const fog = new NArray<number>(world.level.size);
+            fog.fill(0);
+
+            const capital = world.lookup.get(uuid);
+            if(!capital) return;
+
+            for(let i = -1; i <= 1; i++) {
+                for(let j = -1; j <= 1; j++) {
+                    let row = capital.row + i;
+                    let col = capital.col + j;
+                    const data = world.level.isValid(row,col);
+    
+                    if(!data) continue;
+                    fog.set(row,col,1);
+                }
+            }
+        
             if(team){
+                team.fog_map = fog;
                 team.capital_uuid = uuid;
+                team.camera = {
+                    target: {
+                        x: capital.row * 4,
+                        z: capital.col * 4,
+                        y: 0
+                    },
+                    zoom: 0.40
+                };
             }
         }
     }
@@ -61,7 +90,7 @@ export default class PlayerController {
     }
     public updateTurn(): void {
         this._turn++;
-        this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.TURN_CHANGE, data: {turn: this._turn } });
+        this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.TURN_CHANGE, data: { turn: this._turn } });
     }
     set activePlayer(value: Tribe){
         this._active_player = value;
@@ -100,10 +129,10 @@ export default class PlayerController {
         const current = this.players.get(this.activePlayer);
         if(current) { current.camera = this.engine.getCameraPos; }
         this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: { last: this.activePlayer } });
-
         this.activeIndex++;
         if(this.activeIndex >= this.players.size) this.activeIndex = 0;
         this.activePlayer = this.tribes[this.activeIndex];
+        this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.FOG_CHANGE, data: { now: this.activePlayer, last: current?.tribe } });
         this.updateTurn();
         
     }

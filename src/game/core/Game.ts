@@ -8,7 +8,7 @@ import { SystemEvents } from '../events/systemEvents';
 import ActionsManager from '../managers/ActionsManager';
 import UI from './UI';
 import Settings from './Settings';
-
+import Fog from '../managers/Fog';
 import type { SystemEventListener } from './EventEmitter';
 import type { Tribe } from './types';
 
@@ -22,6 +22,7 @@ export default class Game implements SystemEventListener {
     public ui: UI;
     public players: PlayerController;
     private actions: ActionsManager;
+    private fog: Fog;
     
     constructor() {
         if(Game.INSTANCE) return Game.INSTANCE;
@@ -56,9 +57,11 @@ export default class Game implements SystemEventListener {
         this.players = PlayerController.init(tribes,this.engine); // Set the current players of the game
         this.world = new World(this.engine,this.assets,this.players); // init world
         const { capitals } = await this.world.createWorld(tribes,11); // generate world
-        this.players.setCapitals(capitals); // set the uuid of capitals to players 
+        this.players.setCapitals(capitals,this.world); // set the uuid of capitals to players 
         this.ui = new UI(this.world); // init ui stats funcs
         this.actions = new ActionsManager(this.world,this.players, this.settings,this.assets,this.engine); // init game events handler
+        this.fog = new Fog(this.world,this.engine,this.players);
+        this.fog.loadFog(undefined,this.players.activePlayer);
         return true;
     }
     public async destory(){
