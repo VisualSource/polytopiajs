@@ -18,6 +18,9 @@ export function init(game: Game){
                 window.location.reload();
             });
         },
+        "Hide Fog": function() {
+            game.fog.showAll();
+        },
         "Active Player": "bardur"
     }
     const client_info: { [key: string]: any } = {
@@ -39,8 +42,9 @@ export function init(game: Game){
     
     gui.add(actions,"Reset Units");
     gui.add(actions,"Reload Assets");
+    gui.add(actions,"Hide Fog");
     gui.add(actions,"Active Player",["imperius","bardur"]).onChange((value: Tribe)=>{
-        game.world.players.activePlayer = value;
+        game.players.activePlayer = value;
         game.world.units.forEach(unit=>{
             unit.reset();
         });

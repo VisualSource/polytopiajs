@@ -6,20 +6,17 @@ import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
 import { chebyshev_distance } from "../../utils/math";
 import { RenderOrder } from "../core/renderOrder";
-import type Engine from "../core/Engine";
 import type { Position, Tribe, UUID, UnitType } from "../core/types";
-import type AssetLoader from "../loaders/AssetLoader";
-import type World from "./World";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
 import type { SystemEventListener } from "../core/EventEmitter";
-import type PlayerController from "../managers/PlayerController";
+import type Game from "../core/Game";
 
 export default class UnitController implements SystemEventListener {
     private readonly ACCELERATOR: number = 4.5;
     public events: EventEmitter = new EventEmitter();
     private mesh_movement: InstancedObject;
     private mesh_attack: InstancedObject;
-    constructor(private engine: Engine, private assets: AssetLoader, private world: World, private player: PlayerController){
+    constructor(private game: Game){
         this.events.onId<SystemEvents,ObjectEvents>({name: SystemEvents.INTERACTION, id: ObjectEvents.RESET }, this.eventHide);
         this.events.on(SystemEvents.UNIT,event=>{
             switch (event.id) {
@@ -37,16 +34,16 @@ export default class UnitController implements SystemEventListener {
         });
     }
     private eventAttack(event: any){
-        const attacker = this.world.units.get(event.data.attacker);
-        const defender = this.world.units.get(event.data.defender);
+        const attacker = this.game.world.units.get(event.data.attacker);
+        const defender = this.game.world.units.get(event.data.defender);
         if(!attacker || !defender) return;
       //  console.log("ATTACK",event.data, attacker,defender);
 
-        const defenderTile = this.world.level.get(defender.position.row,defender.position.col);
+        const defenderTile = this.game.world.level.get(defender.position.row,defender.position.col);
         if(!defenderTile) return;
 
         /**
-         * @see https://frothfrenzy.github.io/polytopiacalculator/
+         * @see <https://frothfrenzy.github.io/polytopiacalculator/>
          * @summary uses the same formula posted by the developer on the game wikia forums some time ago.
          */
         const attackForce = attacker.attack * (attacker.health / attacker.maxHealth);
@@ -80,9 +77,9 @@ export default class UnitController implements SystemEventListener {
         this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
     }
     private eventGenerate(event: any){
-        const unit = this.world.units.get(event.data.unit);
+        const unit = this.game.world.units.get(event.data.unit);
         if(!unit) return;
-        if(unit.tribe !== this.player.activePlayer) return;
+        if(unit.tribe !== this.game.players.activePlayer) return;
 
         this.generateMovementArea(event.data.unit);
         this.generateAttackArea(unit.position,unit.range,unit.uuid);
@@ -93,7 +90,7 @@ export default class UnitController implements SystemEventListener {
     }
     public async init(): Promise<void> {
         try {
-            const data = this.assets.getVarient("SELECTOR") as VariantGLTF;
+            const data = this.game.assets.getVarient("SELECTOR") as VariantGLTF;
     
             const mesh = data.scene.children[0].clone() as THREE.Mesh;
 
@@ -110,46 +107,60 @@ export default class UnitController implements SystemEventListener {
             this.mesh_movement.renderOrder = RenderOrder.SELECTOR;
             this.mesh_attack = new InstancedObject("SELECTOR_ATTACK",mesh.geometry, attack_mat,[]);
             this.mesh_attack.renderOrder = RenderOrder.SELECTOR;
-            this.engine.scene.add(this.mesh_movement,this.mesh_attack);
+            this.game.engine.scene.add(this.mesh_movement,this.mesh_attack);
         } catch (error) {
             console.error(error);
         }
     }
     public destoryUnit(id: UUID){
-        const unit = this.world.units.get(id);
+        const unit = this.game.world.units.get(id);
         if(!unit) return;
-        this.world.level.get(unit.position.row,unit.position.col).setUnit();
+        this.game.world.level.get(unit.position.row,unit.position.col).setUnit();
         unit.destory();
-        this.world.units.delete(id);
+        this.game.world.units.delete(id);
     }
     public async createUnit(tribe: Tribe, type: UnitType, position: Position, orgin: UUID){
-        const unit = Unit.createNew(this.engine,this.assets,this.world.players, { type, tribe, position, orgin });
-        this.world.units.set(unit.uuid,unit);
-        const tile = this.world.level.get(position.row,position.col).setUnit(unit.uuid);
+        const unit = Unit.createNew(this.game.engine,this.game.assets,this.game.players, { type, tribe, position, orgin });
+        this.game.world.units.set(unit.uuid,unit);
+        const tile = this.game.world.level.get(position.row,position.col).setUnit(unit.uuid);
         await unit.render(tile.uuid);
         return unit;
     }
     public moveUnit(id: UUID, pos: Position) {
-        const unit = this.world.units.get(id);
+        const unit = this.game.world.units.get(id);
         if(!unit) return;
-        const tile = this.world.level.get(pos.row,pos.col);
+        const tile = this.game.world.level.get(pos.row,pos.col);
         tile.setUnit(unit.uuid);
-        this.world.level.get(unit.position.row,unit.position.col).setUnit(null);
+        this.game.world.level.get(unit.position.row,unit.position.col).setUnit(null);
         unit.setPostion(tile.uuid,pos);
         unit.hasMoved = true;
+
+        const range = unit.skills.includes("SCOUT") ? 2 : 1;
+
+        for(let i = -range; i <= range; i++) {
+            for(let j = -range; j <= range; j++) {
+                let row = pos.row + i;
+                let col = pos.col + j;
+                const data = this.game.world.level.isValid(row,col);
+
+                if(!data || data.visible ) continue;
+
+                this.game.fog.updateFog(row,col,1);
+            }
+        }
     }
     public healUnit(id: UUID): void {
-        const unit = this.world.units.get(id);
+        const unit = this.game.world.units.get(id);
         if(!unit || !(unit.health > unit.maxHealth) ) return;
 
         let healRate = 2;
-        if(this.world.level.get(unit.position.row,unit.position.col).owning_tribe === unit.tribe) {
+        if(this.game.world.level.get(unit.position.row,unit.position.col).owning_tribe === unit.tribe) {
             healRate = 4;
         }
         unit.heal(healRate);
     }
     public generateBootArea(center: Position, range: number, unit_uuid: UUID, bootID: ActionEvent) {
-        const self = this.world.units.get(unit_uuid);
+        const self = this.game.world.units.get(unit_uuid);
         if(!self) return;
 
         // hide tiles
@@ -159,20 +170,20 @@ export default class UnitController implements SystemEventListener {
             for(let j = -range; j <= range; j++) {
                 let row = center.row + i;
                 let col = center.col + j;
-                const data = this.world.level.isValid(row,col);
+                const data = this.game.world.level.isValid(row,col);
 
-                if(!data || (i === 0 && j === 0) || !data.unit ) continue;
+                if(!data || (i === 0 && j === 0) || !data.unit || !data.visible ) continue;
 
-                const friend = this.world.units.get(data.unit);
+                const friend = this.game.world.units.get(data.unit);
                 if(!friend || (friend.tribe !== self.tribe) ) continue;
 
                 // generate mesh.
 
-                this.world.level.get(row,col).override = {
+                this.game.world.level.get(row,col).override = {
                     type: SystemEvents.ACTION,
                     id: bootID,
                     data: {
-                        tile: this.world.level.get(row,col).uuid
+                        tile: this.game.world.level.get(row,col).uuid
                     }
                 };
 
@@ -199,24 +210,24 @@ export default class UnitController implements SystemEventListener {
         However, units with the float or Fly skills are not affected. 
         */
 
-        const unit = this.world.units.get(unit_uuid);
+        const unit = this.game.world.units.get(unit_uuid);
         if(!unit || !unit.canMove()) return;
         const center = unit.position;
-        const unitOnRoad = this.world.level.get(unit.position.row,unit.position.col).road;
+        const unitOnRoad = this.game.world.level.get(unit.position.row,unit.position.col).road;
     
         //reset
         this.hideMovement();
         this.mesh_movement.removeAll();
 
-        for(let i = 0; i <= this.world.level.size; i++) {
-            for(let j = 0; j <= this.world.level.size; j++){
-                const data = this.world.level.isValid(i, j);
-                if(!data) continue;
+        for(let i = 0; i <= this.game.world.level.size; i++) {
+            for(let j = 0; j <= this.game.world.level.size; j++){
+                const data = this.game.world.level.isValid(i, j);
+                if(!data || !data.visible) continue;
                 let roadModifer = 1;
                 // only works on a frendly or nuture road
                 if(data.road && unitOnRoad && (data.owning_tribe === null || data.owning_tribe === unit.tribe)) roadModifer  = 0.5;
 
-                const dis = chebyshev_distance(center,{row: i, col: j}) * roadModifer ;
+                const dis = chebyshev_distance(center,{row: i, col: j}) * roadModifer;
 
                 if(!(dis <= 1) || (dis === 0) || data.unit || !unit.vaild_terrian.includes(data.base.type)) continue;
 
@@ -230,7 +241,7 @@ export default class UnitController implements SystemEventListener {
                     z: j,
                     y: 0
                 });
-                this.world.level.get(i,j).override = {
+                this.game.world.level.get(i,j).override = {
                     type: SystemEvents.UNIT,
                     id: UnitEvent.MOVE,
                     data: {
@@ -245,7 +256,7 @@ export default class UnitController implements SystemEventListener {
         this.mesh_movement.visible = true;
     }
     public generateAttackArea(center: Position, range: number, unit_uuid: UUID){
-        const self = this.world.units.get(unit_uuid);
+        const self = this.game.world.units.get(unit_uuid);
         if(!self || !self.canAttack()) return;
 
         this.hideAttack();
@@ -255,11 +266,11 @@ export default class UnitController implements SystemEventListener {
             for(let j = -range; j <= range; j++){
                 let row = center.row + i;
                 let col = center.col + j;
-                const data = this.world.level.isValid(row, col);
+                const data = this.game.world.level.isValid(row, col);
                 // 0,0 is the center
-                if(!data || (i === 0 && j === 0) || !data.unit ) continue;
+                if(!data || (i === 0 && j === 0) || !data.unit || !data.visible ) continue;
 
-                const enemy = this.world.units.get(data.unit);
+                const enemy = this.game.world.units.get(data.unit);
                 if(!enemy || (enemy.tribe === self.tribe) ) continue;
 
                 
@@ -273,7 +284,7 @@ export default class UnitController implements SystemEventListener {
                     z: col,
                     y: 0
                 });
-                this.world.level.get(row,col).override = {
+                this.game.world.level.get(row,col).override = {
                     type: SystemEvents.UNIT,
                     id: UnitEvent.ATTACK,
                     data: {
@@ -292,5 +303,13 @@ export default class UnitController implements SystemEventListener {
     }
     public hideAttack(){
         this.mesh_attack.visible = false;
+    }
+    public setUnitVisibility(id: UUID, visable: boolean){
+        const unit = this.game.world.units.get(id);
+        if(!unit) {
+            console.error(`No unit with id (${id}) exists`);
+            return;
+        }
+        unit.visible = visable;
     }
 }

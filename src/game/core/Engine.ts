@@ -187,7 +187,7 @@ export default class Engine implements SystemEventListener {
             return;
         }
 
-        if(!(object as CityTile)?.isGameObject) return;
+        if(!(object as CityTile)?.isGameObject || !object.visible) return;
 
         this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.TILE_SELECT, data: { type: "tile", owner: (object as CityTile).tile_owner, id: object.uuid } });
     }

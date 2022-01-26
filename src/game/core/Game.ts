@@ -22,7 +22,7 @@ export default class Game implements SystemEventListener {
     public ui: UI;
     public players: PlayerController;
     private actions: ActionsManager;
-    private fog: Fog;
+    public fog: Fog;
     
     constructor() {
         if(Game.INSTANCE) return Game.INSTANCE;
@@ -55,12 +55,12 @@ export default class Game implements SystemEventListener {
         console.info("Init Engine | Starting threejs BUILD", import.meta.env.PACKAGE_VERSION);
 
         this.players = PlayerController.init(tribes,this.engine); // Set the current players of the game
-        this.world = new World(this.engine,this.assets,this.players); // init world
+        this.world = new World(this); // init world
         const { capitals } = await this.world.createWorld(tribes,11); // generate world
         this.players.setCapitals(capitals,this.world); // set the uuid of capitals to players 
-        this.ui = new UI(this.world); // init ui stats funcs
+        this.ui = new UI(this); // init ui stats funcs
         this.actions = new ActionsManager(this.world,this.players, this.settings,this.assets,this.engine); // init game events handler
-        this.fog = new Fog(this.world,this.engine,this.players);
+        this.fog = await new Fog(this.world,this.engine,this.players).init(this.world.level.size);
         this.fog.loadFog(undefined,this.players.activePlayer);
         return true;
     }

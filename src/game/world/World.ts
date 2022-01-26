@@ -13,6 +13,7 @@ import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type PlayerController from "../managers/PlayerController";
 import type { City } from "./Tile";
+import type Game from "../core/Game";
 
 
 export interface WorldJson {
@@ -30,7 +31,7 @@ export default class World {
     public units: Map<string,Unit> = new Map();
     public selector: SelectorTile;
     public unit_controller: UnitController;
-    constructor(private engine: Engine, private assets: AssetLoader, public players: PlayerController){
+    constructor(private game: Game){
        /* fetch("/world.json").then(value=>value.json()).then(world=>{
             this.loadWorld(world).then(()=>{
                 this.unit_controller.createUnit("bardur","WARRIOR",{row: 5, col: 2});
@@ -50,10 +51,10 @@ export default class World {
        
         // Add ui and selector objects
         try {
-            const model = this.assets.getVarient("SELECTOR") as VariantGLTF;
+            const model = this.game.assets.getVarient("SELECTOR") as VariantGLTF;
             this.selector = new SelectorTile(model);
-            this.selector.render(this.engine);
-            this.unit_controller = new UnitController(this.engine,this.assets,this,this.players);
+            this.selector.render(this.game.engine);
+            this.unit_controller = new UnitController(this.game);
             await this.unit_controller.init();
         } catch (error) {
             console.error(error);
@@ -63,10 +64,10 @@ export default class World {
         const capitals: { tribe: Tribe, uuid: UUID }[] = [];
         const level: NArray<TileController> = new NArray(size);
 
-        this.engine.scene.activeLevelReady();
+        this.game.engine.scene.activeLevelReady();
 
         for(const tile of leveldata){
-            const controller = TileController.createNew(this.engine,this.assets,this,tile);
+            const controller = TileController.createNew(this.game,tile);
 
             if(tile.base === "CITY"){
                 capitals.push({ tribe: tile.tribe, uuid: controller.uuid });
@@ -95,10 +96,10 @@ export default class World {
     public async loadWorld(worlddata: WorldJson){
 
         try {
-            const model = this.assets.getVarient("SELECTOR") as VariantGLTF;
+            const model = this.game.assets.getVarient("SELECTOR") as VariantGLTF;
             this.selector = new SelectorTile(model);
-            this.selector.render(this.engine);
-            this.unit_controller = new UnitController(this.engine,this.assets,this,this.players);
+            this.selector.render(this.game.engine);
+            this.unit_controller = new UnitController(this.game);
             await this.unit_controller.init();
         } catch (error) {
             console.error(error);
@@ -106,17 +107,17 @@ export default class World {
 
         const level: NArray<TileController> = new NArray(worlddata.size);
 
-        this.engine.scene.activeLevelReady();
+        this.game.engine.scene.activeLevelReady();
 
         for(const tile of worlddata.leveldata["overworld"]) {
-            const controller = TileController.createFromJson(this.engine,this.assets,this,tile)
+            const controller = TileController.createFromJson(this.game,tile);
             level.set(tile.position.row,tile.position.col,controller);
             this.lookup.set(controller.uuid,tile.position);
             await controller.render();
         }
 
         for(const unit of worlddata.units) {
-            const json_unit = Unit.createFromJson(this.engine,this.assets,this.players,unit);
+            const json_unit = Unit.createFromJson(this.game.engine,this.game.assets,this.game.players,unit);
 
             this.units.set(json_unit.uuid,json_unit);
             const tile = level.get(unit.position.row,unit.position.col).setUnit(json_unit.uuid);

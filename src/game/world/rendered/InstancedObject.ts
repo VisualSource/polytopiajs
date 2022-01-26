@@ -5,7 +5,7 @@ import type { SystemEventListener } from '../../core/EventEmitter';
 import type { UUID } from "../../core/types";
 //import { SystemEvents } from '../../events/systemEvents';
 
-interface WorldObjectData {
+export interface WorldObjectData {
     x: number;
     y: number; 
     z: number;
@@ -30,8 +30,8 @@ interface IEditableWorldObjectData {
 export default class InstancedObject extends InstancedMesh implements SystemEventListener {
     public events: EventEmittter = new EventEmittter();
     private dummy: Object3D = new Object3D();
-    constructor(public name: string, geometry: THREE.BufferGeometry | undefined, material: THREE.Material | THREE.Material[] | undefined, public data: WorldObjectData[], private readonly WORLD_TILE_OFFSET: number = 4 ){
-        super(geometry,material,15**2);
+    constructor(public name: string, geometry: THREE.BufferGeometry | undefined, material: THREE.Material | THREE.Material[] | undefined, public data: WorldObjectData[], private readonly WORLD_TILE_OFFSET: number = 4, max: number = 15**2 ){
+        super(geometry,material,max);
         this.instanceMatrix.setUsage(DynamicDrawUsage);
         this.update();
     }

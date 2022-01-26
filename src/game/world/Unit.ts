@@ -62,6 +62,7 @@ export class Unit {
     public hasMoved: boolean = false;
     public hasAttacked: boolean = false;
     public maxHealth: number = 10;
+    private _visable: boolean = true;
     constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}   
     public get model_id(): string {
         return `${this.type}_${this.tribe.toUpperCase()}`;
@@ -114,9 +115,9 @@ export class Unit {
     }
     get vaild_terrian(): string[] {
         if(this.players.playerHasTech(this.tribe,"climbing")){
-            return ["LAND","FOREST","MOUNTAIN"];
+            return ["LAND","FOREST","MOUNTAIN","CITY"];
         }
-        return ["LAND","FOREST"];
+        return ["LAND","FOREST","CITY"];
     }
     public heal(amount: number): void {
         this.health += amount;
@@ -137,9 +138,11 @@ export class Unit {
         const model = this.engine.scene.getObject(this.model_id);
         if(!model) throw new Error(`Failed to set visablity on non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
 
-        model.editInstance(this.uuid,{
-            shown: show
-        });
+        this._visable = show;
+        model.setVisibility(this.uuid,show);
+    }
+    public get visible(): boolean {
+        return this._visable;
     }
     public reset(){
         this.hasMoved = false;

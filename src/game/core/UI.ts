@@ -4,7 +4,7 @@ import type TileController from "../world/TileController";
 import type { City } from "../world/Tile";
 import type { Tech } from "./types";
 import type { Unit } from "../world/Unit";
-import type World from "../world/World";
+import type Game from "./Game";
 
 const REQUIRED_TECH: { [key: string]: Tech } = {
     "GAME": "hunting",
@@ -15,7 +15,7 @@ const REQUIRED_TECH: { [key: string]: Tech } = {
 export default class UI {
     private ctr: TileController | null = null;
     private ctxU: Unit | null = null;
-    constructor(private world: World){}
+    constructor(private game: Game){}
     /**
      * Checks if the current context has a unit attached to it
      */
@@ -26,7 +26,7 @@ export default class UI {
      *  Sets the current tile that the other func in this class draw from for there infomation
      */
     public setContext(row: number, col: number): void {
-        const ctr = this.world.level.get(row,col);
+        const ctr = this.game.world.level.get(row,col);
         if(!ctr) {
             this.ctr = null;
             return;
@@ -34,7 +34,7 @@ export default class UI {
         this.ctr = ctr;
         this.ctxU = null;
         if(this.ctr.unit){
-            const unit = this.world.units.get(this.ctr.unit);
+            const unit = this.game.world.units.get(this.ctr.unit);
             if(!unit) return;
             this.ctxU = unit;
         }
@@ -51,12 +51,12 @@ export default class UI {
         if(!this.ctr) return [];
         
         if(this.hasUnit()){
-            if(!this.ctxU || this.world.players.activePlayer !== this.ctxU.tribe) return [];
+            if(!this.ctxU || this.game.players.activePlayer !== this.ctxU.tribe) return [];
             let action = [];
             if(this.ctxU.health < this.ctxU.maxHealth) {
                 action.push({ id: ActionEvent.RECOVER, data: { unit: this.ctr.unit, tile: this.ctr.uuid } });
             }
-            if(this.world.players.activePlayerHas("free_spirit")) {
+            if(this.game.players.activePlayerHas("free_spirit")) {
                 action.push({ id: ActionEvent.DISBAND, data: { unit: this.ctr.unit, tile: this.ctr.uuid } });
             }
 
@@ -65,7 +65,7 @@ export default class UI {
             }
 
             return action;
-        } else if((this.ctr.base as City)?.isCity && this.world.players.activePlayer === this.ctr.owning_tribe){
+        } else if((this.ctr.base as City)?.isCity && this.game.players.activePlayer === this.ctr.owning_tribe){
             let actions = [];
 
             actions.push({ id: ActionEvent.SPAWN, data: { tile: this.ctr.uuid, type: "WARRIOR" } });
@@ -106,7 +106,7 @@ export default class UI {
     public getDescription(): string {
         if(!this.ctr) return "";
 
-        if((this.ctr.base as City)?.isCity) return this.world.players.activePlayer === this.ctr.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
+        if((this.ctr.base as City)?.isCity) return this.game.players.activePlayer === this.ctr.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
 
         if(this.ctr.top) {
             switch (this.ctr.top.type) {
@@ -119,14 +119,14 @@ export default class UI {
                 case "FISH": {
                     const tech_need = REQUIRED_TECH[this.ctr.top.type];
                     if(!this.ctr.owning_city) return "This resource is outside of your empire";
-                    return this.world.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
+                    return this.game.players.activePlayerHas(tech_need) ? "Extract this resource to upgrade your city." : `You need to research ${capitalize(tech_need)} to extract this resource.`;
                 }
                 default:
                     break;  
             }
         }
 
-        if(this.ctr.base.type === "MOUNTAIN" && !this.world.players.activePlayerHas("climbing")) return "You need to research Climbing to be able to move here.";
+        if(this.ctr.base.type === "MOUNTAIN" && !this.game.players.activePlayerHas("climbing")) return "You need to research Climbing to be able to move here.";
 
         return "";
     }
