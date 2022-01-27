@@ -30,7 +30,7 @@
     "@types/mocha": "^9.1.0",
     "@types/three": "^0.136.1",
     "canvas": "^2.9.0",
-    "chai": "^4.3.5",
+    "chai": "^4.3.6",
     "image-size": "^1.0.1",
     "lil-gui": "^0.16.0",
     "merge-images": "^2.0.0",
