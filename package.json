@@ -51,7 +51,7 @@
     "localforage": "^1.10.0",
     "nanoid": "^3.2.0",
     "random": "^3.0.6",
-    "svelte": "^3.46.2",
+    "svelte": "^3.46.3",
     "svelte-spa-router": "^3.2.0",
     "sveltestrap": "^5.8.3",
     "three": "^0.135.0",
