@@ -54,7 +54,7 @@
     "svelte": "^3.46.3",
     "svelte-spa-router": "^3.2.0",
     "sveltestrap": "^5.8.3",
-    "three": "^0.137.0",
+    "three": "^0.137.4",
     "three-instanced-uniforms-mesh": "^0.45.0",
     "three-nebula": "^10.0.3",
     "three-spritetext": "^1.6.3",
