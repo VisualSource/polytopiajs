@@ -28,7 +28,7 @@
     "@types/bootstrap": "^5.1.9",
     "@types/chai": "^4.2.22",
     "@types/mocha": "^9.1.0",
-    "@types/three": "^0.136.1",
+    "@types/three": "^0.137.0",
     "canvas": "^2.9.0",
     "chai": "^4.3.6",
     "image-size": "^1.0.1",
