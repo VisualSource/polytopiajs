@@ -3,7 +3,6 @@ import { DynamicDrawUsage, Object3D, InstancedMesh, Matrix4 } from "three";
 import EventEmittter from '../../core/EventEmitter';
 import type { SystemEventListener } from '../../core/EventEmitter';
 import type { UUID } from "../../core/types";
-//import { SystemEvents } from '../../events/systemEvents';
 
 export interface WorldObjectData {
     x: number;
@@ -25,6 +24,8 @@ interface IEditableWorldObjectData {
     owner?: UUID;
 }
 /**
+ * A Dynamic version of the threejs InstancedMesh, this allows for adding, editing and removing instances.
+ * The default max amount of instances is 15**2, but this can be changed when needed.
  @see <https://github.com/BF3RM/MapEditor/blob/development/WebUI/src/script/modules/InstanceManager.ts> 
 */
 export default class InstancedObject extends InstancedMesh implements SystemEventListener {
@@ -35,6 +36,10 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.instanceMatrix.setUsage(DynamicDrawUsage);
         this.update();
     }
+    /**
+     * swap two instance in the matrix and data array.
+     * This is mostly used for visablity, moving hidden instances to the end.
+     */
     private swapInstance(a: number, b: number): void {
         const cachedMatrix = new Matrix4();
         const cachedData = this.data[a];
@@ -48,12 +53,18 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.setMatrixAt(b,cachedMatrix);
         this.data[b] = cachedData;
     }
+     /**
+     * Sets that rotation of a instance
+     */
     public setRotation(index: number, rotation: number): void {
         this.data[index].rotation = rotation;
         this.dummy.rotation.set(0,rotation,0);
         this.dummy.updateMatrix();
         this.setMatrixAt(index,this.dummy.matrix);
     }
+    /**
+     * Sets that postion of a instance
+     */
     public setPostion(index: number, x: number, y: number, z: number): void {
         this.data[index].x = x;
         this.data[index].y = y;
@@ -66,13 +77,25 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         this.dummy.updateMatrix();
         this.setMatrixAt(index,this.dummy.matrix);
     }
+    /**
+     * Returns that data of a instance by the index,
+     * this func is mostly used by raycasting
+     */
     public getIndex(index: number): WorldObjectData | undefined {
         if(index < 0 || index > this.data.length) return;
         return this.data[index];
     }
+    /**
+     * Returns the data of a instances based on the id
+     */
     public getItem(id: UUID): WorldObjectData | undefined {
         return this.data.find(value=>value.id === id);
     }
+    /**
+     * Edit the properity of a instance's data.
+     * Note: setting the shown property may not change the visablity of the object in the world, but will stop it from having its postion or rotation updated,
+     * so its better to just use the 'setVisibility' to set visiblity.
+     */
     public editInstance(id: UUID, data: IEditableWorldObjectData): void {
         const index = this.data.findIndex(value=>value.id===id);
         if(index === -1){
@@ -85,21 +108,45 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
         }
         this.update();
     }
+    /**
+     * Create a new instance to the world
+     */
     public createInstance(data: WorldObjectData): void { 
         this.data.push(data);
         this.count = this.data.length;
         this.update();
     }
+    /**
+     * Removes a single instance form the scene 
+     */
     public removeInstance(id: UUID): void {
-        this.data = this.data.filter(item=>item.id !== id);
-        this.count = this.data.length;
-        this.update();
+        const index = this.data.findIndex(el=>el.id === id);
+
+        if(index === -1) {
+            console.error("Failed to remove a instance that does not exist");
+            return;
+        }
+
+        this.swapInstance(this.data.length - 1, index);
+        this.data.pop();
+
+        if(index < this.count) {
+            this.count--;
+        }
     }
+    /**
+     * Removes all instances.
+     */
     public removeAll(): void {
         this.data = [];
         this.count = 0;
-        this.update();
+        this.instanceMatrix.needsUpdate = true;
     }
+    /**
+     * Update a single instances visiblity.
+     * setting a instance to false does not remove its instance from the data pool,
+     * but it is not rendered in the world.
+     */
     public setVisibility(id: UUID, visible: boolean): boolean {
         const index = this.data.findIndex(value=>value.id===id);
         if(index === -1){
@@ -132,31 +179,15 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
 
         return true;
     }
+    /**
+     * Updates the positions and rotation of all instances.
+     */
     public update(): void {
         for(let i = 0; i < this.data.length; i++){
+            if(!this.data[i].shown) continue;
             this.setPostion(i,this.data[i].x,this.data[i].y,this.data[i].z);
             this.setRotation(i,this.data[i].rotation);
         }
         this.instanceMatrix.needsUpdate = true;
     }
 }
-
-/*
- public removeInstance(index: number): WorldObjectData {
-        if (index < 0 || index >= this.data.length) throw new Error('Index out of bounds');
-        const len = this.data.length - 1;
-
-        let item = this.data[index];
-
-        for(let i = index; i < len; i++){
-            this.data[i] = this.data[i + 1];
-        }
-
-        this.data.length = len;
-
-        this.update();
-
-        return item;
-    }
-
-*/

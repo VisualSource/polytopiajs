@@ -86,6 +86,7 @@ export default class Player {
                 break;
         }
     }
+    
     public toJSON(){
         return {
             capital_uuid: this.capital_uuid,

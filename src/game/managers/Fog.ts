@@ -2,18 +2,15 @@ import EventEmitter from "../core/EventEmitter";
 import { SystemEvents, GameEvent } from "../events/systemEvents";
 import {nanoid} from 'nanoid';
 import InstancedObject, { type WorldObjectData } from '../world/rendered/InstancedObject';
-import { MeshBasicMaterial, BoxBufferGeometry } from 'three';
-import type Engine from "../core/Engine";
 import type { SystemEventListener } from "../core/EventEmitter";
 import type { Tribe } from "../core/types";
-import type World from "../world/World";
-import type PlayerController from "./PlayerController";
 import type NArray from "../../utils/NArray";
+import type Game from '../core/Game';
 
 export default class Fog implements SystemEventListener {
     public events: EventEmitter = new EventEmitter();
     private fog_layer: NArray<number>;
-    constructor(private world: World, private engine: Engine, private players: PlayerController){
+    constructor(private game: Game){
         this.events.onId<SystemEvents, GameEvent>({ name: SystemEvents.GAME_EVENT, id: GameEvent.FOG_CHANGE  },(event)=>{
             this.loadFog(event.data.last,event.data.now);
         });
@@ -35,19 +32,16 @@ export default class Fog implements SystemEventListener {
                     });
                 }
             }
-
-            const mat = new MeshBasicMaterial();
-            const geo = new BoxBufferGeometry(2,2,2);
-
-            const fog = new InstancedObject("FOG",geo,mat,data,4,size**2);
-            this.engine.scene.add(fog);
+            const assets = await this.game.assets.getAsset("CLOUD",0,"gltf");
+            const fog = new InstancedObject("FOG",assets.geometry,assets.material,data,4,this.game.world.level.size**2);
+            this.game.engine.scene.add(fog);
         } catch (error) {
             console.log("Failed to create fog layer");
         }
         return this;
     }
     public getObject(): InstancedObject | undefined {
-        return this.engine.scene.getObjectByName("FOG") as ( InstancedObject | undefined )
+        return this.game.engine.scene.getObjectByName("FOG") as ( InstancedObject | undefined )
     }
     public setFogTileVisablity(row: number, col: number, state: boolean): void {
         const obj = this.getObject();
@@ -68,11 +62,11 @@ export default class Fog implements SystemEventListener {
     }
     public loadFog(old: Tribe | undefined, next: Tribe): void {
         if(old) {
-            let fog = this.players.players.get(old);
+            let fog = this.game.players.players.get(old);
             if(fog) fog.fog_map = this.fog_layer;
         }
 
-        const player = this.players.players.get(next);
+        const player = this.game.players.players.get(next);
         if(!player) return;
         if(!player.fog_map) return;
         this.fog_layer = player.fog_map;
@@ -82,10 +76,10 @@ export default class Fog implements SystemEventListener {
                 this.updateFog(row,col,this.fog_layer.get(row,col));
             }
         }
-        if(player.camera) this.engine.setCameraPos = player.camera;
+        if(player.camera) this.game.engine.setCameraPos = player.camera;
     }
     public updateFog(row: number, col: number, state: number) {
-        const tile = this.world.level.get(row,col);
+        const tile = this.game.world.level.get(row,col);
         if(!tile) return;
         const bool = Boolean(state);
         this.fog_layer.set(row,col,state);

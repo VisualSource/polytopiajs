@@ -1,6 +1,11 @@
 [
     {
         "type": "model",
+        "name": "CLOUD",
+        "file": "assets/CLOUD.glb"
+    },
+    {
+        "type": "model",
         "name": "IMPERIUS_CITY",
         "file": "assets/IMPERIUS_CITY.glb"
     },

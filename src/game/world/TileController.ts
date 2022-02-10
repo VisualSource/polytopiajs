@@ -1,12 +1,11 @@
 import { nanoid } from "nanoid";
-import EventEmitter from "../core/EventEmitter";
+import EventEmitter, { type SystemEventListener } from "../core/EventEmitter";
 import { Tile, BuildTile, City } from "./Tile";
 import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
 import { RenderOrder } from "../core/renderOrder";
 import type { TileJson, CityJson } from './Tile';
 import type { WorldTile } from "./generator/WorldGenerator";
-import type { SystemEventListener } from "../core/EventEmitter";
-import type {Position, Tech, TileBase, Tribe, UUID} from '../core/types';
+import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type InstancedObject from "./rendered/InstancedObject";
 import type CityTile from "./rendered/CityTile";
 import type Game from "../core/Game";
@@ -33,9 +32,6 @@ export interface TileControllerJson {
  * @listens INTERACTION
  * @emits UNIT 
  * @emits INTERACTION
- * @export
- * @class TileController
- * @implements {SystemEventListener}
  */
 export default class TileController implements SystemEventListener {
     /**
@@ -212,7 +208,13 @@ export default class TileController implements SystemEventListener {
             type
         }});
     }
-    public async addBuilding(): Promise<void> {}
+    public async addBuilding(): Promise<void> {
+        try {
+            if(this.top) throw new Error(`${this.top.type} already exists on this tile`);
+        } catch (error) {
+            console.error(error);
+        }
+    }
     public removeBuilding(): void {
         if(!this.top) return;
         try {
@@ -220,26 +222,27 @@ export default class TileController implements SystemEventListener {
             let obj = this.game.engine.scene.getObject<InstancedObject>(top_type);
             if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);
             obj.removeInstance(this.top.id);
-            this.top = null;
         } catch (error) {
             console.warn(error);
+        } finally {
+            this.top = null;
         }
     }
-    public destory(){
+    public destory(): void {
         try {
+            this.removeBuilding();
+
             const base_type = this.base.getType(this.tribe);
             let obj = this.game.engine.scene.getObject<InstancedObject>(base_type);
             if(!obj) throw new Error(`Failed to destory object | ${base_type}:${this.base.id} | Why: Object type does not exist`);
 
             obj.removeInstance(this.base.id);
 
-            this.removeBuilding();
-
         } catch (error) {
             console.warn(error);
         }
     }
-    public setVisablity(show: boolean) {
+    public setVisablity(show: boolean): void  {
         this.visible = show;
 
         if(this.unit) {
@@ -268,7 +271,7 @@ export default class TileController implements SystemEventListener {
             }
         }
     }
-    public async render(){
+    public async render(): Promise<void> {
         try {
             if((this.base as City)?.isCity) {
 

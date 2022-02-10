@@ -57,10 +57,10 @@ export default class Game implements SystemEventListener {
         this.players = PlayerController.init(tribes,this.engine); // Set the current players of the game
         this.world = new World(this); // init world
         const { capitals } = await this.world.createWorld(tribes,11); // generate world
-        this.players.setCapitals(capitals,this.world); // set the uuid of capitals to players 
+        this.players.setupPlayers(capitals,this.world); // set the uuid of capitals to players 
         this.ui = new UI(this); // init ui stats funcs
         this.actions = new ActionsManager(this.world,this.players, this.settings,this.assets,this.engine); // init game events handler
-        this.fog = await new Fog(this.world,this.engine,this.players).init(this.world.level.size);
+        this.fog = await new Fog(this).init(this.world.level.size);
         this.fog.loadFog(undefined,this.players.activePlayer);
         return true;
     }

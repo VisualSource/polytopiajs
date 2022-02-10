@@ -20,7 +20,15 @@ export default class PlayerController {
     private activeIndex = 0;
     private events: EventEmitter = new EventEmitter();
     constructor(private engine: Engine){}
-    public setCapitals(data: { tribe: Tribe, uuid: UUID }[], world: World): void {
+    /**
+     * does the main set for players in a world.
+     * Sets up: 
+     *  Player fog layer
+     *  adding the players capitals to the player object
+     *  spwnaing the default unit
+     *  setting the default camera postion 
+     */
+    public setupPlayers(data: { tribe: Tribe, uuid: UUID }[], world: World): void {
         for(const { tribe, uuid } of data){
             const team = this.players.get(tribe);
 
@@ -44,6 +52,7 @@ export default class PlayerController {
             if(team){
                 team.fog_map = fog;
                 team.capital_uuid = uuid;
+                world.unit_controller.createUnit(team.tribe,"WARRIOR",capital,uuid);
                 team.camera = {
                     target: {
                         x: capital.row * 4,
