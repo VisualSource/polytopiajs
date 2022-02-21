@@ -23,7 +23,7 @@
     "last 1 Edge version"
   ],
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.36",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.37",
     "@testing-library/svelte": "^3.0.3",
     "@tsconfig/svelte": "^3.0.0",
     "@types/bootstrap": "^5.1.9",
