@@ -9,7 +9,8 @@
     "build": "npm run spritesheet && vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "spritesheet": "node ./scripts/spritesheet.js"
+    "spritesheet": "node ./scripts/spritesheet.js",
+    "nebula": "./scripts/nebula-editor/Nebula.exe"
   },
   "author": "VisualSource",
   "license": "MIT",
