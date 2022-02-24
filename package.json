@@ -66,6 +66,6 @@
     "workbox-precaching": "^6.4.2",
     "workbox-recipes": "^6.4.2",
     "workbox-routing": "^6.4.2",
-    "workbox-strategies": "^6.4.2"
+    "workbox-strategies": "^6.5.0"
   }
 }
