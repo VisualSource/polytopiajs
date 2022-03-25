@@ -60,7 +60,7 @@
     "three-nebula": "^10.0.3",
     "three-spritetext": "^1.6.5",
     "troika-three-text": "^0.45.0",
-    "workbox-cacheable-response": "^6.4.2",
+    "workbox-cacheable-response": "^6.5.2",
     "workbox-core": "^6.4.2",
     "workbox-expiration": "^6.4.2",
     "workbox-precaching": "^6.4.2",
