@@ -4,6 +4,7 @@ import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type {Position, Tribe, UUID, Skill, UnitType } from "../core/types";
 import type PlayerController from "../managers/PlayerController";
+import { EqualDepth, GreaterDepth, LessDepth } from "three";
 
 interface IUnit {
     type: UnitType;
@@ -124,7 +125,7 @@ export class Unit {
         if(this.health > this.maxHealth) this.health = this.maxHealth;
     }
     public setPostion(next_tile_owner: UUID, postion: Position){
-        const model = this.engine.scene.getObject(this.model_id);
+        const model = this.engine.scenes.unit.getObject(this.model_id);
         if(!model) return;
 
         this.position = postion;
@@ -135,7 +136,7 @@ export class Unit {
         });
     }
     public set visible(show: boolean) {
-        const model = this.engine.scene.getObject(this.model_id);
+        const model = this.engine.scenes.unit.getObject(this.model_id);
         if(!model) throw new Error(`Failed to set visablity on non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
 
         this._visable = show;
@@ -149,7 +150,7 @@ export class Unit {
         this.hasAttacked = false;
     }
     public destory(){
-        const model = this.engine.scene.getObject(this.model_id);
+        const model = this.engine.scenes.unit.getObject(this.model_id);
         if(!model) throw new Error(`Failed to destory non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
         model.removeInstance(this.uuid);
     }
@@ -165,7 +166,7 @@ export class Unit {
     public async setTribe(tribe: Tribe){
         if(this.tribe === tribe) return;
 
-        const unit = this.engine.scene.getObject(this.model_id);
+        const unit = this.engine.scenes.unit.getObject(this.model_id);
         if(!unit) throw new Error(`Failed to get object for model with id of ${this.model_id}`);
 
         const data = unit.getItem(this.uuid);
@@ -182,11 +183,12 @@ export class Unit {
         try {
             if(!this.engine || !this.asset ) throw new Error(`Unit was not init correctly`);
             
-            let model = this.engine.scene.getObject(this.model_id);
+            let model = this.engine.scenes.unit.getObject(this.model_id);
             if(!model) {
                 const asset = await this.asset.getAsset(this.type,this.model_index,"gltf");
-                model = this.engine.scene.createObjectInstance(this.model_id,asset.geometry,asset.material);
+                model = this.engine.scenes.unit.createObjectInstance(this.model_id,asset.geometry,asset.material);
                 model.renderOrder = RenderOrder.UNIT;
+                (model.material as THREE.Material).depthFunc = LessDepth;
             }
 
             model.createInstance({

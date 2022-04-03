@@ -9,9 +9,6 @@ import type { UnitJson } from "./Unit";
 import type { TileControllerJson } from './TileController';
 import type { VariantGLTF } from "../loaders/KHR_Variants";
 import type { Tribe, UUID } from "../core/types";
-import type Engine from "../core/Engine";
-import type AssetLoader from "../loaders/AssetLoader";
-import type PlayerController from "../managers/PlayerController";
 import type { City } from "./Tile";
 import type Game from "../core/Game";
 
@@ -64,7 +61,7 @@ export default class World {
         const capitals: { tribe: Tribe, uuid: UUID }[] = [];
         const level: NArray<TileController> = new NArray(size);
 
-        this.game.engine.scene.activeLevelReady();
+       // this.game.engine.scene.activeLevelReady();
 
         for(const tile of leveldata){
             const controller = TileController.createNew(this.game,tile);
@@ -87,7 +84,6 @@ export default class World {
             (tile.base as City).claimLand(this,city.uuid,city.tribe);
         }
 
-
         return {
             level,
             capitals
@@ -107,7 +103,7 @@ export default class World {
 
         const level: NArray<TileController> = new NArray(worlddata.size);
 
-        this.game.engine.scene.activeLevelReady();
+        //this.game.engine.scene.activeLevelReady();
 
         for(const tile of worlddata.leveldata["overworld"]) {
             const controller = TileController.createFromJson(this.game,tile);

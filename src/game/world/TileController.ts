@@ -219,7 +219,7 @@ export default class TileController implements SystemEventListener {
         if(!this.top) return;
         try {
             const top_type = this.top.getType(this.tribe);
-            let obj = this.game.engine.scene.getObject<InstancedObject>(top_type);
+            let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(top_type);
             if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);
             obj.removeInstance(this.top.id);
         } catch (error) {
@@ -233,7 +233,7 @@ export default class TileController implements SystemEventListener {
             this.removeBuilding();
 
             const base_type = this.base.getType(this.tribe);
-            let obj = this.game.engine.scene.getObject<InstancedObject>(base_type);
+            let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(base_type);
             if(!obj) throw new Error(`Failed to destory object | ${base_type}:${this.base.id} | Why: Object type does not exist`);
 
             obj.removeInstance(this.base.id);
@@ -250,7 +250,7 @@ export default class TileController implements SystemEventListener {
         }
 
         if((this.base as City)?.isCity) {
-            let obj = this.game.engine.scene.getObject<CityTile>((this.base as City).key);
+            let obj = this.game.engine.scenes.tile.getObject<CityTile>((this.base as City).key);
             if(obj) {   
                 obj.visible = show;
             }
@@ -258,14 +258,14 @@ export default class TileController implements SystemEventListener {
         }
 
         const base_type = this.getBaseModalName();
-        let obj = this.game.engine.scene.getObject<InstancedObject>(base_type);
+        let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(base_type);
         if(obj) {
            obj.setVisibility(this.base.id,show);
         }
         if(this.top){
             const top_type = this.getTopModalName();
             if(!top_type) throw new Error("Failed to get top modal name.");
-            let obj = this.game.engine.scene.getObject<InstancedObject>(top_type);
+            let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(top_type);
             if(obj) {
               obj.setVisibility(this.top.id,show);
             }
@@ -277,7 +277,7 @@ export default class TileController implements SystemEventListener {
 
                 const base = this.base as City;
                 
-                let city = this.game.engine.scene.getObject<CityTile>(base.key);
+                let city = this.game.engine.scenes.tile.getObject<CityTile>(base.key);
 
                 if(!city) {
                     const model_type = {
@@ -285,7 +285,7 @@ export default class TileController implements SystemEventListener {
                         name: `LAND_${ this.owning_tribe === "xin-xi" ? "IMPERIUS" : this.owning_tribe?.toUpperCase() }`
                     }
                     const model = await this.game.assets.getAsset("LAND",model_type,"gltf");
-                    city = this.game.engine.scene.createCityInstance(base.key, this.position, this.uuid ,model.geometry,model.material);
+                    city = this.game.engine.scenes.tile.createCityInstance(base.key, this.position, this.uuid ,model.geometry,model.material);
                     city.visible = true;
                     await base.render(this.game.assets,this.game.engine,this.owning_tribe as Tribe, this.uuid);
                 }
@@ -294,11 +294,11 @@ export default class TileController implements SystemEventListener {
 
             // Generate base level asset
             const base_type = this.getBaseModalName();
-            let obj = this.game.engine.scene.getObject<InstancedObject>(base_type);
+            let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(base_type);
             if(!obj) {
                 const {asset,type,item} = this.base.manifest(this.tribe);
                 const model = await this.game.assets.getAsset(asset,item,type);
-                obj = this.game.engine.scene.createObjectInstance(base_type,model.geometry,model.material);
+                obj = this.game.engine.scenes.tile.createObjectInstance(base_type,model.geometry,model.material);
                 obj.renderOrder = RenderOrder.BASE;
             }
 
@@ -317,11 +317,11 @@ export default class TileController implements SystemEventListener {
             if(this.top){
                 const top_type = this.getTopModalName();
                 if(!top_type) throw new Error("Failed to get top modal name.");
-                let obj = this.game.engine.scene.getObject<InstancedObject>(top_type);
+                let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(top_type);
                 if(!obj){
                     const {asset,item,type} = this.top.manifest(this.tribe);
                     const model = await this.game.assets.getAsset(asset,item,type);
-                    obj = this.game.engine.scene.createObjectInstance(top_type,model.geometry,model.material);
+                    obj = this.game.engine.scenes.tile.createObjectInstance(top_type,model.geometry,model.material);
                     obj.renderOrder = RenderOrder.TOP;
                     
                 }

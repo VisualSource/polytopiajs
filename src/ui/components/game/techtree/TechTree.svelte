@@ -38,7 +38,7 @@
 
     const game = new Game();
 
-    const p = game.world.players.getActivePlayer();
+    const p = game.players.getActivePlayer();
 
     const tier_one_cost = (): number => {
         return 1 * p.citys + 4;

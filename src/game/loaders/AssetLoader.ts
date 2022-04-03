@@ -1,10 +1,11 @@
 import localforage from 'localforage';
 import JsZip from 'jszip';
+import Nebula from 'three-nebula';
 
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { LoadingManager } from 'three';
+import { LoadingManager, TextureLoader, SpriteMaterial, Sprite } from 'three';
 
 import KHR_Variants from './KHR_Variants';
 import type { VariantGLTF } from './KHR_Variants';
@@ -33,6 +34,14 @@ interface ManifestItem {
     resource?: string;
 }
 
+interface LoadedAsset {
+    type: "sound" | "asset" | "partical";
+    data: { 
+        name: string, 
+        asset: GLTF | THREE.Group | AudioBuffer | Nebula
+    }
+}
+
 /**
  *  @see https://www.iana.org/assignments/media-types/media-types.xhtml#model
 */
@@ -54,6 +63,7 @@ const mimeTypes = {
 export default class AssetLoader  {
     static INSTANCE: AssetLoader | null = null;
     public assets: Map<string, GLTF | THREE.Group> = new Map();
+    private particals: Map<string, Nebula> = new Map();
     public audio: Map<string,AudioBuffer> = new Map();
     public context: AudioContext;
     constructor(init: boolean = false){
@@ -61,7 +71,9 @@ export default class AssetLoader  {
         AssetLoader.INSTANCE = this;
         if(init) this.init();
     }
-
+    public getPartical(asset: string): Nebula | undefined {
+        return this.particals.get(asset);
+    }
     public async getAsset(asset: string, item: Variant = 0, type: ModelType = "gltf"){
         const content = this.assets.get(asset);
         if(!content) throw new Error(`Failed to get asset "${asset}"`);
@@ -166,7 +178,7 @@ export default class AssetLoader  {
             console.error("INSTALL ERROR |", error);
         }
     }
-    private async *cache(assets: ManifestItem[], file: JsZip): AsyncGenerator<CachedAsset, null, any>{
+    private async *cache(assets: ManifestItem[], file: JsZip): AsyncGenerator<CachedAsset, null, void>{
         let i = 0;
         while (i < assets.length) {
             const filePath = assets[i].file;
@@ -195,7 +207,7 @@ export default class AssetLoader  {
         }
         return null;
     }
-    private async *loadAsset(cachedAssets: Map<string, CachedAsset>): AsyncGenerator<{ type: "sound" | "asset", data: { name: string, asset: GLTF | THREE.Group | AudioBuffer } }, null, any> {
+    private async *loadAsset(cachedAssets: Map<string, CachedAsset>): AsyncGenerator<LoadedAsset, null, void> {
         const loaderManager = new LoadingManager(
             undefined, undefined,(url: string)=> {console.error("Loader Error |", url);});
         const gltfLoader = new GLTFLoader(loaderManager);
@@ -208,7 +220,7 @@ export default class AssetLoader  {
                 case "model/gltf-binary":
                 case "model/gltf+json":{
                     
-                    const gltfAsset = await gltfLoader.parseAsync(await data.blob.arrayBuffer(),"");
+                    const gltfAsset: VariantGLTF = await gltfLoader.parseAsync(await data.blob.arrayBuffer(),"") as any;
 
                     if("functions" in gltfAsset){
                         await (gltfAsset as VariantGLTF).functions.ensureLoadVariants(gltfAsset.scene.children[0] as THREE.Mesh);
@@ -256,6 +268,23 @@ export default class AssetLoader  {
                     break;
                 }
                 case "application/json": {
+                    try {
+                        const raw = await data.blob.text();
+                        const partical = JSON.parse(raw);
+
+                        const system = await Nebula.fromJSONAsync(partical, { TextureLoader, SpriteMaterial, Sprite });
+
+                        yield {
+                            type: "partical",
+                            data: {
+                                name,
+                                asset: system
+                            }
+                        };
+
+                    } catch (error) {
+                        console.error(error);
+                    }
                     break;
                 }
                 case "audio/webm":
@@ -292,10 +321,18 @@ export default class AssetLoader  {
         if(!pak) throw new Error("Failed to load asset.");
         
         for await (const asset of this.loadAsset(pak)) {
-            if(asset.type === "asset") {
-                this.assets.set(asset.data.name,asset.data.asset as (GLTF | THREE.Group));
-            } else {
-                this.audio.set(asset.data.name,asset.data.asset as AudioBuffer);
+            switch (asset.type) {
+                case "asset":
+                    this.assets.set(asset.data.name,asset.data.asset as (GLTF | THREE.Group));
+                    break;
+                case "sound":
+                    this.audio.set(asset.data.name,asset.data.asset as AudioBuffer);
+                    break;
+                case "partical":
+                    this.particals.set(asset.data.name,asset.data.asset);
+                    break;
+                default:
+                    break;
             }
         }
 

@@ -107,7 +107,7 @@ export default class UnitController implements SystemEventListener {
             this.mesh_movement.renderOrder = RenderOrder.SELECTOR;
             this.mesh_attack = new InstancedObject("SELECTOR_ATTACK",mesh.geometry, attack_mat,[]);
             this.mesh_attack.renderOrder = RenderOrder.SELECTOR;
-            this.game.engine.scene.add(this.mesh_movement,this.mesh_attack);
+            this.game.engine.scenes.ui.add(this.mesh_movement,this.mesh_attack);
         } catch (error) {
             console.error(error);
         }

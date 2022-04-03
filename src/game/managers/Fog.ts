@@ -34,14 +34,14 @@ export default class Fog implements SystemEventListener {
             }
             const assets = await this.game.assets.getAsset("CLOUD",0,"gltf");
             const fog = new InstancedObject("FOG",assets.geometry,assets.material,data,4,this.game.world.level.size**2);
-            this.game.engine.scene.add(fog);
+            this.game.engine.scenes.tile.add(fog);
         } catch (error) {
             console.log("Failed to create fog layer");
         }
         return this;
     }
     public getObject(): InstancedObject | undefined {
-        return this.game.engine.scene.getObjectByName("FOG") as ( InstancedObject | undefined )
+        return this.game.engine.scenes.tile.getObjectByName("FOG") as ( InstancedObject | undefined )
     }
     public setFogTileVisablity(row: number, col: number, state: boolean): void {
         const obj = this.getObject();

@@ -11,6 +11,7 @@ import Settings from './Settings';
 import Fog from '../managers/Fog';
 import type { SystemEventListener } from './EventEmitter';
 import type { Tribe } from './types';
+import { Transparency } from '../../utils/transparency';
 
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
@@ -62,6 +63,8 @@ export default class Game implements SystemEventListener {
         this.actions = new ActionsManager(this.world,this.players, this.settings,this.assets,this.engine); // init game events handler
         this.fog = await new Fog(this).init(this.world.level.size);
         this.fog.loadFog(undefined,this.players.activePlayer);
+
+        //Transparency.init(this.engine.scene.children as any);
         return true;
     }
     public async destory(){

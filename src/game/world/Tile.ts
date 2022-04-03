@@ -383,7 +383,7 @@ export class City extends Tile {
         };
     }
     public async levelUpCity(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {
-        const tile = engine.scene.getObject<CityTile>(this.key);
+        const tile = engine.scenes.tile.getObject<CityTile>(this.key);
 
         if(!tile) {
             console.warn("Render | Failed to regenerate city | Why: city object does not exist.");
@@ -406,7 +406,7 @@ export class City extends Tile {
     
     public async render(assets: AssetLoader, engine: Engine, tribe: Tribe, owner: UUID): Promise<void> {
         try {
-            const tile = engine.scene.getObject<CityTile>(this.key);
+            const tile = engine.scenes.tile.getObject<CityTile>(this.key);
 
             if(!tile) {
                 console.warn("Render | Failed to render city |", this.id, "| Why: Root object does not exist.");
@@ -424,7 +424,6 @@ export class City extends Tile {
 
                 item.createInstance({
                     id: "",
-                    index: 0,
                     owner: owner,
                     rotation: 0,
                     shown: true,

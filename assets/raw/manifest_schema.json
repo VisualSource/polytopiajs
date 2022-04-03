@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#", 
+    "$id": "#manifest",
+    "type":"array",
+    "required": [
+        "name",
+        "file"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "type": { "const": "model" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "file": {
+                        "pattern": "^(assets/)(.)*(.obj|.glb|.glft)$"
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": { "const": "partical" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "file": {
+                        "pattern": "^(assets/)(.)*(.json)$"
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": { "const": "sound" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "file": {
+                        "pattern": "^(sound/)(.)*(.webm|.mp4)$"
+                    }
+                }
+            }
+        }
+    ],
+    "properties": {
+        "type": {
+            "type":"string",
+            "enum": ["model","sound","material","partical"]
+        },
+        "file": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "resource": {
+            "type": "string"
+        }
+    }
+}
