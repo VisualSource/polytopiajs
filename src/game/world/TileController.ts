@@ -9,6 +9,7 @@ import type {Position, TileBase, Tribe, UUID} from '../core/types';
 import type InstancedObject from "./rendered/InstancedObject";
 import type CityTile from "./rendered/CityTile";
 import type Game from "../core/Game";
+import { GreaterDepth } from "three";
 
 /**
  * The selected object on this tile.
@@ -67,7 +68,7 @@ export default class TileController implements SystemEventListener {
     } | null = null;
     private tribe: Tribe;
     private isSelected: boolean = false;
-    constructor(private game: Game){
+    private constructor(private game: Game){
         this.events.on(SystemEvents.INTERACTION,(event)=>{
             switch (event.id) {
                 case ObjectEvents.TILE_SELECT:
@@ -102,7 +103,7 @@ export default class TileController implements SystemEventListener {
                 if(this.owning_tribe && this.game.players.playerHasTech(this.owning_tribe,"meditation")) return 1.5;
                 return 1;
             case "CITY":
-                const unit = this.game.world.units.get(this.unit as string);
+                const unit = this.game.engine.scenes. unit.getUnit(this.unit as UUID);
                 if(this.base.metadata?.cityWall && unit?.tribe === this.owning_tribe && unit?.skills.includes("FORTIFY")) return 4;
                 return 1;
             default:
@@ -127,6 +128,7 @@ export default class TileController implements SystemEventListener {
             this.base = Tile.defaultConstructor(tile_data.base as TileBase, tile_data.metadata);
             if(tile_data.buldings.length > 0) this.top = BuildTile.createNew(tile_data.buldings);
         }
+        this.game.engine.scenes.tile.insertTile(this.uuid,this.position);
         return this;
     }
     /**
@@ -144,6 +146,7 @@ export default class TileController implements SystemEventListener {
         }
         this.road = json.road;
         this.owning_tribe = json.owning_tribe;
+        this.game.engine.scenes.tile.insertTile(this.uuid,this.position);
         return this;
     }
     public toJSON(): TileControllerJson {
@@ -238,6 +241,7 @@ export default class TileController implements SystemEventListener {
 
             obj.removeInstance(this.base.id);
 
+            this.game.engine.scenes.tile.deleteTile(this.uuid);
         } catch (error) {
             console.warn(error);
         }
@@ -299,7 +303,6 @@ export default class TileController implements SystemEventListener {
                 const {asset,type,item} = this.base.manifest(this.tribe);
                 const model = await this.game.assets.getAsset(asset,item,type);
                 obj = this.game.engine.scenes.tile.createObjectInstance(base_type,model.geometry,model.material);
-                obj.renderOrder = RenderOrder.BASE;
             }
 
             obj.createInstance({
@@ -322,8 +325,6 @@ export default class TileController implements SystemEventListener {
                     const {asset,item,type} = this.top.manifest(this.tribe);
                     const model = await this.game.assets.getAsset(asset,item,type);
                     obj = this.game.engine.scenes.tile.createObjectInstance(top_type,model.geometry,model.material);
-                    obj.renderOrder = RenderOrder.TOP;
-                    
                 }
 
                 obj.createInstance({

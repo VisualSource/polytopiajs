@@ -4,7 +4,6 @@ import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
 import type {Position, Tribe, UUID, Skill, UnitType } from "../core/types";
 import type PlayerController from "../managers/PlayerController";
-import { EqualDepth, GreaterDepth, LessDepth } from "three";
 
 interface IUnit {
     type: UnitType;
@@ -64,7 +63,9 @@ export class Unit {
     public hasAttacked: boolean = false;
     public maxHealth: number = 10;
     private _visable: boolean = true;
-    constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){}   
+    private constructor(private engine: Engine, private asset: AssetLoader, private players: PlayerController){
+        this.engine.scenes.unit.insertUnit(this);
+    }   
     public get model_id(): string {
         return `${this.type}_${this.tribe.toUpperCase()}`;
     } 
@@ -153,6 +154,7 @@ export class Unit {
         const model = this.engine.scenes.unit.getObject(this.model_id);
         if(!model) throw new Error(`Failed to destory non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
         model.removeInstance(this.uuid);
+        this.engine.scenes.unit.removeUnit(this.uuid);
     }
     public canMove(): boolean {
         return !this.hasAttacked && !this.hasMoved;
@@ -187,8 +189,6 @@ export class Unit {
             if(!model) {
                 const asset = await this.asset.getAsset(this.type,this.model_index,"gltf");
                 model = this.engine.scenes.unit.createObjectInstance(this.model_id,asset.geometry,asset.material);
-                model.renderOrder = RenderOrder.UNIT;
-                (model.material as THREE.Material).depthFunc = LessDepth;
             }
 
             model.createInstance({

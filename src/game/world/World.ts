@@ -22,10 +22,9 @@ export interface WorldJson {
 }
 
 export default class World {
-    public lookup: Map<UUID,{ row: number, col: number }> = new Map();
+    //public lookup: Map<UUID,{ row: number, col: number }> = new Map();
     // this problily will need to be a map for when working with different dimensions and the like.
     public level: NArray<TileController>;
-    public units: Map<string,Unit> = new Map();
     public selector: SelectorTile;
     public unit_controller: UnitController;
     constructor(private game: Game){
@@ -70,18 +69,18 @@ export default class World {
                 capitals.push({ tribe: tile.tribe, uuid: controller.uuid });
             }
             level.set(tile.row,tile.col,controller);
-            this.lookup.set(controller.uuid,{ row: tile.row, col: tile.col })
+           // this.lookup.set(controller.uuid,{ row: tile.row, col: tile.col })
 
             await controller.render();
         }   
         this.level = level;
 
         for(const city of capitals){
-            const pos = this.lookup.get(city.uuid);
+            const pos = this.game.engine.scenes.tile.getTile(city.uuid);
             if(!pos) continue;
             const tile = this.level.get(pos.row,pos.col);
             if(!tile) continue;
-            (tile.base as City).claimLand(this,city.uuid,city.tribe);
+            (tile.base as City).claimLand(this.game.engine,this,city.uuid,city.tribe);
         }
 
         return {
@@ -108,14 +107,13 @@ export default class World {
         for(const tile of worlddata.leveldata["overworld"]) {
             const controller = TileController.createFromJson(this.game,tile);
             level.set(tile.position.row,tile.position.col,controller);
-            this.lookup.set(controller.uuid,tile.position);
+         //   this.lookup.set(controller.uuid,tile.position);
             await controller.render();
         }
 
         for(const unit of worlddata.units) {
             const json_unit = Unit.createFromJson(this.game.engine,this.game.assets,this.game.players,unit);
 
-            this.units.set(json_unit.uuid,json_unit);
             const tile = level.get(unit.position.row,unit.position.col).setUnit(json_unit.uuid);
             await json_unit.render(tile.uuid);
         }
@@ -130,21 +128,13 @@ export default class World {
         }
         return world;
     }
-    public unitsToJson(){
-        let units: UnitJson[] = [];
-        this.units.forEach((value)=>{
-            units.push(value.toJSON());
-        });
-        return units;
-
-    }
     public async saveWorld(): Promise<WorldJson> {
         return {
             size: this.level.size,
             leveldata: {
                 "overworld": this.levelToJson(),
             },
-            units: this.unitsToJson()
+            units: this.game.engine.scenes.unit.unitsToJson()
         }
     }
         

@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
 import { chebyshev_distance } from "../../utils/math";
-import { RenderOrder } from "../core/renderOrder";
+
 import type { Position, Tribe, UUID, UnitType } from "../core/types";
 import type { VariantGLTF } from "../loaders/KHR_Variants";
 import type { SystemEventListener } from "../core/EventEmitter";
@@ -34,8 +34,8 @@ export default class UnitController implements SystemEventListener {
         });
     }
     private eventAttack(event: any){
-        const attacker = this.game.world.units.get(event.data.attacker);
-        const defender = this.game.world.units.get(event.data.defender);
+        const attacker = this.game.engine.scenes.unit.getUnit(event.data.attacker);
+        const defender = this.game.engine.scenes.unit.getUnit(event.data.defender);
         if(!attacker || !defender) return;
       //  console.log("ATTACK",event.data, attacker,defender);
 
@@ -77,7 +77,7 @@ export default class UnitController implements SystemEventListener {
         this.events.emit<SystemEvents,ObjectEvents>({ type: SystemEvents.INTERACTION, id: ObjectEvents.DESELECTION, data: { unit_deselection: true } });
     }
     private eventGenerate(event: any){
-        const unit = this.game.world.units.get(event.data.unit);
+        const unit = this.game.engine.scenes.unit.getUnit(event.data.unit);
         if(!unit) return;
         if(unit.tribe !== this.game.players.activePlayer) return;
 
@@ -104,30 +104,26 @@ export default class UnitController implements SystemEventListener {
             attack_mat.color = new Color("red")
 
             this.mesh_movement = new InstancedObject("SELECTOR_MOVEMENT",mesh.geometry,movement_mat,[]);
-            this.mesh_movement.renderOrder = RenderOrder.SELECTOR;
             this.mesh_attack = new InstancedObject("SELECTOR_ATTACK",mesh.geometry, attack_mat,[]);
-            this.mesh_attack.renderOrder = RenderOrder.SELECTOR;
-            this.game.engine.scenes.ui.add(this.mesh_movement,this.mesh_attack);
+            this.game.engine.scenes.selector.add(this.mesh_movement,this.mesh_attack);
         } catch (error) {
             console.error(error);
         }
     }
     public destoryUnit(id: UUID){
-        const unit = this.game.world.units.get(id);
+        const unit = this.game.engine.scenes.unit.getUnit(id);
         if(!unit) return;
         this.game.world.level.get(unit.position.row,unit.position.col).setUnit();
         unit.destory();
-        this.game.world.units.delete(id);
     }
     public async createUnit(tribe: Tribe, type: UnitType, position: Position, orgin: UUID){
         const unit = Unit.createNew(this.game.engine,this.game.assets,this.game.players, { type, tribe, position, orgin });
-        this.game.world.units.set(unit.uuid,unit);
         const tile = this.game.world.level.get(position.row,position.col).setUnit(unit.uuid);
         await unit.render(tile.uuid);
         return unit;
     }
     public moveUnit(id: UUID, pos: Position) {
-        const unit = this.game.world.units.get(id);
+        const unit = this.game.engine.scenes.unit.getUnit(id);
         if(!unit) return;
         const tile = this.game.world.level.get(pos.row,pos.col);
         tile.setUnit(unit.uuid);
@@ -150,7 +146,7 @@ export default class UnitController implements SystemEventListener {
         }
     }
     public healUnit(id: UUID): void {
-        const unit = this.game.world.units.get(id);
+        const unit = this.game.engine.scenes.unit.getUnit(id);
         if(!unit || !(unit.health > unit.maxHealth) ) return;
 
         let healRate = 2;
@@ -160,7 +156,7 @@ export default class UnitController implements SystemEventListener {
         unit.heal(healRate);
     }
     public generateBootArea(center: Position, range: number, unit_uuid: UUID, bootID: ActionEvent) {
-        const self = this.game.world.units.get(unit_uuid);
+        const self = this.game.engine.scenes.unit.getUnit(unit_uuid);
         if(!self) return;
 
         // hide tiles
@@ -174,7 +170,7 @@ export default class UnitController implements SystemEventListener {
 
                 if(!data || (i === 0 && j === 0) || !data.unit || !data.visible ) continue;
 
-                const friend = this.game.world.units.get(data.unit);
+                const friend = this.game.engine.scenes.unit.getUnit(data.unit);
                 if(!friend || (friend.tribe !== self.tribe) ) continue;
 
                 // generate mesh.
@@ -210,7 +206,7 @@ export default class UnitController implements SystemEventListener {
         However, units with the float or Fly skills are not affected. 
         */
 
-        const unit = this.game.world.units.get(unit_uuid);
+        const unit = this.game.engine.scenes.unit.getUnit(unit_uuid);
         if(!unit || !unit.canMove()) return;
         const center = unit.position;
         const unitOnRoad = this.game.world.level.get(unit.position.row,unit.position.col).road;
@@ -256,7 +252,7 @@ export default class UnitController implements SystemEventListener {
         this.mesh_movement.visible = true;
     }
     public generateAttackArea(center: Position, range: number, unit_uuid: UUID){
-        const self = this.game.world.units.get(unit_uuid);
+        const self = this.game.engine.scenes.unit.getUnit(unit_uuid);
         if(!self || !self.canAttack()) return;
 
         this.hideAttack();
@@ -270,7 +266,7 @@ export default class UnitController implements SystemEventListener {
                 // 0,0 is the center
                 if(!data || (i === 0 && j === 0) || !data.unit || !data.visible ) continue;
 
-                const enemy = this.game.world.units.get(data.unit);
+                const enemy = this.game.engine.scenes.unit.getUnit(data.unit);
                 if(!enemy || (enemy.tribe === self.tribe) ) continue;
 
                 
@@ -305,7 +301,7 @@ export default class UnitController implements SystemEventListener {
         this.mesh_attack.visible = false;
     }
     public setUnitVisibility(id: UUID, visable: boolean){
-        const unit = this.game.world.units.get(id);
+        const unit = this.game.engine.scenes.unit.getUnit(id);
         if(!unit) {
             console.error(`No unit with id (${id}) exists`);
             return;

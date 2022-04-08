@@ -36,7 +36,7 @@ export default class Fog implements SystemEventListener {
             const fog = new InstancedObject("FOG",assets.geometry,assets.material,data,4,this.game.world.level.size**2);
             this.game.engine.scenes.tile.add(fog);
         } catch (error) {
-            console.log("Failed to create fog layer");
+            console.error("Failed to create fog layer");
         }
         return this;
     }

@@ -302,7 +302,7 @@ export class City extends Tile {
     public level_data: CityLevelData;
     public city_name: string = "";
     public population: number = 0;
-    constructor(){
+    private constructor(){
         super();
         this.level_data = new CityLevelData(this);
     }
@@ -313,8 +313,8 @@ export class City extends Tile {
             await this.levelUpCity(assets,engine,tribe,owner);
         }
     }
-    public claimLand(world: World, id: UUID, tribe: Tribe, range: number = 1): void {
-        const center = world.lookup.get(id);
+    public claimLand(engine: Engine, world: World, id: UUID, tribe: Tribe, range: number = 1): void {
+        const center = engine.scenes.tile.getTile(id);
     
         if(!center) return;
 

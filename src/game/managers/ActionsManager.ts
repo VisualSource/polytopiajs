@@ -16,7 +16,7 @@ export default class ActionsManager implements SystemEventListener {
         this.events.on(SystemEvents.GAME_EVENT,(event)=>{
             if((event.id === GameEvent.TURN_CHANGE)){
                 replace("/loading");
-                this.world.units.forEach(unit=>{
+                this.engine.scenes.unit.forUnit(unit=>{
                     if(unit.tribe === event.data.last) unit.reset();
                 });
 
@@ -26,7 +26,7 @@ export default class ActionsManager implements SystemEventListener {
             }
         })
         this.events.on(SystemEvents.ACTION,(event)=>{
-            const pos = this.world.lookup.get(event.data.tile);
+            const pos = this.engine.scenes.tile.getTile(event.data.tile);
             if(!pos) return;
             const tile = this.world.level.get(pos.row,pos.col);
             if(!tile) return;
@@ -52,13 +52,12 @@ export default class ActionsManager implements SystemEventListener {
                     if(!tile.top) break;
                     // will need to get the closest city to add pop to
                     const uuid = this.players.getActivePlayer().capital_uuid;
-                    const pos = this.world.lookup.get(uuid);
+                    const pos = this.engine.scenes.tile.getTile(uuid);
                     if(!pos) break;
 
                     const city = this.world.level.get(pos.row,pos.col);
 
                     (city.base as City).add_population(1,{ engine: this.engine, assets: this.assets, tribe: city.owning_tribe as Tribe, owner: city.uuid });
-
 
                     tile.removeBuilding();
                     break;

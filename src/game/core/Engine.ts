@@ -1,22 +1,22 @@
-import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
-import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
-//import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import type { Pass } from 'three/examples/jsm/postprocessing/Pass';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import CameraControls from 'camera-controls';
 import { WebGLRenderer, OrthographicCamera, Fog,
     MathUtils, MOUSE, Quaternion, Vector2 , Vector3, 
     Vector4, Spherical, Matrix4, Raycaster, Box3, Sphere, TextureLoader,
-    Group, HemisphereLight, DirectionalLight, Color, Light } from 'three';
+    Group, HemisphereLight, DirectionalLight, Color } from 'three';
 
 import EventEmitter from '../core/EventEmitter';
 import { ObjectEvents, SystemEvents } from '../events/systemEvents';
 
-import WorldScene from '../world/rendered/Scene';
-import UIScene from '../world/scences/UiScene';
+import UIScene from '../world/scences/UIScene';
 import TileScene from '../world/scences/TileScene';
 import UnitScene from '../world/scences/UnitScene';
-
+import SelectorScene from '../world/scences/SelectorScene';
 
 import { isMobile } from '../../utils/mobile';
 import TouchTap from './TouchTap';
@@ -29,15 +29,29 @@ import { BehaviorSubject } from 'rxjs';
 interface Scenes {
     unit: UnitScene,
     ui: UIScene,
-    tile: TileScene
+    tile: TileScene,
+    selector: SelectorScene
 }
 
+interface Renders {
+    [key: string]: {
+        composer: EffectComposer;
+        effects: {
+            [key: string]: Pass
+        }
+    }
+}
+
+interface SceneOptions { 
+    lights?: boolean; 
+    rootScene?: boolean;
+    ffaa?: boolean;
+    outline?: boolean;
+}
 export default class Engine implements SystemEventListener {
-    private fxaa: ShaderPass;
-   // private outlinePass: OutlinePass;
     private controls: CameraControls;
     private renderer: WebGLRenderer;
-    private composer: EffectComposer;
+    private renders: Renders = {};
     private camera: OrthographicCamera;
     private raycaster: Raycaster = new Raycaster();
     private textureLoader: TextureLoader = new TextureLoader();
@@ -78,7 +92,8 @@ export default class Engine implements SystemEventListener {
         this.scenes = {
             tile: new TileScene(this.level),
             ui: new UIScene(this.level),
-            unit: new UnitScene(this.level)
+            unit: new UnitScene(this.level),
+            selector: new SelectorScene(this.level)
         }
         // create camera
         this.camera = new OrthographicCamera( 
@@ -91,35 +106,56 @@ export default class Engine implements SystemEventListener {
         );
 
         // Effect composer setup
-        this.composer = new EffectComposer(this.renderer);
-        this.composer.setSize(window.innerWidth,window.innerHeight);
-        this.composer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth,window.innerHeight, true);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.camera.position.set(0,0,100);
 
-        // Effects
-       /* this.outlinePass = new OutlinePass(
-            new Vector2(window.innerWidth,window.innerHeight), this.scene, this.camera
-        );
-        this.outlinePass.visibleEdgeColor = new Color('#ffffff');
-        this.outlinePass.hiddenEdgeColor = new Color('#190a05');
-        this.outlinePass.edgeStrength = 3;
-        this.outlinePass.edgeGlow = 1;
-        this.outlinePass.edgeThickness = 1;
-        this.outlinePass.pulsePeriod = 0;
-        this.outlinePass.usePatternTexture = false;
+        this.initControls();
+        this.createPass("tile",this.scenes.tile,{ lights: true, rootScene: true, ffaa: true });
+        this.createPass("unit",this.scenes.unit,{ lights: true, ffaa: true });
+        this.createPass("selector",this.scenes.selector,{ lights: true, ffaa: true });
+        this.createPass("ui",this.scenes.ui,{});
+      
+        this.renderer.setAnimationLoop(this.animationLoop);
+    }
+    private createPass<T extends THREE.Scene>(key: string, scene: T, opt: SceneOptions) {
+        const composer = new EffectComposer(this.renderer);
+        composer.addPass(new RenderPass(scene,this.camera));
 
-        this.composer.addPass(this.outlinePass);*/
+        this.renders[key] = {
+            composer,
+            effects: {}
+        }
 
-        this.fxaa = new ShaderPass(FXAAShader);
+        if(opt?.ffaa) {
+            const fxaa = new ShaderPass(FXAAShader);
+            const pixelRatio = this.renderer.getPixelRatio();
+            
+            fxaa.material.uniforms['resolution'].value.x = 1 / (this.renderer.domElement.offsetWidth * pixelRatio);
+            fxaa.material.uniforms['resolution'].value.y = 1 / (this.renderer.domElement.offsetHeight * pixelRatio);
+            composer.addPass(fxaa);
+            this.renders[key].effects["ffaa"] = fxaa;
+        }
+        if(opt?.outline) {
+            const outlinePass = new OutlinePass(
+                new Vector2(window.innerWidth,window.innerHeight), scene, this.camera
+            );
+            outlinePass.visibleEdgeColor = new Color('#ffffff');
+            outlinePass.hiddenEdgeColor = new Color('#190a05');
+            outlinePass.edgeStrength = 3;
+            outlinePass.edgeGlow = 1;
+            outlinePass.edgeThickness = 1;
+            outlinePass.pulsePeriod = 0;
+            outlinePass.usePatternTexture = false;
+    
+            composer.addPass(outlinePass);
+            this.renders[key].effects["outline"] = outlinePass;
+        }
 
-        const pixelRatio = this.renderer.getPixelRatio();
+        this.initScene(scene,opt?.lights,opt?.rootScene);
 
-        this.fxaa.material.uniforms['resolution'].value.x = 1 / (this.renderer.domElement.offsetWidth * pixelRatio);
-        this.fxaa.material.uniforms['resolution'].value.y = 1 / (this.renderer.domElement.offsetHeight * pixelRatio);
-        this.composer.addPass(this.fxaa);
-
+    }
+    private initControls(){
         this.controls = new CameraControls(this.camera,this.renderer.domElement);
         this.controls.polarAngle = 0.8726646259971647;
         this.controls.azimuthAngle = 3.9269908169872414;
@@ -143,12 +179,6 @@ export default class Engine implements SystemEventListener {
         } else {
             this.renderer.domElement.addEventListener("click",this.selection_normal,true);    
         }
-
-        this.initScene(this.scenes.tile,true,true);
-        this.initScene(this.scenes.unit,true);
-        this.initScene(this.scenes.ui);
-
-        this.renderer.setAnimationLoop(this.animationLoop);
     }
     private initScene<T extends THREE.Scene>(scene: T, lights: boolean = false, root: boolean = false): void {
         if(root){
@@ -157,9 +187,6 @@ export default class Engine implements SystemEventListener {
             scene.fog = new Fog(0x000000);
         }
         if(lights){
-            // rendering effects
-            //this.composer.addPass(new RenderPass(scene,this.camera));
-
             // lights
             const lightGroup = new Group();
             lightGroup.name = "Lights";
@@ -175,9 +202,6 @@ export default class Engine implements SystemEventListener {
     
             scene.add(lightGroup);
         }
-    }
-    public addOutline(object: THREE.Object3D) {
-      //  this.outlinePass.selectedObjects.push(object);
     }
     public destory(){
         document.removeEventListener("resize",this.resize);
@@ -250,17 +274,17 @@ export default class Engine implements SystemEventListener {
         this.camera.top = this.frustumSize / 2;
         this.camera.bottom = -this.frustumSize / 2;*/
 
-        this.composer.setSize(window.innerWidth,window.innerHeight);
-        this.composer.setPixelRatio(window.devicePixelRatio);
+        //this.composer.setSize(window.innerWidth,window.innerHeight);
+       // this.composer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth,window.innerHeight, true);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
         this.camera.updateProjectionMatrix();
 
-        const pixelRatio = this.renderer.getPixelRatio();
+        //const pixelRatio = this.renderer.getPixelRatio();
 
-        this.fxaa.material.uniforms['resolution'].value.x = 1 / (this.renderer.domElement.offsetWidth * pixelRatio);
-        this.fxaa.material.uniforms['resolution'].value.y = 1 / (this.renderer.domElement.offsetHeight * pixelRatio);
+       // this.fxaa.material.uniforms['resolution'].value.x = 1 / (this.renderer.domElement.offsetWidth * pixelRatio);
+       // this.fxaa.material.uniforms['resolution'].value.y = 1 / (this.renderer.domElement.offsetHeight * pixelRatio);
     }
     private hoverUpdate() {
         if(this.is_mobile) return;
@@ -284,16 +308,28 @@ export default class Engine implements SystemEventListener {
     private animationLoop = (time: number) => {
         this.controls.update(time);
         this.hoverUpdate();
-        //this.composer.render(time);
 
+      /*  this.renders["tile"].composer.render(time);
+        this.renderer.autoClear = false;
+        this.renderer.clearDepth();
+
+        this.renders["selector"].composer.render(time);
+        this.renderer.clearDepth();*/
+
+        // tile layer   
         this.renderer.render(this.scenes.tile,this.camera);
         this.renderer.autoClear = false;
         this.renderer.clearDepth();
+        // selector layer
+        this.renderer.render(this.scenes.selector,this.camera);
+        this.renderer.clearDepth();
+        // unit layer
         this.renderer.render(this.scenes.unit,this.camera);
         this.renderer.clearDepth();
+        // ui layer
         this.renderer.render(this.scenes.ui,this.camera);
         this.renderer.autoClear = true;
-
+        
        // Transparency.update(this.scene.children as any, this.camera);
     }
     set setCameraPos(data: { target: { x: number, y: number, z: number }, zoom: number }) {

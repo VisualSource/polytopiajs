@@ -19,7 +19,7 @@ export default class PlayerController {
     private _turn: number = 0;
     private activeIndex = 0;
     private events: EventEmitter = new EventEmitter();
-    constructor(private engine: Engine){}
+    private constructor(private engine: Engine){}
     /**
      * does the main set for players in a world.
      * Sets up: 
@@ -32,11 +32,13 @@ export default class PlayerController {
         for(const { tribe, uuid } of data){
             const team = this.players.get(tribe);
 
+            console.info("Preparing tribe",tribe);
+
             const fog = new NArray<number>(world.level.size);
             fog.fill(0);
 
-            const capital = world.lookup.get(uuid);
-            if(!capital) return;
+            const capital = this.engine.scenes.tile.getTile(uuid);
+            if(!capital) continue;
 
             for(let i = -1; i <= 1; i++) {
                 for(let j = -1; j <= 1; j++) {

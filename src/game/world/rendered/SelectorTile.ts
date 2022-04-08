@@ -65,6 +65,6 @@ export default class SelectorTile implements SystemEventListener {
         // Don't add the selector to the level group.
         // this stops the ray from hitting it so,
         // we don't need to worry about having to deal with it.
-        engine.scenes.ui.add(this.mesh);
+        engine.scenes.selector.add(this.mesh);
     }
 }

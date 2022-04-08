@@ -34,7 +34,7 @@ export default class UI {
         this.ctr = ctr;
         this.ctxU = null;
         if(this.ctr.unit){
-            const unit = this.game.world.units.get(this.ctr.unit);
+            const unit = this.game.engine.scenes.unit.getUnit(this.ctr.unit);
             if(!unit) return;
             this.ctxU = unit;
         }
