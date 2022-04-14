@@ -1,3 +1,4 @@
+import { map, Subject, BehaviorSubject } from 'rxjs';
 import Player from "./Player";
 import type { Tech, Tribe, UUID } from "../core/types";
 import EventEmitter from "../core/EventEmitter";
@@ -5,6 +6,38 @@ import { GameEvent, SystemEvents, UIEvent } from "../events/systemEvents";
 import type Engine from "../core/Engine";
 import type World from "../world/World";
 import NArray from "../../utils/NArray";
+
+class ActivePlayer {
+    public player: Subject<Player> = new Subject();
+    private _p: Player;
+    constructor(){
+        this.player.subscribe(player=>{
+            this._p = player;
+        });
+    }
+    public get value(): Player {
+        return this._p;
+    }
+    public inc_star_gain(value: number): void {
+        this._p.star_gain += value;
+        this.player.next(this._p);
+    }
+    public inc_stars(value: number): void {
+        this._p.stars += value;
+        this.player.next(this._p);
+    }
+    public inc_citys(value: number): void {
+        this._p.citys += value;
+        this.player.next(this._p);
+    }
+    public hasTech(tech: Tech): boolean {
+        return (this._p.tech as any)[tech] ?? false;
+    }
+    public setActive(player: Player) {
+        this.player.next(player);
+    }
+}
+
 
 export default class PlayerController {
     static loadFromJson(engine: Engine): PlayerController {
@@ -15,13 +48,24 @@ export default class PlayerController {
     }
     public tribes: Tribe[] = [];
     public players: Map<Tribe,Player> = new Map();
-    private _active_player: Tribe = "imperius";
-    private _turn: number = 0;
-    private activeIndex = 0;
-    private events: EventEmitter = new EventEmitter();
-    private constructor(private engine: Engine){}
+    public turn: BehaviorSubject<number> = new BehaviorSubject(0);
+    public active: ActivePlayer = new ActivePlayer();
+    private _activeIndex = 0;
+    private _events: EventEmitter = new EventEmitter();
+    private constructor(private engine: Engine){ }
+    public jsonConstructor(): this {
+        return this;
+    }
+    public defaultConstructor(tribes: Tribe[]): this {
+        this.tribes = tribes;
+        for(const tribe of tribes){
+            this.players.set(tribe,new Player(tribe,null));
+        }
+        this.activePlayer = tribes[0];
+        return this;
+    }
     /**
-     * does the main set for players in a world.
+     * does the main setup for players in a world.
      * Sets up: 
      *  Player fog layer
      *  adding the players capitals to the player object
@@ -65,71 +109,27 @@ export default class PlayerController {
                 };
             }
         }
+
+        const tribe = this.tribes[this._activeIndex];
+        this.activePlayer = tribe;
     }
-    public getActivePlayer(): Player {
-        const p = this.players.get(this.activePlayer);
-        if(!p) throw new Error("Failed to get active player data");
-        return p;
+    private incTurn(): void {
+        this.turn.next(this.turn.getValue() + 1);
     }
-    get activePlayerStarGain(): number {
-        return this.getActivePlayer().star_gain;
+    private saveActive(): Tribe {
+        const current = this.active.value;
+        current.camera = this.engine.getCameraPos;
+        this.players.set(current.tribe,current);
+        return current.tribe;
     }
-    set activePlayerStarGain(value: number) {
-        const p = this.getActivePlayer();
-        p.star_gain = value;
-        this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.STAR_GAIN_CHANGE, data: { star_gain: p.star_gain } });
-    }
-    get activePlayerStars(): number {
-        return this.getActivePlayer().stars
-    }
-    set activePlayerStars(value: number) {
-        const p = this.getActivePlayer();
-        p.stars += value;
-        this.events.emit<SystemEvents,UIEvent>({type: SystemEvents.UI, id: UIEvent.STARS_CHANGE, data: { stars: p.stars }});
-    }
-    get activePlayerScore(): number {
-        return this.getActivePlayer().score;
-    }
-    set activePlayerScore(value: number){
-        const p = this.getActivePlayer();
-        p.score += value;
-        this.events.emit<SystemEvents, UIEvent>({ type: SystemEvents.UI, id: UIEvent.SCORE_CHANGE, data: { score: p.score } });
-    }
-    set activePlayerCitys(value: number){
-        const p = this.getActivePlayer();
-        p.citys = value;
-    }
-    public updateTurn(): void {
-        this._turn++;
-        this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.TURN_CHANGE, data: { turn: this._turn } });
-    }
-    set activePlayer(value: Tribe){
-        this._active_player = value;
-        const p = this.getActivePlayer();
+    private set activePlayer(value: Tribe){
+        const p = this.players.get(value);
+        if(!p) throw new Error(`Failed to find tribe ${value}`);
         if(p.camera) this.engine.setCameraPos = p.camera;
-        this.events.emit<SystemEvents,UIEvent>({ type: SystemEvents.UI, id: UIEvent.ALL, data: {
-            score: p.score,
-            stars: p.stars,
-            turn: this._turn,
-            star_gain: p.star_gain
-        } });
-    }
-    get activePlayer(): Tribe {
-        return this._active_player;
-    }
-    public jsonConstructor(): this {
-        return this;
-    }
-    public defaultConstructor(tribes: Tribe[]): this {
-        this.tribes = tribes;
-        for(const tribe of tribes){
-            this.players.set(tribe,new Player(tribe,null));
-        }
-        this.activePlayer = tribes[0];
-        return this;
+        this.active.setActive(p);
     }
     public activePlayerHas(tech: Tech): boolean {
-        return this.playerHasTech(this.activePlayer,tech);
+        return this.active.hasTech(tech);
     }
     public playerHasTech(tribe: Tribe, tech: Tech): boolean {
         const player = this.players.get(tribe);
@@ -137,15 +137,15 @@ export default class PlayerController {
         return (player.tech as any)[tech] ?? false;
     }
     public changeTurn(){
-        const current = this.players.get(this.activePlayer);
-        if(current) { current.camera = this.engine.getCameraPos; }
-        this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: { last: this.activePlayer } });
-        this.activeIndex++;
-        if(this.activeIndex >= this.players.size) this.activeIndex = 0;
-        this.activePlayer = this.tribes[this.activeIndex];
-        this.events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.FOG_CHANGE, data: { now: this.activePlayer, last: current?.tribe } });
-        this.updateTurn();
-        
+        const last = this.saveActive();
+        this._events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.TURN_CHANGE, data: { last } });
+
+        this._activeIndex++;
+        if(this._activeIndex >= this.players.size) this._activeIndex = 0;
+        this.activePlayer = this.tribes[this._activeIndex];
+
+        this._events.emit<SystemEvents,GameEvent>({ type: SystemEvents.GAME_EVENT, id: GameEvent.FOG_CHANGE, data: { now: this.activePlayer, last } });
+        this.incTurn();
     }
     public toJson(){
         let players: any[] = [];
@@ -154,7 +154,7 @@ export default class PlayerController {
         });
         return {
             players,
-            active_player: this._active_player
+            active_player: this._activeIndex
         };
     }
 

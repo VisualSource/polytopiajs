@@ -1,5 +1,6 @@
 //import { InstancedUniformsMesh } from 'three-instanced-uniforms-mesh';
 import { DynamicDrawUsage, Object3D, InstancedMesh, Matrix4 } from "three";
+import { remove, sortBy } from 'lodash-es';
 import EventEmittter from '../../core/EventEmitter';
 import type { SystemEventListener } from '../../core/EventEmitter';
 import type { UUID } from "../../core/types";
@@ -40,18 +41,27 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
      * swap two instance in the matrix and data array.
      * This is mostly used for visablity, moving hidden instances to the end.
      */
-    private swapInstance(a: number, b: number): void {
+    private swapInstance(index1: number, index2: number): void {
         const cachedMatrix = new Matrix4();
-        const cachedData = this.data[a];
-        this.getMatrixAt(a,cachedMatrix);
+        this.getMatrixAt(index1,cachedMatrix);
+        const cachedData = this.data[index1];
+       
 
         const matrix = new Matrix4();
-        this.getMatrixAt(b,matrix);
-        this.setMatrixAt(a,matrix);
-        this.data[a] = this.data[b];
+        this.getMatrixAt(index2,matrix);
+        this.setMatrixAt(index1,matrix);
+        this.data[index1] = this.data[index2];
 
-        this.setMatrixAt(b,cachedMatrix);
-        this.data[b] = cachedData;
+        this.setMatrixAt(index2,cachedMatrix);
+        this.data[index2] = cachedData;
+    }
+    // visible instances should be at the fount of the array.
+    private sortVisablity(){
+        this.data.sort((a,b)=>{
+            if(!a.shown && b.shown) return -1;
+            if(a.shown === b.shown) return 0;
+            return 1;
+        });
     }
      /**
      * Sets that rotation of a instance
@@ -113,26 +123,45 @@ export default class InstancedObject extends InstancedMesh implements SystemEven
      */
     public createInstance(data: WorldObjectData): void { 
         this.data.push(data);
+        
+        this.sortVisablity();
+
         this.count = this.data.length;
+    
         this.update();
     }
     /**
      * Removes a single instance form the scene 
      */
     public removeInstance(id: UUID): void {
-        const index = this.data.findIndex(el=>el.id === id);
 
-        if(index === -1) {
-            console.error("Failed to remove a instance that does not exist");
-            return;
-        }
+        remove(this.data,item=>item.id===id);
 
-        this.swapInstance(this.data.length - 1, index);
-        this.data.pop();
+        if(this.count !== 0) this.count--;
+        this.instanceMatrix.needsUpdate = true;
 
-        if(index < this.count) {
-            this.count--;
-        }
+        this.update();
+
+     
+       // const index = this.data.findIndex(el=>el.id === id);
+
+
+      //  if(index === -1) {
+       //     console.error("Failed to remove a instance that does not exist");
+      //      return;
+     //   }
+
+       // this.swapInstance(this.data.length - 1, index);
+       // this.data.pop();
+
+      //  if(index < this.count) {
+      //      this.count--;
+      //  }
+
+        
+
+      //  this.count = this.data.length;
+       // this.instanceMatrix.needsUpdate = true;
     }
     /**
      * Removes all instances.

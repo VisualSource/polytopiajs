@@ -62,7 +62,7 @@ export default class Game implements SystemEventListener {
         this.ui = new UI(this); // init ui stats funcs
         this.actions = new ActionsManager(this.world,this.players, this.settings,this.assets,this.engine); // init game events handler
         this.fog = await new Fog(this).init(this.world.level.size);
-        this.fog.loadFog(undefined,this.players.activePlayer);
+        this.fog.loadFog(undefined,this.players.active.value.tribe);
 
         //Transparency.init(this.engine.scene.children as any);
         return true;

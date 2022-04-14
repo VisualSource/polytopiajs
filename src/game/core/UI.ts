@@ -51,7 +51,7 @@ export default class UI {
         if(!this.ctr) return [];
         
         if(this.hasUnit()){
-            if(!this.ctxU || this.game.players.activePlayer !== this.ctxU.tribe) return [];
+            if(!this.ctxU || this.game.players.active.value.tribe !== this.ctxU.tribe) return [];
             let action = [];
             if(this.ctxU.health < this.ctxU.maxHealth) {
                 action.push({ id: ActionEvent.RECOVER, data: { unit: this.ctr.unit, tile: this.ctr.uuid } });
@@ -65,7 +65,7 @@ export default class UI {
             }
 
             return action;
-        } else if((this.ctr.base as City)?.isCity && this.game.players.activePlayer === this.ctr.owning_tribe){
+        } else if((this.ctr.base as City)?.isCity && this.game.players.active.value.tribe === this.ctr.owning_tribe){
             let actions = [];
 
             actions.push({ id: ActionEvent.SPAWN, data: { tile: this.ctr.uuid, type: "WARRIOR" } });
@@ -106,7 +106,7 @@ export default class UI {
     public getDescription(): string {
         if(!this.ctr) return "";
 
-        if((this.ctr.base as City)?.isCity) return this.game.players.activePlayer === this.ctr.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
+        if((this.ctr.base as City)?.isCity) return this.game.players.active.value.tribe === this.ctr.owning_tribe ? "Choose a unit to produce" : "Move a unit here to capture this city!";
 
         if(this.ctr.top) {
             switch (this.ctr.top.type) {

@@ -11,9 +11,6 @@ export default class ParticalManager {
         const data = this.game.assets.getPartical(partical);
         if(!data) throw new Error("Invaild partical name");
 
-        const nebulaRenderer = new SpriteRenderer(this.game.engine.scene,{ BoxGeometry, Mesh, MeshLambertMaterial});
-        const a = data.addRenderer(nebulaRenderer);
-
-
+    
     }
 }

@@ -51,7 +51,7 @@ export default class ActionsManager implements SystemEventListener {
                 case ActionEvent.GATHER:{
                     if(!tile.top) break;
                     // will need to get the closest city to add pop to
-                    const uuid = this.players.getActivePlayer().capital_uuid;
+                    const uuid = this.players.active.value.capital_uuid;
                     const pos = this.engine.scenes.tile.getTile(uuid);
                     if(!pos) break;
 

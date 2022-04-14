@@ -221,6 +221,7 @@ export default class TileController implements SystemEventListener {
     public removeBuilding(): void {
         if(!this.top) return;
         try {
+            console.log(this.position);
             const top_type = this.top.getType(this.tribe);
             let obj = this.game.engine.scenes.tile.getObject<InstancedObject>(top_type);
             if(!obj) throw new Error(`Failed to destory object | ${top_type}:${this.top.id} | Why: Object type does not exist`);

@@ -79,7 +79,7 @@ export default class UnitController implements SystemEventListener {
     private eventGenerate(event: any){
         const unit = this.game.engine.scenes.unit.getUnit(event.data.unit);
         if(!unit) return;
-        if(unit.tribe !== this.game.players.activePlayer) return;
+        if(unit.tribe !== this.game.players.active.value.tribe) return;
 
         this.generateMovementArea(event.data.unit);
         this.generateAttackArea(unit.position,unit.range,unit.uuid);
