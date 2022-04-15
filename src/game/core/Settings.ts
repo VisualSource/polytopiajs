@@ -6,6 +6,7 @@ export default class Settings {
     public suggestions = true;
     public info_on_build = true;
     public volume: number = 50;
+    public lang: string = "en-US";
     constructor(){}
     public load(): void {}
 }

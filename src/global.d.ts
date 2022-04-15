@@ -89,3 +89,9 @@ declare module "three-nebula" {
         constructor(scene: THREE.Scene, THREE: THREE_SpriteRenderer_ref);
     }
 }
+
+declare module 'qs' {
+    function stringify(obj: any, options?: qs.IStringifyOptions): string;
+    function parse(str: string, options?: qs.IParseOptions & { decoder?: never | undefined }): qs.ParsedQs;
+    function parse(str: string | Record<string, string>, options?: qs.IParseOptions): { [key: string]: unknown };
+}

@@ -1,9 +1,10 @@
+import { BehaviorSubject } from 'rxjs';
 import EventEmitter from './EventEmitter';
 import AssetLoader from '../loaders/AssetLoader';
 import Engine from './Engine';
 import World from '../world/World';
 import PlayerController from '../managers/PlayerController';
-import {init} from './debug';
+import { init } from './debug';
 import { SystemEvents } from '../events/systemEvents';
 import ActionsManager from '../managers/ActionsManager';
 import UI from './UI';
@@ -11,8 +12,20 @@ import Settings from './Settings';
 import Fog from '../managers/Fog';
 import type { SystemEventListener } from './EventEmitter';
 import type { Tribe } from './types';
-import { Transparency } from '../../utils/transparency';
-import { BehaviorSubject } from 'rxjs';
+import { replace } from 'svelte-spa-router';
+
+interface GameParams {
+    init: string; // bool
+    size?: string; // int
+    tribes?: Tribe[];
+    mode?: string;
+    online: string; // bool
+    type: "sp" | "mp";
+    load?: string;
+    token?: string;
+    with?: string[];
+
+}
 
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
@@ -58,7 +71,22 @@ export default class Game implements SystemEventListener {
 
         return this;
     }
-    public async launchGame(settings: {}){}
+    public async launchGame(settings: GameParams,canvas: HTMLCanvasElement){
+        if( !("online" in settings && "init" in settings) ) {
+            replace("/?error=launch-error");
+            return false;
+        }
+        let init = settings.init === "true";
+        let online = settings.online === "true";
+        let size = parseInt(settings?.size ?? "0");
+
+        // fetch map if needed
+
+        console.log(settings);
+
+
+        return this.initEngine(canvas);
+    }
 
 
     public async initEngine(canvas: HTMLCanvasElement): Promise<boolean> {
@@ -75,7 +103,6 @@ export default class Game implements SystemEventListener {
         this.fog = await new Fog(this).init(this.world.level.size);
         this.fog.loadFog(undefined,this.players.active.value.tribe);
 
-        //Transparency.init(this.engine.scene.children as any);
         return true;
     }
     public async destory(){

@@ -1,5 +1,6 @@
 <script lang="ts">
-    import Router, { replace } from 'svelte-spa-router';
+    import Router, { replace, querystring } from 'svelte-spa-router';
+    import {parse} from 'qs';
     import {onMount, onDestroy} from 'svelte';
     import Game from '../../game/core/Game';
     import { timer } from '../../utils/time';
@@ -8,22 +9,27 @@
     import TileInteraction from './game/TileInteraction.svelte';
     import UserStats from './game/UserStats.svelte';
     import Controls from './game/Controls.svelte';
+import type { Subscription } from 'rxjs';
     
     let game: Game;
     let canvas: HTMLCanvasElement;
     let routes = game_routes;
     let ready: boolean = false;
+    let sub: Subscription;
     const prefix = "/playing";
 
     onMount( async ()=>{
+        let settings = parse($querystring ?? "",{ comma: true });
         replace("/playing/loading");
         await timer(100);
+        
         game = Game.Get();
 
-        game.ready.subscribe(async (value)=>{
+        sub = game.ready.subscribe(async (value)=>{
             if(!value) return;
         
-            await game.initEngine(canvas);
+            const ok = await game.launchGame(settings,canvas);
+            if(!ok) return;
             await timer(1000);
 
             replace(game.settings.confirm_turn ? "/playing/change" : "/playing");
@@ -31,7 +37,10 @@
             ready = true;
         });
     });
-    onDestroy(()=>game?.destory());
+    onDestroy(()=>{
+        game?.destory();
+        sub?.unsubscribe();
+    });
 </script>
 
 
