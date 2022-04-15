@@ -1,6 +1,7 @@
 <script lang="ts">
-    import ControlsUI from '../../controllers/ControlsUI';
     import {replace} from 'svelte-spa-router';
+    import { _ } from 'svelte-i18n';
+    import ControlsUI from '../../controllers/ControlsUI';
     const { turnText, turnColor, nextTurn } = new ControlsUI();
 </script>
 
@@ -39,25 +40,25 @@
 </style>
 
 <div id="controls">
-    <div class="ctrl-btn" on:click={()=>replace("/settings")}>
+    <div class="ctrl-btn" on:click={()=>replace("/playing/settings")}>
         <div role="button" class="rounded-circle border border-2 btn-size bg-dark">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
                 <path d="M0 0h24v24H0V0z" fill="none"/>
                 <path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/>
             </svg>
         </div>
-        <span>Settings</span>
+        <span>{$_("game.ui.btn.settings")}</span>
     </div>
-    <div class="ctrl-btn" on:click={()=>replace("/stats")}>
+    <div class="ctrl-btn" on:click={()=>replace("/playing/stats")}>
         <div role="button" class="rounded-circle border border-2 btn-size bg-primary">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
                 <path d="M0 0h24v24H0V0z" fill="none"/>
                 <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>
             </svg>
         </div>
-        <span>Game Stats</span>
+        <span>{$_("game.ui.btn.game_stats")}</span>
     </div>
-    <div class="ctrl-btn" on:click={()=>replace("/tech-tree")}>
+    <div class="ctrl-btn" on:click={()=>replace("/playing/tech-tree")}>
         <div role="button" class="rounded-circle border border-2 btn-size bg-primary">
             <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
                 <g>
@@ -68,16 +69,16 @@
                 </g>
             </svg>
         </div>
-        <span>Tech Tree</span>
+        <span>{$_("game.ui.btn.tech_tree")}</span>
     </div>
-    <div class="ctrl-btn" on:click={()=>replace("/portals")}>
+    <div class="ctrl-btn" on:click={()=>replace("/playing/portals")}>
         <div role="button" class="rounded-circle border border-2 btn-size portal-bg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
                 <path d="M0 0h24v24H0V0z" fill="none"/>
                 <path d="M19 19V4h-4V3H5v16H3v2h12V6h2v15h4v-2h-2zm-6 0H7V5h6v14zm-3-8h2v2h-2z"/>
             </svg>
         </div>
-        <span>Portal</span>
+        <span>{$_("game.ui.btn.portal")}</span>
     </div>
     <div class="ctrl-btn">
         <div role="button" class={"rounded-circle border border-2 btn-size " + $turnColor} on:click={nextTurn}>
@@ -85,6 +86,6 @@
                 <path d="M0 0h24v24H0V0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
             </svg>
         </div>
-        <span>{$turnText}</span>
+        <span>{$_($turnText)}</span>
     </div>
 </div>

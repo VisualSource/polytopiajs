@@ -24,7 +24,7 @@
 
         <div class="icon">HEAD ICON</div>
 
-        <Button color="primary" on:click={()=>replace("/")}>START</Button>
+        <Button color="primary" on:click={()=>replace("/playing")}>START</Button>
 
         <Button color="link" class="text-light" on:click={()=>replace("/")}>Exit</Button>
     </div>

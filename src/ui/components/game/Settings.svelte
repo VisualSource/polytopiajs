@@ -14,14 +14,9 @@
     import { Button } from 'sveltestrap';
     import BackButton from './shared/BackButton.svelte';
     import ToggleButton from './shared/ToggleButton.svelte';
-
     import SettingsUI from '../../controllers/SettingsUI';
-    import { onDestroy } from 'svelte';
-    const { volume, sound_effects, ambience, tribe_music, suggestions, info_on_build, confirm_turn, destory } = new SettingsUI();
 
-    onDestroy(()=>{
-        destory();
-    });
+    const { volume, sound_effects, ambience, tribe_music, suggestions, info_on_build, confirm_turn } = new SettingsUI();
 </script>
 
 <div id="game-settings" in:fade="{{duration: 200}}" out:fade="{{duration: 200}}">

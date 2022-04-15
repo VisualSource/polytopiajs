@@ -35,10 +35,11 @@
     import TechItem from './TechItem.svelte';
     import BackButton from '../shared/BackButton.svelte';
     import Game from '../../../../game/core/Game';
+    import type Player from '../../../../game/managers/Player';
 
-    const game = new Game();
-
-    const p = game.players.getActivePlayer();
+    const game = Game.Get();
+    let p: Player;
+    game.players.active.player.subscribe(value=>{ p = value; });
 
     const tier_one_cost = (): number => {
         return 1 * p.citys + 4;

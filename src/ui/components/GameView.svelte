@@ -3,34 +3,35 @@
     import {onMount, onDestroy} from 'svelte';
     import Game from '../../game/core/Game';
     import { timer } from '../../utils/time';
+    import { game_routes } from '../routes';
 
     import TileInteraction from './game/TileInteraction.svelte';
     import UserStats from './game/UserStats.svelte';
     import Controls from './game/Controls.svelte';
-    import Settings from './game/Settings.svelte';
-    import TechTree from './game/techtree/TechTree.svelte';
-    import GlobalStats from './game/GlobalStats.svelte';
-    import Portals from './game/Portals.svelte';
-    import TurnChange from './game/TurnChange.svelte';
-    import GameLoading from './game/GameLoading.svelte';
-
-    let canvas: HTMLCanvasElement;
-    const routes = { 
-        "/settings": Settings,
-        "/tech-tree": TechTree,
-        "/stats": GlobalStats,
-        "/portals": Portals,
-        "/change": TurnChange,
-        "/loading": GameLoading 
-    };
     
-    onMount(()=>{
-        replace("/loading");
-        Game.INSTANCE?.init().then(self=>{
-            self.initEngine(canvas).then(()=>timer(10000)).then(()=>replace(self.settings.confirm_turn ? "/change" : "/"))
+    let game: Game;
+    let canvas: HTMLCanvasElement;
+    let routes = game_routes;
+    let ready: boolean = false;
+    const prefix = "/playing";
+
+    onMount( async ()=>{
+        replace("/playing/loading");
+        await timer(100);
+        game = Game.Get();
+
+        game.ready.subscribe(async (value)=>{
+            if(!value) return;
+        
+            await game.initEngine(canvas);
+            await timer(1000);
+
+            replace(game.settings.confirm_turn ? "/playing/change" : "/playing");
+
+            ready = true;
         });
     });
-    onDestroy(()=>Game.INSTANCE?.destory());
+    onDestroy(()=>game?.destory());
 </script>
 
 
@@ -47,9 +48,11 @@
 
 
 <div id="game-view">
-    <UserStats/>
+    {#if ready}
+        <UserStats/>
+    {/if}
     <canvas bind:this={canvas} id="polytopia"></canvas>
-    <Router {routes} />
+    <Router {routes} {prefix}/>
     <TileInteraction/>
     <Controls/>
 </div>

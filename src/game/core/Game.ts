@@ -12,6 +12,7 @@ import Fog from '../managers/Fog';
 import type { SystemEventListener } from './EventEmitter';
 import type { Tribe } from './types';
 import { Transparency } from '../../utils/transparency';
+import { BehaviorSubject } from 'rxjs';
 
 export default class Game implements SystemEventListener {
     static INSTANCE: Game | null = null;
@@ -24,14 +25,20 @@ export default class Game implements SystemEventListener {
     public players: PlayerController;
     private actions: ActionsManager;
     public fog: Fog;
-    
+    public ready: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    static Get(): Game {
+        if(Game.INSTANCE) return Game.INSTANCE;
+        return new Game();
+    }
     constructor() {
         if(Game.INSTANCE) return Game.INSTANCE;
         Game.INSTANCE = this;
 
         this.settings.load();
 
-        if(import.meta.env.DEV) init(this);;
+        if(import.meta.env.DEV) init(this);
+
+        this.init();
     }
 
     public async init(){
@@ -47,15 +54,19 @@ export default class Game implements SystemEventListener {
             }
         });
 
+        this.ready.next(true);
+
         return this;
     }
+    public async launchGame(settings: {}){}
+
+
     public async initEngine(canvas: HTMLCanvasElement): Promise<boolean> {
         const tribes: Tribe[] = ["bardur","imperius"]; // THIS IS A TEMP VALUE.
         this.engine = new Engine(canvas);
         this.engine.init(); // START THREEJS, Controls, load assets, etc
         console.info("Init Engine | Starting threejs BUILD", import.meta.env.PACKAGE_VERSION);
-
-        this.players = PlayerController.init(tribes,this.engine); // Set the current players of the game
+        this.players = PlayerController.init(this.engine);
         this.world = new World(this); // init world
         const { capitals } = await this.world.createWorld(tribes,11); // generate world
         this.players.setupPlayers(capitals,this.world); // set the uuid of capitals to players 

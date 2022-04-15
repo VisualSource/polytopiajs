@@ -2,7 +2,7 @@ import { map, Subject, BehaviorSubject } from 'rxjs';
 import Player from "./Player";
 import type { Tech, Tribe, UUID } from "../core/types";
 import EventEmitter from "../core/EventEmitter";
-import { GameEvent, SystemEvents, UIEvent } from "../events/systemEvents";
+import { GameEvent, SystemEvents } from "../events/systemEvents";
 import type Engine from "../core/Engine";
 import type World from "../world/World";
 import NArray from "../../utils/NArray";
@@ -43,8 +43,8 @@ export default class PlayerController {
     static loadFromJson(engine: Engine): PlayerController {
         return new PlayerController(engine).jsonConstructor();
     }
-    static init(tribes: Tribe[], engine: Engine): PlayerController {
-        return new PlayerController(engine).defaultConstructor(tribes);
+    static init(engine: Engine): PlayerController {
+        return new PlayerController(engine);
     }
     public tribes: Tribe[] = [];
     public players: Map<Tribe,Player> = new Map();
@@ -54,14 +54,6 @@ export default class PlayerController {
     private _events: EventEmitter = new EventEmitter();
     private constructor(private engine: Engine){ }
     public jsonConstructor(): this {
-        return this;
-    }
-    public defaultConstructor(tribes: Tribe[]): this {
-        this.tribes = tribes;
-        for(const tribe of tribes){
-            this.players.set(tribe,new Player(tribe,null));
-        }
-        this.activePlayer = tribes[0];
         return this;
     }
     /**
@@ -74,7 +66,9 @@ export default class PlayerController {
      */
     public setupPlayers(data: { tribe: Tribe, uuid: UUID }[], world: World): void {
         for(const { tribe, uuid } of data){
-            const team = this.players.get(tribe);
+            const team = new Player(tribe,null);
+            this.players.set(tribe,team);
+            this.tribes.push(tribe);
 
             console.info("Preparing tribe",tribe);
 

@@ -15,13 +15,13 @@ export default class ActionsManager implements SystemEventListener {
     constructor(private world: World, private players: PlayerController, private settings: Settings, private assets: AssetLoader, private engine: Engine){
         this.events.on(SystemEvents.GAME_EVENT,(event)=>{
             if((event.id === GameEvent.TURN_CHANGE)){
-                replace("/loading");
+                replace("/playing/loading");
                 this.engine.scenes.unit.forUnit(unit=>{
                     if(unit.tribe === event.data.last) unit.reset();
                 });
 
                 timer(500).then(()=>{
-                    if(this.settings.confirm_turn) replace("/change"); else replace("/");
+                    replace(this.settings.confirm_turn ? "/playing/change": "/playing");
                 });
             }
         })

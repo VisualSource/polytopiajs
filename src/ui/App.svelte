@@ -1,10 +1,26 @@
 <script lang="ts">
     import Router from 'svelte-spa-router';
-    import routes from './routes';
+    import { register, init, getLocaleFromNavigator, isLoading } from 'svelte-i18n';
+    import { routes }from './routes';
+
+
+    register("en-US",()=>import("../lang/en-us.json"));
+
+    init({
+      fallbackLocale: 'en-US',
+      initialLocale: getLocaleFromNavigator()
+    });
+
 </script>
 
 <div class="App">
-  <Router {routes} />
+  {#if $isLoading}
+    <div>
+      Loading...
+    </div>
+    {:else}
+    <Router {routes} />
+  {/if}
 </div>
 
 <style lang="sass">

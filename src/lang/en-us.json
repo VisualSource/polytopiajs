@@ -1,0 +1,9 @@
+{
+    "ui.btn.play": "Play",
+    "game.ui.btn.settings": "Settings",
+    "game.ui.btn.game_stats": "Game Stats",
+    "game.ui.btn.tech_tree": "Tech Tree",
+    "game.ui.btn.portal": "Portal",
+    "game.ui.btn.end_turn": "End Turn",
+    "game.ui.btn.finish_turn": "Finish Game"
+}

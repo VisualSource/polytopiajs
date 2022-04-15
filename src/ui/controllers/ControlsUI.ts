@@ -12,15 +12,15 @@ export default class ControlsUI {
         this.game.players.changeTurn();
     }
     public setActions(){
-        this.turnText.set("End Turn");
+        this.turnText.set("game.ui.btn.end_turn");
         this.turnColor.set("bg-dark");
     }
     public setNoActions(){
-        this.turnText.set("End Turn");
+        this.turnText.set("game.ui.btn.end_turn");
         this.turnColor.set("bg-primary");
     }
     public setEndGame(){
-        this.turnText.set("Finish Game");
+        this.turnText.set("game.ui.btn.finish_turn");
         this.turnColor.set("bg-success");
     }
 }
