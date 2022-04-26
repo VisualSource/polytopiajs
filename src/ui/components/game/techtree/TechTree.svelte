@@ -41,29 +41,14 @@
     let p: Player;
     game.players.active.player.subscribe(value=>{ p = value; });
 
-    const tier_one_cost = (): number => {
-        return 1 * p.citys + 4;
-    }
-    const tier_two_cost = (): number => {
-        return 2 * p.citys + 4;
-    }
-    const tier_three_cost = (): number => {
-        return 3 * p.citys + 4;
+    // (technology tier) × (number of cities) + 4. 
+    const tech_cost = (level: number): number => {
+        return level + p.citys + 4;
     }
 
-    const tier_one = () => {
-        return p.stars >= tier_one_cost();
+    const can_buy = (level: number) => {
+        return p.stars >= tech_cost(level);
     }
-
-    const tier_two = () => {
-        return p.stars >= tier_two_cost();
-    }
-    
-    const tier_three = () => {
-        return p.stars >= tier_three_cost();
-    }
-
-    
 
 </script>
 
@@ -71,82 +56,82 @@
     <BackButton/>
     <div class="container-md d-flex flex-column justify-content-center">
         <div class="row tech-row">
-            <TechItem pre={true} canbuy={tier_one()} owned={p.tech.riding} title="Riding" cost={tier_one_cost()}/>
+            <TechItem pre={true} canbuy={can_buy(1)} owned={p.tech.riding} title="Riding" cost={tech_cost(1)}/>
             <hr class="line line-required"/>
             <div class="tech-col">
                 <div class="tech-row">
-                    <TechItem pre={p.tech.riding} canbuy={tier_two()} owned={p.tech.free_spirit} title="Free spirit" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.riding} canbuy={can_buy(2)} owned={p.tech.free_spirit} title="Free spirit" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.free_spirit} canbuy={tier_three()} owned={p.tech.chivalry} title="Chivalry" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.free_spirit} canbuy={can_buy(3)} owned={p.tech.chivalry} title="Chivalry" cost={tech_cost(3)}/>
                 </div>
                 <div class="tech-row">
-                    <TechItem pre={p.tech.riding} canbuy={tier_two()} owned={p.tech.roads} title="Roads" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.riding} canbuy={can_buy(2)} owned={p.tech.roads} title="Roads" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.roads} canbuy={tier_three()} owned={p.tech.trade} title="Trade" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.roads} canbuy={can_buy(3)} owned={p.tech.trade} title="Trade" cost={tech_cost(3)}/>
                 </div>
             </div>
         </div>
         <div class="row tech-row">
-            <TechItem pre={true} canbuy={tier_one()} owned={p.tech.organization} title="Organization" cost={tier_one_cost()}/>
+            <TechItem pre={true} canbuy={can_buy(1)} owned={p.tech.organization} title="Organization" cost={tech_cost(1)}/>
             <hr class="line line-required"/>
             <div class="tech-col">
                 <div class="tech-row">
-                    <TechItem pre={p.tech.organization} canbuy={tier_two()} owned={p.tech.farming} title="Farming" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.organization} canbuy={can_buy(2)} owned={p.tech.farming} title="Farming" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.farming} canbuy={tier_three()} owned={p.tech.construction} title="Construction" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.farming} canbuy={can_buy(3)} owned={p.tech.construction} title="Construction" cost={tech_cost(3)}/>
                 </div>
                 <div class="tech-row">
-                    <TechItem pre={p.tech.organization} canbuy={tier_two()} owned={p.tech.shields} title="Shields" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.organization} canbuy={can_buy(2)} owned={p.tech.shields} title="Shields" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.shields} canbuy={tier_three()} owned={false} cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.shields} canbuy={can_buy(3)} owned={false} cost={tech_cost(3)}/>
                 </div>
             </div>
         </div>
         <div class="row tech-row">
-            <TechItem pre={true} canbuy={tier_one()} owned={p.tech.climbing} title="Climbing" cost={tier_one_cost()}/>
+            <TechItem pre={true} canbuy={can_buy(1)} owned={p.tech.climbing} title="Climbing" cost={tech_cost(1)}/>
             <hr class="line line-required"/>
             <div class="tech-col">
                 <div class="tech-row">
-                    <TechItem pre={p.tech.climbing} canbuy={tier_two()} owned={p.tech.mining} title="Mining" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.climbing} canbuy={can_buy(2)} owned={p.tech.mining} title="Mining" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.mining} canbuy={tier_three()} owned={p.tech.smithery} title="Smithery" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.mining} canbuy={can_buy(3)} owned={p.tech.smithery} title="Smithery" cost={tech_cost(3)}/>
                 </div>
                 <div class="tech-row">
-                    <TechItem pre={p.tech.climbing} canbuy={tier_two()} owned={p.tech.meditation} title="Mediation" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.climbing} canbuy={can_buy(2)} owned={p.tech.meditation} title="Mediation" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.meditation} canbuy={tier_three()} owned={p.tech.philosophy} title="Philosophy" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.meditation} canbuy={can_buy(3)} owned={p.tech.philosophy} title="Philosophy" cost={tech_cost(3)}/>
                 </div>
             </div>
         </div>
         <div class="row tech-row">
-            <TechItem pre={true} canbuy={tier_one()} owned={p.tech.fishing} title="Fishing" cost={tier_one_cost()}/>
+            <TechItem pre={true} canbuy={can_buy(1)} owned={p.tech.fishing} title="Fishing" cost={tech_cost(1)}/>
             <hr class="line line-required"/>
             <div class="tech-col">
                 <div class="tech-row">
-                    <TechItem pre={p.tech.fishing} canbuy={tier_two()} owned={p.tech.whaling} title="Whaling" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.fishing} canbuy={can_buy(2)} owned={p.tech.whaling} title="Whaling" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.whaling} canbuy={tier_three()} owned={p.tech.aquatism} title="Aquatism" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.whaling} canbuy={can_buy(3)} owned={p.tech.aquatism} title="Aquatism" cost={tech_cost(3)}/>
                 </div>
                 <div class="tech-row">
-                    <TechItem pre={p.tech.fishing} canbuy={tier_two()} owned={p.tech.sailing} title="Sailing" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.fishing} canbuy={can_buy(2)} owned={p.tech.sailing} title="Sailing" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.navigation} canbuy={tier_three()} owned={p.tech.navigation} title="Navigation" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.navigation} canbuy={can_buy(3)} owned={p.tech.navigation} title="Navigation" cost={tech_cost(3)}/>
                 </div>
             </div>
         </div>
         <div class="row tech-row">
-            <TechItem pre={true} canbuy={tier_one()} owned={p.tech.hunting} title="Hunting" cost={tier_one_cost()}/>
+            <TechItem pre={true} canbuy={can_buy(1)} owned={p.tech.hunting} title="Hunting" cost={tech_cost(1)}/>
             <hr class="line line-required"/>
             <div class="tech-col">
                 <div class="tech-row">
-                    <TechItem pre={p.tech.hunting} canbuy={tier_two()} owned={p.tech.archery} title="Archery" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.hunting} canbuy={can_buy(2)} owned={p.tech.archery} title="Archery" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.archery} canbuy={tier_three()} owned={p.tech.spiritualism} title="Spirtualisms" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.archery} canbuy={can_buy(3)} owned={p.tech.spiritualism} title="Spirtualisms" cost={tech_cost(3)}/>
                 </div>
                 <div class="tech-row">
-                    <TechItem pre={p.tech.hunting} canbuy={tier_two()} owned={p.tech.forestry} title="Forestry" cost={tier_two_cost()}/>
+                    <TechItem pre={p.tech.hunting} canbuy={can_buy(2)} owned={p.tech.forestry} title="Forestry" cost={tech_cost(2)}/>
                     <hr class="line line-required"/>
-                    <TechItem pre={p.tech.forestry} canbuy={tier_three()} owned={p.tech.mathematics} title="Mathematices" cost={tier_three_cost()}/>
+                    <TechItem pre={p.tech.forestry} canbuy={can_buy(3)} owned={p.tech.mathematics} title="Mathematices" cost={tech_cost(3)}/>
                 </div>
             </div>
         </div>

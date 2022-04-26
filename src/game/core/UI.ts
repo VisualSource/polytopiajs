@@ -102,6 +102,7 @@ export default class UI {
     /**
      * Get the description of the tile depending on the state of the player, world and tile
      * 
+     * TODO Update to work with il8n
      */
     public getDescription(): string {
         if(!this.ctr) return "";

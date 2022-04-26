@@ -2,14 +2,12 @@ import { nanoid } from "nanoid";
 import EventEmitter, { type SystemEventListener } from "../core/EventEmitter";
 import { Tile, BuildTile, City } from "./Tile";
 import { ObjectEvents, SystemEvents, UnitEvent } from "../events/systemEvents";
-import { RenderOrder } from "../core/renderOrder";
 import type { TileJson, CityJson } from './Tile';
 import type { WorldTile } from "./generator/WorldGenerator";
-import type {Position, TileBase, Tribe, UUID} from '../core/types';
+import type {Position, TileBase, Tribe, UUID, Sterilizable, Renderable, Construable } from '../core/types';
 import type InstancedObject from "./rendered/InstancedObject";
 import type CityTile from "./rendered/CityTile";
 import type Game from "../core/Game";
-import { GreaterDepth } from "three";
 
 /**
  * The selected object on this tile.
@@ -34,18 +32,18 @@ export interface TileControllerJson {
  * @emits UNIT 
  * @emits INTERACTION
  */
-export default class TileController implements SystemEventListener {
+export default class TileController implements SystemEventListener, Sterilizable<TileControllerJson>, Renderable, Construable<TileController, TileControllerJson> {
     /**
      * @constructor
      */
     static createFromJson(game: Game, json: TileControllerJson): TileController {
-        return new TileController(game).initFromJson(json);
+        return new TileController(game).jsonConstructor(json);
     }
     /**
      *@constructor
      */
     static createNew(game: Game, tile_data: WorldTile): TileController {
-        return new TileController(game).init(tile_data);
+        return new TileController(game).defaultConstructor(tile_data);
     }
     public selected: Selected = Selected.TILE; 
     public readonly uuid: UUID = nanoid();
@@ -117,7 +115,7 @@ export default class TileController implements SystemEventListener {
      * @return {*}  {this}
      * @memberof TileController
      */
-    public init(tile_data: WorldTile): this {
+    public defaultConstructor(tile_data: WorldTile): this {
         this.position = { row: tile_data.row, col: tile_data.col };
         this.tribe = tile_data.tribe;
         if(tile_data.base === "CITY") {
@@ -135,7 +133,7 @@ export default class TileController implements SystemEventListener {
      * @constructor
      * @memberof TileController
      */
-    public initFromJson(json: TileControllerJson): this {
+    public jsonConstructor(json: TileControllerJson): this {
         this.position = json.position;
         this.tribe = json.tribe;
         if(json.base.type === "CITY") {

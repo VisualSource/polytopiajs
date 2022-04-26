@@ -45,7 +45,7 @@ export default class ActionsManager implements SystemEventListener {
                     break;
                 case ActionEvent.DISBAND: {
                     if(!tile.unit) break;
-                    this.world.unit_controller.destoryUnit(tile.uuid);
+                    this.world.unit_controller.destoryUnit(tile.unit);
                     break;
                 }
                 case ActionEvent.GATHER:{

@@ -25,6 +25,7 @@ import TouchTap from './TouchTap';
 import type { SystemEventListener } from '../core/EventEmitter';
 import type InstancedObject from '../world/rendered/InstancedObject';
 import type CityTile from '../world/rendered/CityTile';
+import type { CameraPosition } from './types';
 
 
 interface Scenes {
@@ -55,14 +56,6 @@ interface SceneOptions {
     outline?: boolean;
 }
 
-interface CameraPosition {
-    target: { 
-        x: number, 
-        y: number, 
-        z: number 
-    }, 
-    zoom: number
-}
 export default class Engine implements SystemEventListener {
     private controls: CameraControls;
     private renderer: WebGLRenderer;

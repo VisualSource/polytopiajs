@@ -1,6 +1,5 @@
-//import { InstancedUniformsMesh } from 'three-instanced-uniforms-mesh';
 import { DynamicDrawUsage, Object3D, InstancedMesh, Matrix4 } from "three";
-import { remove, sortBy } from 'lodash-es';
+import { remove } from 'lodash-es';
 import EventEmittter from '../../core/EventEmitter';
 import type { SystemEventListener } from '../../core/EventEmitter';
 import type { UUID } from "../../core/types";

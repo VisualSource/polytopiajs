@@ -41,7 +41,7 @@ export default class TileUI {
         });
     }
     private interaction = (event: any): void => {
-        console.log("Event");
+       // console.log("Event");
         switch (event.id) {
             case ObjectEvents.SELECTION:
                 this.game.ui.setContext(event.data.world.row,event.data.world.col);

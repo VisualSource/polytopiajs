@@ -3,7 +3,7 @@ import random from "random";
 import { capitalize } from "lodash-es";
 
 import type { Manifest } from "../loaders/AssetLoader";
-import type {Position, TileBase, Tribe, UUID} from '../core/types';
+import type { Sterilizable, TileBase, Tribe, UUID, Construable } from '../core/types';
 import type AssetLoader from "../loaders/AssetLoader";
 import type Engine from "../core/Engine";
 import type CityTile from "./rendered/CityTile";
@@ -13,7 +13,7 @@ interface ITile {
     manifest: (tribe: Tribe) => Manifest;
 }
 
-const TO_TEXT = {
+const AS_TEXT = {
     0: "ZERO",
     1: "ONE",
     2: "TWO",
@@ -47,7 +47,7 @@ export interface CityJson {
  * @class Tile
  * @implements {ITile}
  */
-export class Tile implements ITile {
+export class Tile implements ITile, Sterilizable<TileJson>, Construable<Tile,TileJson> {
     static jsonConstructor(json: TileJson): Tile {
         return new Tile().jsonConstructor(json);
     }
@@ -72,7 +72,7 @@ export class Tile implements ITile {
     }
     public getType(tribe: Tribe){
         if(this.type === "OCEAN" || this.type === "WATER") {
-            return `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
+            return `${this.type}_${(AS_TEXT as any)[this.metadata?.model_id ?? 0]}`;
         } 
         return `${this.type}_${tribe.toUpperCase()}`;
     }
@@ -81,7 +81,7 @@ export class Tile implements ITile {
         switch (this.type) {
             case "WATER":
             case "OCEAN":{
-                let key = `${this.type}_${(TO_TEXT as any)[this.metadata?.model_id ?? 0]}`;
+                let key = `${this.type}_${(AS_TEXT as any)[this.metadata?.model_id ?? 0]}`;
                 return {
                     asset: key,
                     item: 0,
@@ -286,7 +286,7 @@ const CITY_SYLLABLES: {[tribe: string]: string[] } = {
     "imperius": ["ca","do", "ica", "ip", "lo", "lus", "ma", "mo", "mus", "nu", "pi", "re", "res", "ro", "sum", "te"]
 }
 
-export class City extends Tile {
+export class City extends Tile implements Sterilizable<CityJson>   {
     static cityJsonConstructor(json: CityJson): City {
         return new City().cityJsonConstructor(json);
     }
@@ -446,13 +446,13 @@ export class City extends Tile {
  * @class BuildTile
  * @implements {ITile}
  */
-export class BuildTile implements ITile {
+export class BuildTile implements ITile, Sterilizable<TileJson>, Construable<BuildTile,TileJson> {
     static createFromJson(json: TileJson | null): BuildTile | null {
         if(!json) return null;
-        return new BuildTile().initFromJson(json);
+        return new BuildTile().jsonConstructor(json);
     }
     static createNew(types: string[]): BuildTile {
-        return new BuildTile().init(types);
+        return new BuildTile().defaultConstructor(types);
     }
     public id: UUID = nanoid(4);
     public type: string;
@@ -466,7 +466,7 @@ export class BuildTile implements ITile {
      * @return {*}  {this}
      * @memberof BuildTile
      */
-    public init(types: string[]): this {
+    public defaultConstructor(types: string[]): this {
         // Ruins cover furit and game so we need to set the RUIN as the type to render,
         // and save the other object to be render later
         if(types.includes("RUIN")) {
@@ -486,7 +486,7 @@ export class BuildTile implements ITile {
      * @return {*}  {this}
      * @memberof BuildTile
      */
-    public initFromJson(json: TileJson): this {
+    public jsonConstructor(json: TileJson): this {
         this.type = json.type;
         this.metadata = json.metadata;
         return this;

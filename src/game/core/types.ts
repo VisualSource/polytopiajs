@@ -10,3 +10,27 @@ export type Skill = "CARRY" | "CONVERT" | "DASH" | "ESCAPE" | "FLOAT" | "FORTIFY
 export type UnitType = "WARRIOR" | "ARCHER" | "DEFENDER" | "RIDER" | "MIND_BENDER" | "SWORDSMAN" | "CATAPULT" | "KNIGHT" | "GIANT";
 
 export type UUID = string;
+
+export interface CameraPosition {
+    target: { 
+        x: number, 
+        y: number, 
+        z: number 
+    }, 
+    zoom: number
+}
+
+
+export interface Sterilizable<T> {
+    toJSON: () => T
+}
+
+export interface Renderable {
+    render: (...data: any[]) => Promise<void>,
+    destory: () => void
+}
+
+export interface Construable<S,J> {
+    defaultConstructor: (...data: any[]) => S,
+    jsonConstructor: (data: J) => S
+}

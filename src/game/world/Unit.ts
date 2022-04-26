@@ -1,8 +1,7 @@
 import { nanoid } from "nanoid";
-import { RenderOrder } from "../core/renderOrder";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
-import type {Position, Tribe, UUID, Skill, UnitType, TileBase } from "../core/types";
+import type {Position, Tribe, UUID, Skill, UnitType, TileBase, Sterilizable, Renderable, Construable } from "../core/types";
 import type PlayerController from "../managers/PlayerController";
 
 interface IUnit {
@@ -22,12 +21,12 @@ export interface UnitJson {
     health: number;
     is_veteran: boolean;
 } 
-export class Unit {
+export class Unit implements Sterilizable<UnitJson>, Renderable, Construable<Unit,UnitJson> {
     static createFromJson(engine: Engine, asset: AssetLoader, players: PlayerController, json: UnitJson): Unit {
-        return new Unit(engine,asset,players).initFromJson(json);
+        return new Unit(engine,asset,players).jsonConstructor(json);
     }
     static createNew(engine: Engine, asset: AssetLoader,players: PlayerController, data: IUnit): Unit {
-        return new Unit(engine,asset,players).initDefault(data);
+        return new Unit(engine,asset,players).defaultConstructor(data);
     }
     static readonly UNIT_MODEL_ID: { [tribe: string]: number } = {
         "imperius": 0,
@@ -72,13 +71,13 @@ export class Unit {
     private get model_index(): number {
         return Unit.UNIT_MODEL_ID[this.tribe];
     }
-    public initDefault(data: IUnit): this {
+    public defaultConstructor(data: IUnit): this {
         this.position = data.position;
         this.type = data.type;
         this.tribe = data.tribe;
         this.orgin = data.orgin;
 
-        const {range,maxHealth,movement,skills,defence,attack} = Unit.UNIT_DATA[this.type];
+        const { range, maxHealth, movement, skills, defence, attack } = Unit.UNIT_DATA[this.type];
         this.movement = movement;
         this.range = range;
         this.skills = skills;
@@ -91,7 +90,7 @@ export class Unit {
          // use the commented part when we have models to use for the diffenent tribes and unit types.
         return this;
     }
-    public initFromJson(json: UnitJson): this {
+    public jsonConstructor(json: UnitJson): this {
         this.position = json.position;
         this.type = json.type;
         this.tribe = json.tribe;
@@ -116,6 +115,7 @@ export class Unit {
         }
     }
     get vaild_terrian(): TileBase[] {
+        //TODO: rework how vaild tiles are selected
         if(this.skills.includes("FLOAT")) {
             if(this.players.playerHasTech(this.tribe,"navigation")) {
                 return ["WATER","OCEAN"];
@@ -152,11 +152,11 @@ export class Unit {
     public get visible(): boolean {
         return this._visable;
     }
-    public reset(){
+    public reset(): void {
         this.hasMoved = false;
         this.hasAttacked = false;
     }
-    public destory(){
+    public destory(): void {
         const model = this.engine.scenes.unit.getObject(this.model_id);
         if(!model) throw new Error(`Failed to destory non-existint object for Unit: (${this.tribe}_${this.type} | ${this.uuid}) `);
         model.removeInstance(this.uuid);

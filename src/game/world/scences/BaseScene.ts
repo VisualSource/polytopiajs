@@ -1,6 +1,6 @@
-import type { BehaviorSubject } from "rxjs";
 import { Group, Scene } from "three";
 import InstancedObject from "../rendered/InstancedObject";
+import type { BehaviorSubject } from "rxjs";
 
 export default class BaseScene extends Scene {
     constructor(private level: BehaviorSubject<string>) {

@@ -1,7 +1,8 @@
-import InstancedObject from "./rendered/InstancedObject";
 import { Color } from "three";
-import {SystemEvents, UnitEvent, ObjectEvents, ActionEvent} from '../events/systemEvents';
 import { nanoid } from "nanoid";
+
+import InstancedObject from "./rendered/InstancedObject";
+import { SystemEvents, UnitEvent, ObjectEvents, ActionEvent } from '../events/systemEvents';
 import EventEmitter from "../core/EventEmitter";
 import { Unit } from "./Unit";
 import { chebyshev_distance } from "../../utils/math";

@@ -329,7 +329,7 @@ export default class AssetLoader  {
                     this.audio.set(asset.data.name,asset.data.asset as AudioBuffer);
                     break;
                 case "partical":
-                    this.particals.set(asset.data.name,asset.data.asset);
+                    this.particals.set(asset.data.name,asset.data.asset as Nebula);
                     break;
                 default:
                     break;

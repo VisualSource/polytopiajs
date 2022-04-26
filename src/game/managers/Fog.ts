@@ -1,7 +1,9 @@
+import { nanoid } from 'nanoid';
+
 import EventEmitter from "../core/EventEmitter";
 import { SystemEvents, GameEvent } from "../events/systemEvents";
-import {nanoid} from 'nanoid';
 import InstancedObject, { type WorldObjectData } from '../world/rendered/InstancedObject';
+
 import type { SystemEventListener } from "../core/EventEmitter";
 import type { Tribe } from "../core/types";
 import type NArray from "../../utils/NArray";

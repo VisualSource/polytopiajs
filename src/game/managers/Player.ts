@@ -1,5 +1,5 @@
 import type NArray from "../../utils/NArray";
-import type { Tribe, UUID } from "../core/types";
+import type { CameraPosition, Tribe, UUID } from "../core/types";
 
 interface ITech {
     climbing: boolean;
@@ -60,7 +60,7 @@ export default class Player {
     public star_gain: number = 2;
     public citys: number = 1;
     public capital_uuid: UUID;
-    public camera: { target: { x: number, y: number, z: number }, zoom: number } | null = null;
+    public camera: CameraPosition | null = null;
     public fog_map: NArray<number> | null = null;
     constructor(public tribe: Tribe, public uuid: UUID | null){
         switch (tribe) {

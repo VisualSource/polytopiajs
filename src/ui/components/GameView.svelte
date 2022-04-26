@@ -28,7 +28,7 @@ import type { Subscription } from 'rxjs';
         sub = game.ready.subscribe(async (value)=>{
             if(!value) return;
         
-            const ok = await game.launchGame(settings,canvas);
+            const ok = await game.launchGame(settings as any,canvas);
             if(!ok) return;
             await timer(1000);
 
