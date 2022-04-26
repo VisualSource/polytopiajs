@@ -6,8 +6,8 @@
  */
 export default class NArray<T> {
     /*
-    *   1  2
-    *  [ ][ ] 
+    *        2
+    *  1 [ ][ ] 
     *   1 => ROW
     *   2 => COL
     */

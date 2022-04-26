@@ -10,8 +10,3 @@ export type Skill = "CARRY" | "CONVERT" | "DASH" | "ESCAPE" | "FLOAT" | "FORTIFY
 export type UnitType = "WARRIOR" | "ARCHER" | "DEFENDER" | "RIDER" | "MIND_BENDER" | "SWORDSMAN" | "CATAPULT" | "KNIGHT" | "GIANT";
 
 export type UUID = string;
-
-export abstract class Constructable {
-    public abstract defaultConstructor(...params: any[]): this;
-    public abstract jsonConstructor(...params: any[]): this;
-}

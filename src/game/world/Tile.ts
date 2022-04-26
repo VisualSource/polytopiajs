@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import random from "random";
-import { capitalize } from "../../utils/strings";
+import { capitalize } from "lodash-es";
 
 import type { Manifest } from "../loaders/AssetLoader";
 import type {Position, TileBase, Tribe, UUID} from '../core/types';

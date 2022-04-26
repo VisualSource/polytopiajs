@@ -1,4 +1,4 @@
-import { type Object3D, type Mesh, type Camera, Matrix4, Vector3 } from "three";
+import { type Object3D, type Camera, Matrix4, Vector3 } from "three";
 
 export const Transparency = {
     init: <T extends Object3D & { material: { transparent: boolean, depthWrite: boolean } }>(objects: T[]): void => {

@@ -4,6 +4,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+import { BehaviorSubject } from 'rxjs';
 import CameraControls from 'camera-controls';
 import { WebGLRenderer, OrthographicCamera, Fog,
     MathUtils, MOUSE, Quaternion, Vector2 , Vector3, 
@@ -24,7 +25,7 @@ import TouchTap from './TouchTap';
 import type { SystemEventListener } from '../core/EventEmitter';
 import type InstancedObject from '../world/rendered/InstancedObject';
 import type CityTile from '../world/rendered/CityTile';
-import { BehaviorSubject } from 'rxjs';
+
 
 interface Scenes {
     unit: UnitScene,
@@ -42,11 +43,25 @@ interface Renders {
     }
 }
 
+interface Hover {
+    INTERSECTION: any; 
+    pointer: Vector2;
+}
+
 interface SceneOptions { 
     lights?: boolean; 
     rootScene?: boolean;
     ffaa?: boolean;
     outline?: boolean;
+}
+
+interface CameraPosition {
+    target: { 
+        x: number, 
+        y: number, 
+        z: number 
+    }, 
+    zoom: number
 }
 export default class Engine implements SystemEventListener {
     private controls: CameraControls;
@@ -56,7 +71,7 @@ export default class Engine implements SystemEventListener {
     private raycaster: Raycaster = new Raycaster();
     private textureLoader: TextureLoader = new TextureLoader();
     private touch: TouchTap | null = null;
-    private hover: { INTERSECTION: any; pointer: Vector2; } = {
+    private hover: Hover = {
         INTERSECTION: null,
         pointer: new Vector2()
     };
@@ -320,6 +335,10 @@ export default class Engine implements SystemEventListener {
         this.renderer.render(this.scenes.tile,this.camera);
         this.renderer.autoClear = false;
         this.renderer.clearDepth();
+
+        // building layer
+
+
         // selector layer
         this.renderer.render(this.scenes.selector,this.camera);
         this.renderer.clearDepth();
@@ -332,13 +351,13 @@ export default class Engine implements SystemEventListener {
         
        // Transparency.update(this.scene.children as any, this.camera);
     }
-    set setCameraPos(data: { target: { x: number, y: number, z: number }, zoom: number }) {
+    set setCameraPos(data: CameraPosition) {
         this.controls.setTarget(data.target.x,data.target.y,data.target.z,false);
         this.controls.zoomTo(data.zoom,false);
         this.controls.polarAngle = 0.8726646259971647;
         this.controls.azimuthAngle = 3.9269908169872414;
     }
-    get getCameraPos(): { target: { x: number, y: number, z: number }, zoom: number } {
+    get getCameraPos(): CameraPosition {
         const target = new Vector3();
         this.controls.getTarget(target);
         return {

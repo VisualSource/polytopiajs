@@ -9,7 +9,7 @@ export function init(game: Game){
 
     const actions = {
         "Reset Units": function() {
-            game.world.units.forEach(unit=>{
+            game.engine.scenes.unit.forUnit((unit)=>{
                 unit.reset();
             });
         },
@@ -44,8 +44,8 @@ export function init(game: Game){
     gui.add(actions,"Reload Assets");
     gui.add(actions,"Hide Fog");
     gui.add(actions,"Active Player",["imperius","bardur"]).onChange((value: Tribe)=>{
-        game.players.activePlayer = value;
-        game.world.units.forEach(unit=>{
+        //change player here.
+        game.engine.scenes.unit.forUnit((unit)=>{
             unit.reset();
         });
     });

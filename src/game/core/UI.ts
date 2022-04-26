@@ -1,4 +1,4 @@
-import { capitalize } from "../../utils/strings";
+import { capitalize } from "lodash-es";
 import { ActionEvent } from "../events/systemEvents";
 import type TileController from "../world/TileController";
 import type { City } from "../world/Tile";

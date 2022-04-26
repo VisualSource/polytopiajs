@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { RenderOrder } from "../core/renderOrder";
 import type Engine from "../core/Engine";
 import type AssetLoader from "../loaders/AssetLoader";
-import type {Position, Tribe, UUID, Skill, UnitType } from "../core/types";
+import type {Position, Tribe, UUID, Skill, UnitType, TileBase } from "../core/types";
 import type PlayerController from "../managers/PlayerController";
 
 interface IUnit {
@@ -115,7 +115,13 @@ export class Unit {
             is_veteran: this.isVeteran,
         }
     }
-    get vaild_terrian(): string[] {
+    get vaild_terrian(): TileBase[] {
+        if(this.skills.includes("FLOAT")) {
+            if(this.players.playerHasTech(this.tribe,"navigation")) {
+                return ["WATER","OCEAN"];
+            }
+            return ["WATER"];
+        }
         if(this.players.playerHasTech(this.tribe,"climbing")){
             return ["LAND","FOREST","MOUNTAIN","CITY"];
         }

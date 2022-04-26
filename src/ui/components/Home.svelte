@@ -1,6 +1,9 @@
 <script lang="ts">
     import {link} from 'svelte-spa-router';
     import { _ } from 'svelte-i18n';
+    import {replace} from 'svelte-spa-router';
+
+    replace("/playing");
 </script>
 
 <a use:link href="/playing?init=true&size=121&tribes=bardur,imperius&mode=domination&online=false&type=sp">Create local SP Game</a>
